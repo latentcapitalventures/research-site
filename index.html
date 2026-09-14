@@ -1,13 +1,106 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Latent Capital · Research</title>
-<style>
-  body{font-family:system-ui,sans-serif;max-width:40rem;margin:2rem auto;padding:0 1rem;color:#1c1915;background:#f7f3eb;line-height:1.5}
-  a{color:#2a7a73} li{margin:0.4rem 0}
-</style></head><body>
-<h1>Research packs</h1>
-<p>Public HTML outputs only. Build source stays private.</p>
-<ul>
-  <li><a href="SPOT/">SPOT — Spotify after the soft guide</a> · <a href="SPOT/report.pdf">PDF</a></li>
-</ul>
-</body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Research packs</title>
+  <style>
+    :root {
+      --paper: #f7f3eb;
+      --card: #fffcf7;
+      --ink: #1c1915;
+      --muted: #5c574f;
+      --rule: #d4cbb8;
+      --brick: #b54a3c;
+      --teal: #2a7a73;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+      font-size: 17px;
+      line-height: 1.5;
+    }
+    main {
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: 1.5rem 1.15rem 3rem;
+    }
+    header.mast {
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .kicker {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 600;
+      margin: 0.25rem 0 0.4rem;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+    p { margin: 0 0 0.85rem; }
+    .meta { color: var(--muted); font-size: 0.92rem; }
+    ul.packs {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0;
+    }
+    ul.packs li {
+      background: var(--card);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      margin: 0 0 0.65rem;
+    }
+    ul.packs a {
+      color: var(--teal);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    ul.packs a:hover { text-decoration: underline; }
+    .pdf {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-left: 0.5rem;
+    }
+    .empty { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="mast">
+      <div class="kicker">Latent · research packs</div>
+      <h1>Published desks</h1>
+      <p class="meta">Public host:
+        <a href="https://latentcapitalventures.github.io/research-site/">https://latentcapitalventures.github.io/research-site/</a>.
+        Source stays in private research-packs.</p>
+    </header>
+    
+    <ul class="packs">
+      
+      <li>
+        <a href="SPOT/">SPOT</a>
+        <a class="pdf" href="SPOT/report.pdf">PDF</a>
+      </li>
+      
+      <li>
+        <a href="SPOT-conversion/">SPOT-conversion</a>
+        <a class="pdf" href="SPOT-conversion/report.pdf">PDF</a>
+      </li>
+      
+    </ul>
+    
+  </main>
+</body>
+</html>
