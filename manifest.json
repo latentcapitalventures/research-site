@@ -15,7 +15,24 @@
           "path": "SPOT-conversion/",
           "kind": "dig"
         }
-      ]
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "SPOT-conversion",
+      "name": "Spotify conversion",
+      "path": "SPOT-conversion/",
+      "kind": "dig",
+      "summary": "Premium conversion dig — lag test, seasonal calendar, growth wedge, and hike overlay.",
+      "updated": "2026-09-17",
+      "related": [
+        {
+          "label": "SPOT key metrics",
+          "path": "SPOT/",
+          "kind": "key-metrics"
+        }
+      ],
+      "pdf": false
     },
     {
       "ticker": "GOOGL",
@@ -23,7 +40,8 @@
       "path": "GOOGL/",
       "kind": "key-metrics",
       "summary": "Search & ads scoreboard, Cloud, FCF, TAC, and weekly trailing / forward PE.",
-      "updated": "2026-09-17"
+      "updated": "2026-09-17",
+      "pdf": false
     },
     {
       "ticker": "IBKR",
@@ -31,7 +49,8 @@
       "path": "IBKR/",
       "kind": "key-metrics",
       "summary": "Fee tollbooth, account growth, and weekly trailing / forward PE.",
-      "updated": "2026-09-17"
+      "updated": "2026-09-17",
+      "pdf": false
     },
     {
       "ticker": "Z",
@@ -39,7 +58,8 @@
       "path": "Z/",
       "kind": "key-metrics",
       "summary": "Visits, TTV bps, Rentals/ZHL, PE unlock, Preferred mix, and Comscore reach.",
-      "updated": "2026-09-17"
+      "updated": "2026-09-17",
+      "pdf": false
     }
   ]
 }
