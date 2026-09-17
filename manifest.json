@@ -1,0 +1,45 @@
+{
+  "title": "Latent Capital · Research",
+  "updated": "2026-09-17",
+  "packs": [
+    {
+      "ticker": "SPOT",
+      "name": "Spotify",
+      "path": "SPOT/",
+      "kind": "key-metrics",
+      "summary": "Users, monetization, P&L trajectory, and weekly trailing / forward PE.",
+      "updated": "2026-09-17",
+      "related": [
+        {
+          "label": "Premium conversion dig",
+          "path": "SPOT-conversion/",
+          "kind": "dig"
+        }
+      ]
+    },
+    {
+      "ticker": "GOOGL",
+      "name": "Alphabet",
+      "path": "GOOGL/",
+      "kind": "key-metrics",
+      "summary": "Search & ads scoreboard, Cloud, FCF, TAC, and weekly trailing / forward PE.",
+      "updated": "2026-09-17"
+    },
+    {
+      "ticker": "IBKR",
+      "name": "Interactive Brokers",
+      "path": "IBKR/",
+      "kind": "key-metrics",
+      "summary": "Fee tollbooth, account growth, and weekly trailing / forward PE.",
+      "updated": "2026-09-17"
+    },
+    {
+      "ticker": "Z",
+      "name": "Zillow Group",
+      "path": "Z/",
+      "kind": "key-metrics",
+      "summary": "Visits, TTV bps, Rentals/ZHL, PE unlock, Preferred mix, and Comscore reach.",
+      "updated": "2026-09-17"
+    }
+  ]
+}

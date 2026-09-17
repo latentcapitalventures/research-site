@@ -1,9 +1,13 @@
-# research-site
+# Latent research site
 
-Public static host for Latent Capital desk research packs (HTML + PDF only).
+Public GitHub Pages host for Latent Capital desk research packs.
 
-- **Source / build:** private [`research-packs`](https://github.com/latentcapitalventures/research-packs)
-- **This repo:** published `site/{TICKER}/` only — no series.json, no IR dumps, no Tylor
-- **Pages:** `https://latentcapitalventures.github.io/research-site/`
+**Hub:** https://latentcapitalventures.github.io/research-site/
 
-Do not commit analytics cabinets or filing HTMs here.
+## Updating the index when a pack publishes
+
+1. Publish / copy the pack HTML under `SPOT/`, `GOOGL/`, `IBKR/`, `Z/`, etc.
+2. Edit `manifest.json` — add or refresh the pack entry (`ticker`, `name`, `path`, `kind`, `summary`, `updated`).
+3. Commit and push `main`. Pages rebuilds the hub automatically.
+
+Source builds live in the private `research-packs` repo. Cursor/`cursor[bot]` often lacks write access here; CoS pushes after pack publish.

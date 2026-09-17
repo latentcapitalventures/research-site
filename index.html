@@ -3,51 +3,257 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Research packs</title>
+  <meta name="color-scheme" content="dark light"/>
+  <title>Latent Capital · Research</title>
   <style>
     :root {
-      --paper: #f7f3eb;
-      --card: #fffcf7;
-      --ink: #1c1915;
-      --muted: #5c574f;
-      --rule: #d4cbb8;
-      --teal: #2a7a73;
+      --bg: #0e1116;
+      --bg-elev: #161b22;
+      --card: #1c2330;
+      --card-hover: #232b3a;
+      --ink: #e8edf5;
+      --muted: #9aa6b8;
+      --rule: #2a3344;
+      --accent: #5ee1c5;
+      --accent-dim: rgba(94, 225, 197, 0.14);
+      --chip: #2a3344;
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      --radius: 16px;
+      --font: "Segoe UI", ui-sans-serif, system-ui, -apple-system, sans-serif;
+      --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f4f0e8;
+        --bg-elev: #fffcf7;
+        --card: #fffcf7;
+        --card-hover: #fff;
+        --ink: #1c1915;
+        --muted: #5c574f;
+        --rule: #d4cbb8;
+        --accent: #1f7a6c;
+        --accent-dim: rgba(31, 122, 108, 0.12);
+        --chip: #ebe4d6;
+        --shadow: 0 10px 30px rgba(40, 30, 10, 0.08);
+      }
     }
     * { box-sizing: border-box; }
     html, body {
       margin: 0; padding: 0;
-      background: var(--paper); color: var(--ink);
-      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
-      font-size: 17px; line-height: 1.5;
+      background: var(--bg); color: var(--ink);
+      font-family: var(--font);
+      font-size: 16px; line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
-    main { max-width: 40rem; margin: 0 auto; padding: 1.5rem 1.15rem 3rem; }
-    header.mast { border-bottom: 1px solid var(--rule); padding-bottom: 1rem; margin-bottom: 1.25rem; }
-    .kicker { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
-    h1 { font-size: 1.85rem; font-weight: 600; margin: 0.25rem 0 0.4rem; letter-spacing: -0.02em; line-height: 1.15; }
-    p { margin: 0 0 0.85rem; }
-    .meta { color: var(--muted); font-size: 0.92rem; }
-    ul.packs { list-style: none; padding: 0; margin: 1rem 0 0; }
-    ul.packs li { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 0.85rem 1rem; margin: 0 0 0.65rem; }
-    ul.packs a { color: var(--teal); font-weight: 600; text-decoration: none; }
-    ul.packs a:hover { text-decoration: underline; }
+    a { color: inherit; }
+    .wrap { max-width: 72rem; margin: 0 auto; padding: 1.25rem 1.1rem 3.5rem; }
+    header.mast {
+      display: flex; flex-direction: column; gap: 0.75rem;
+      padding: 0.5rem 0 1.5rem; margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .brand-row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .kicker {
+      font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); font-weight: 600;
+    }
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(1.75rem, 5vw, 2.35rem);
+      font-weight: 600; letter-spacing: -0.02em;
+      margin: 0.15rem 0 0; line-height: 1.15;
+    }
+    .lede { margin: 0; color: var(--muted); max-width: 36rem; font-size: 0.98rem; }
+    .nav-pills {
+      display: flex; flex-wrap: wrap; gap: 0.45rem;
+      position: sticky; top: 0; z-index: 5;
+      padding: 0.65rem 0; margin: 0 0 1rem;
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(8px);
+    }
+    .nav-pills a {
+      display: inline-flex; align-items: center;
+      padding: 0.45rem 0.75rem; min-height: 2.5rem;
+      border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--bg-elev); color: var(--ink);
+      text-decoration: none; font-size: 0.85rem; font-weight: 600;
+    }
+    .nav-pills a:hover, .nav-pills a:focus-visible {
+      border-color: var(--accent); color: var(--accent);
+      outline: none;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    @media (min-width: 640px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 1.15rem; }
+    }
+    .card {
+      display: flex; flex-direction: column; gap: 0.85rem;
+      background: var(--card); border: 1px solid var(--rule);
+      border-radius: var(--radius); padding: 1.15rem 1.2rem 1.2rem;
+      box-shadow: var(--shadow);
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+    .card:hover { background: var(--card-hover); border-color: color-mix(in srgb, var(--accent) 35%, var(--rule)); }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
+    .name { font-family: var(--serif); font-size: 1.35rem; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+    .ticker {
+      flex-shrink: 0;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em;
+      padding: 0.35rem 0.55rem; border-radius: 8px;
+      background: var(--accent-dim); color: var(--accent);
+    }
+    .summary { margin: 0; color: var(--muted); font-size: 0.95rem; flex: 1; }
+    .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .tag {
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 0.3rem 0.55rem; border-radius: 6px; background: var(--chip); color: var(--muted);
+    }
+    .meta-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; }
+    .updated { font-size: 0.8rem; color: var(--muted); }
+    .actions { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.15rem; }
+    @media (min-width: 420px) {
+      .actions { flex-direction: row; flex-wrap: wrap; align-items: center; }
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 2.75rem; padding: 0.65rem 1.1rem;
+      border-radius: 10px; text-decoration: none; font-weight: 650; font-size: 0.95rem;
+      background: var(--accent); color: #06241e;
+    }
+    @media (prefers-color-scheme: light) {
+      .btn { color: #fff; }
+    }
+    .btn:hover { filter: brightness(1.05); }
+    .btn-secondary {
+      background: transparent; color: var(--ink);
+      border: 1px solid var(--rule);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    footer {
+      margin-top: 2.25rem; padding-top: 1.25rem; border-top: 1px solid var(--rule);
+      color: var(--muted); font-size: 0.85rem;
+    }
+    footer a { color: var(--accent); }
+    .status { font-size: 0.8rem; color: var(--muted); margin: 0 0 0.75rem; }
   </style>
 </head>
 <body>
-  <main>
+  <div class="wrap">
     <header class="mast">
-      <div class="kicker">Latent · research packs</div>
-      <h1>Published desks</h1>
-      <p class="meta">Public host:
-        <a href="https://latentcapitalventures.github.io/research-site/">https://latentcapitalventures.github.io/research-site/</a>.
-        Source stays in private research-packs.</p>
+      <div class="brand-row">
+        <div>
+          <div class="kicker">Latent Capital</div>
+          <h1>Research</h1>
+        </div>
+      </div>
+      <p class="lede">Latest published desk briefs — key metrics and digs. Tap a card to open the live report.</p>
     </header>
-    <ul class="packs">
-      <li><a href="SPOT/">SPOT</a> — Spotify key metrics</li>
-      <li><a href="SPOT-conversion/">SPOT-conversion</a> — Premium conversion dig</li>
-      <li><a href="GOOGL/">GOOGL</a> — Alphabet key metrics</li>
-      <li><a href="Z/">Z</a> — Zillow key metrics</li>
-      <li><a href="IBKR/">IBKR</a> — Interactive Brokers key metrics</li>
-    </ul>
-  </main>
+
+    <nav class="nav-pills" id="nav" aria-label="Tickers"></nav>
+    <p class="status" id="status" hidden></p>
+    <section class="grid" id="grid" aria-live="polite"></section>
+
+    <footer>
+      Public host only. Source packs stay private.
+      Catalog: <code>manifest.json</code> — CoS updates it when a pack publishes.
+    </footer>
+  </div>
+  <script>
+    const FALLBACK = {
+      title: "Latent Capital · Research",
+      updated: "2026-09-17",
+      packs: [
+        {
+          ticker: "SPOT", name: "Spotify", path: "SPOT/", kind: "key-metrics",
+          summary: "Users, monetization, P&L trajectory, and weekly trailing / forward PE.",
+          updated: "2026-09-17",
+          related: [{ label: "Premium conversion dig", path: "SPOT-conversion/", kind: "dig" }]
+        },
+        {
+          ticker: "GOOGL", name: "Alphabet", path: "GOOGL/", kind: "key-metrics",
+          summary: "Search & ads scoreboard, Cloud, FCF, TAC, and weekly trailing / forward PE.",
+          updated: "2026-09-17"
+        },
+        {
+          ticker: "IBKR", name: "Interactive Brokers", path: "IBKR/", kind: "key-metrics",
+          summary: "Fee tollbooth, account growth, and weekly trailing / forward PE.",
+          updated: "2026-09-17"
+        },
+        {
+          ticker: "Z", name: "Zillow Group", path: "Z/", kind: "key-metrics",
+          summary: "Visits, TTV bps, Rentals/ZHL, PE unlock, Preferred mix, and Comscore reach.",
+          updated: "2026-09-17"
+        }
+      ]
+    };
+
+    function kindLabel(kind) {
+      if (kind === "dig") return "Dig";
+      if (kind === "key-metrics") return "Key metrics";
+      return kind || "Report";
+    }
+
+    function render(data) {
+      const nav = document.getElementById("nav");
+      const grid = document.getElementById("grid");
+      nav.innerHTML = "";
+      grid.innerHTML = "";
+      data.packs.forEach((p) => {
+        const pill = document.createElement("a");
+        pill.href = "#" + p.ticker;
+        pill.textContent = p.ticker;
+        nav.appendChild(pill);
+
+        const card = document.createElement("article");
+        card.className = "card";
+        card.id = p.ticker;
+
+        const related = (p.related || []).map((r) =>
+          `<a class="btn btn-secondary" href="${r.path}">${r.label}</a>`
+        ).join("");
+
+        card.innerHTML = `
+          <div class="card-top">
+            <h2 class="name">${p.name}</h2>
+            <span class="ticker">${p.ticker}</span>
+          </div>
+          <p class="summary">${p.summary || ""}</p>
+          <div class="tags">
+            <span class="tag">${kindLabel(p.kind)}</span>
+            ${(p.related || []).map((r) => `<span class="tag">${kindLabel(r.kind)}</span>`).join("")}
+          </div>
+          <div class="meta-row">
+            <span class="updated">${p.updated ? "Updated " + p.updated : ""}</span>
+          </div>
+          <div class="actions">
+            <a class="btn" href="${p.path}">Open report</a>
+            ${related}
+          </div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    async function boot() {
+      const status = document.getElementById("status");
+      try {
+        const res = await fetch("manifest.json", { cache: "no-store" });
+        if (!res.ok) throw new Error("manifest " + res.status);
+        const data = await res.json();
+        render(data);
+      } catch (e) {
+        status.hidden = false;
+        status.textContent = "Using built-in catalog (manifest unavailable).";
+        render(FALLBACK);
+      }
+    }
+    boot();
+  </script>
 </body>
 </html>
