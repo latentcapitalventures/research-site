@@ -50,6 +50,13 @@
       "kind": "key-metrics",
       "summary": "Fee tollbooth, account growth, and weekly trailing / forward PE.",
       "updated": "2026-09-17",
+      "related": [
+        {
+          "label": "Fee-toll intensity dig",
+          "path": "IBKR-intensity/",
+          "kind": "dig"
+        }
+      ],
       "pdf": false
     },
     {
@@ -59,6 +66,22 @@
       "kind": "key-metrics",
       "summary": "Visits, TTV bps, Rentals/ZHL, PE unlock, Preferred mix, and Comscore reach.",
       "updated": "2026-09-17",
+      "pdf": false
+    },
+    {
+      "ticker": "IBKR-intensity",
+      "name": "IBKR fee-toll intensity",
+      "path": "IBKR-intensity/",
+      "kind": "dig",
+      "summary": "Fee-toll intensity dig — per-account / per-order / per-equity take, growth decomposition, and real-vs-nominal reads.",
+      "updated": "2026-09-17",
+      "related": [
+        {
+          "label": "IBKR key metrics",
+          "path": "IBKR/",
+          "kind": "key-metrics"
+        }
+      ],
       "pdf": false
     }
   ]
