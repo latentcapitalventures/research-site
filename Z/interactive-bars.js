@@ -2,6 +2,12 @@
  * House interactive bar charts (Chart.js).
  * Modes: stacked | stacked100 | grouped.
  * Tooltips: period label, each series $ value + % share of period total.
+ *
+ * HOUSE RULE (composition only): offer Stacked / 100% / Grouped only when the
+ * series are additive parts of one disclosed whole (true composition) — e.g.
+ * Residential + Mortgages + Rentals = company revenue. For parallel metrics
+ * that do not sum (revenue vs Adj. EBITDA, visits vs AMUU), do not set
+ * interactive / do not expose stacked or stacked100 — keep the matplotlib PNG.
  */
 (function () {
   "use strict";
