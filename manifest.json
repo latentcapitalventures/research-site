@@ -71,6 +71,11 @@
           "label": "Marketplace mix pilot (2026-09-21)",
           "path": "Z-pilot-2026-09-21/",
           "kind": "dig"
+        },
+        {
+          "label": "Marketplace mix pilot v2 (2026-09-21)",
+          "path": "Z-pilot-2026-09-21-v2/",
+          "kind": "dig"
         }
       ],
       "pdf": false
@@ -87,6 +92,32 @@
           "label": "Z key metrics",
           "path": "Z/",
           "kind": "key-metrics"
+        },
+        {
+          "label": "Marketplace mix pilot v2",
+          "path": "Z-pilot-2026-09-21-v2/",
+          "kind": "dig"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "Z-pilot-2026-09-21-v2",
+      "name": "Zillow key metrics — marketplace mix, take-rate, falsifiers (v2)",
+      "path": "Z-pilot-2026-09-21-v2/",
+      "kind": "dig",
+      "summary": "Pilot v2 — derived For Sale marked on the chart, GAAP net income grouped with revenue and adjusted EBITDA, falsifiers.",
+      "updated": "2026-09-21",
+      "related": [
+        {
+          "label": "Z key metrics",
+          "path": "Z/",
+          "kind": "key-metrics"
+        },
+        {
+          "label": "Marketplace mix pilot v1",
+          "path": "Z-pilot-2026-09-21/",
+          "kind": "dig"
         }
       ],
       "pdf": false
