@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Research",
-  "updated": "2026-09-17",
+  "updated": "2026-09-20",
   "packs": [
     {
       "ticker": "SPOT",
@@ -16,7 +16,7 @@
           "kind": "dig"
         }
       ],
-      "pdf": false
+      "pdf": true
     },
     {
       "ticker": "SPOT-conversion",
@@ -32,7 +32,7 @@
           "kind": "key-metrics"
         }
       ],
-      "pdf": false
+      "pdf": true
     },
     {
       "ticker": "GOOGL",
@@ -65,7 +65,7 @@
       "path": "Z/",
       "kind": "key-metrics",
       "summary": "Visits, TTV bps, Rentals/ZHL, PE unlock, Preferred mix, and Comscore reach.",
-      "updated": "2026-09-17",
+      "updated": "2026-09-20",
       "pdf": false
     },
     {
