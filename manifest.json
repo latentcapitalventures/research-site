@@ -83,6 +83,11 @@
           "label": "Fee-toll intensity dig",
           "path": "IBKR-intensity/",
           "kind": "dig"
+        },
+        {
+          "label": "Key metrics zbar (2026-09-21)",
+          "path": "IBKR-zbar-2026-09-21/",
+          "kind": "dig"
         }
       ],
       "pdf": false
@@ -182,6 +187,27 @@
         {
           "label": "Premium conversion dig",
           "path": "SPOT-conversion/",
+          "kind": "dig"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "IBKR-zbar-2026-09-21",
+      "name": "IBKR key metrics (zbar)",
+      "path": "IBKR-zbar-2026-09-21/",
+      "kind": "dig",
+      "summary": "From-scratch key metrics — fee toll, franchise scale, and API moat (2026-09-21).",
+      "updated": "2026-09-21",
+      "related": [
+        {
+          "label": "IBKR key metrics",
+          "path": "IBKR/",
+          "kind": "key-metrics"
+        },
+        {
+          "label": "Fee-toll intensity dig",
+          "path": "IBKR-intensity/",
           "kind": "dig"
         }
       ],
