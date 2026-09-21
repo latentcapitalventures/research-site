@@ -14,6 +14,11 @@
           "label": "Premium conversion dig",
           "path": "SPOT-conversion/",
           "kind": "dig"
+        },
+        {
+          "label": "Key metrics zbar (2026-09-21)",
+          "path": "SPOT-zbar-2026-09-21/",
+          "kind": "dig"
         }
       ],
       "pdf": false
@@ -157,6 +162,27 @@
           "label": "IBKR key metrics",
           "path": "IBKR/",
           "kind": "key-metrics"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "SPOT-zbar-2026-09-21",
+      "name": "Spotify key metrics (zbar)",
+      "path": "SPOT-zbar-2026-09-21/",
+      "kind": "dig",
+      "summary": "From-scratch Spotify key metrics — marketplace mix, ARPU, and falsifiers (2026-09-21). Does not replace SPOT.",
+      "updated": "2026-09-21",
+      "related": [
+        {
+          "label": "SPOT key metrics",
+          "path": "SPOT/",
+          "kind": "key-metrics"
+        },
+        {
+          "label": "Premium conversion dig",
+          "path": "SPOT-conversion/",
+          "kind": "dig"
         }
       ],
       "pdf": false
