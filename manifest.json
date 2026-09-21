@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Research",
-  "updated": "2026-09-20",
+  "updated": "2026-09-21",
   "packs": [
     {
       "ticker": "SPOT",
@@ -16,7 +16,7 @@
           "kind": "dig"
         }
       ],
-      "pdf": true
+      "pdf": false
     },
     {
       "ticker": "SPOT-conversion",
@@ -32,7 +32,7 @@
           "kind": "key-metrics"
         }
       ],
-      "pdf": true
+      "pdf": false
     },
     {
       "ticker": "GOOGL",
@@ -66,6 +66,29 @@
       "kind": "key-metrics",
       "summary": "Visits, TTV bps, Rentals/ZHL, PE unlock, Preferred mix, and Comscore reach.",
       "updated": "2026-09-20",
+      "related": [
+        {
+          "label": "Marketplace mix pilot (2026-09-21)",
+          "path": "Z-pilot-2026-09-21/",
+          "kind": "dig"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "Z-pilot-2026-09-21",
+      "name": "Zillow marketplace mix pilot",
+      "path": "Z-pilot-2026-09-21/",
+      "kind": "dig",
+      "summary": "From-scratch pilot — marketplace mix, take-rate, Preferred attachment, and falsifiers (2026-09-21).",
+      "updated": "2026-09-21",
+      "related": [
+        {
+          "label": "Z key metrics",
+          "path": "Z/",
+          "kind": "key-metrics"
+        }
+      ],
       "pdf": false
     },
     {
