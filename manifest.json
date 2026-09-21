@@ -41,6 +41,29 @@
       "kind": "key-metrics",
       "summary": "Search & ads scoreboard, Cloud, FCF, TAC, and weekly trailing / forward PE.",
       "updated": "2026-09-17",
+      "related": [
+        {
+          "label": "Search durability dig (2026-09-21)",
+          "path": "GOOGL-zbar-2026-09-21/",
+          "kind": "dig"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "GOOGL-zbar-2026-09-21",
+      "name": "Alphabet Search durability dig",
+      "path": "GOOGL-zbar-2026-09-21/",
+      "kind": "dig",
+      "summary": "From-scratch dig — Search durability, ads moat, and Cloud upside (2026-09-21).",
+      "updated": "2026-09-21",
+      "related": [
+        {
+          "label": "GOOGL key metrics",
+          "path": "GOOGL/",
+          "kind": "key-metrics"
+        }
+      ],
       "pdf": false
     },
     {
