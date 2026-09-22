@@ -114,6 +114,11 @@
           "label": "Marketplace mix pilot v3 (2026-09-21)",
           "path": "Z-pilot-2026-09-21-v3/",
           "kind": "dig"
+        },
+        {
+          "label": "Marketplace mix pilot v5 (2026-09-21)",
+          "path": "Z-pilot-2026-09-21-v5/",
+          "kind": "dig"
         }
       ],
       "pdf": false
@@ -139,6 +144,11 @@
         {
           "label": "Marketplace mix pilot v3",
           "path": "Z-pilot-2026-09-21-v3/",
+          "kind": "dig"
+        },
+        {
+          "label": "Marketplace mix pilot v5",
+          "path": "Z-pilot-2026-09-21-v5/",
           "kind": "dig"
         }
       ],
@@ -166,6 +176,11 @@
           "label": "Marketplace mix pilot v3",
           "path": "Z-pilot-2026-09-21-v3/",
           "kind": "dig"
+        },
+        {
+          "label": "Marketplace mix pilot v5",
+          "path": "Z-pilot-2026-09-21-v5/",
+          "kind": "dig"
         }
       ],
       "pdf": false
@@ -191,6 +206,37 @@
         {
           "label": "Marketplace mix pilot v1",
           "path": "Z-pilot-2026-09-21/",
+          "kind": "dig"
+        },
+        {
+          "label": "Marketplace mix pilot v5",
+          "path": "Z-pilot-2026-09-21-v5/",
+          "kind": "dig"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "Z-pilot-2026-09-21-v5",
+      "name": "Zillow key metrics — marketplace mix, take-rate, falsifiers (v5)",
+      "path": "Z-pilot-2026-09-21-v5/",
+      "kind": "dig",
+      "summary": "Pilot v5 — For Sale is the cabinet figure wherever it is filled, including 2022, 2023, and early 2024. First through third quarter 2023 stay Residential plus Mortgages, marked derived, and are not written into the fact column.",
+      "updated": "2026-09-22",
+      "related": [
+        {
+          "label": "Z key metrics",
+          "path": "Z/",
+          "kind": "key-metrics"
+        },
+        {
+          "label": "Marketplace mix pilot v3",
+          "path": "Z-pilot-2026-09-21-v3/",
+          "kind": "dig"
+        },
+        {
+          "label": "Marketplace mix pilot v2",
+          "path": "Z-pilot-2026-09-21-v2/",
           "kind": "dig"
         }
       ],
