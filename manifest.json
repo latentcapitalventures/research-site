@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Research",
-  "updated": "2026-09-21",
+  "updated": "2026-09-22",
   "packs": [
     {
       "ticker": "SPOT",
@@ -109,6 +109,11 @@
           "label": "Marketplace mix pilot v2 (2026-09-21)",
           "path": "Z-pilot-2026-09-21-v2/",
           "kind": "dig"
+        },
+        {
+          "label": "Marketplace mix pilot v3 (2026-09-21)",
+          "path": "Z-pilot-2026-09-21-v3/",
+          "kind": "dig"
         }
       ],
       "pdf": false
@@ -130,6 +135,11 @@
           "label": "Marketplace mix pilot v2",
           "path": "Z-pilot-2026-09-21-v2/",
           "kind": "dig"
+        },
+        {
+          "label": "Marketplace mix pilot v3",
+          "path": "Z-pilot-2026-09-21-v3/",
+          "kind": "dig"
         }
       ],
       "pdf": false
@@ -146,6 +156,37 @@
           "label": "Z key metrics",
           "path": "Z/",
           "kind": "key-metrics"
+        },
+        {
+          "label": "Marketplace mix pilot v1",
+          "path": "Z-pilot-2026-09-21/",
+          "kind": "dig"
+        },
+        {
+          "label": "Marketplace mix pilot v3",
+          "path": "Z-pilot-2026-09-21-v3/",
+          "kind": "dig"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "Z-pilot-2026-09-21-v3",
+      "name": "Zillow key metrics — marketplace mix, take-rate, falsifiers (v3)",
+      "path": "Z-pilot-2026-09-21-v3/",
+      "kind": "dig",
+      "summary": "Pilot v3 — For Sale is the printed figure from fourth-quarter 2024; earlier quarters stay blank. Residential, Mortgages, and Rentals chart as themselves.",
+      "updated": "2026-09-22",
+      "related": [
+        {
+          "label": "Z key metrics",
+          "path": "Z/",
+          "kind": "key-metrics"
+        },
+        {
+          "label": "Marketplace mix pilot v2",
+          "path": "Z-pilot-2026-09-21-v2/",
+          "kind": "dig"
         },
         {
           "label": "Marketplace mix pilot v1",
