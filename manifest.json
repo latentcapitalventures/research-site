@@ -217,8 +217,8 @@
       "name": "Spotify key metrics (zbar)",
       "path": "SPOT-zbar-2026-09-21/",
       "kind": "dig",
-      "summary": "From-scratch Spotify key metrics — marketplace mix, ARPU, and falsifiers (2026-09-21). Does not replace SPOT.",
-      "updated": "2026-09-21",
+      "summary": "From-scratch Spotify key metrics — marketplace mix, ARPU, and falsifiers (2026-09-21). Fourth quarters come from the shareholder letter. Does not replace SPOT.",
+      "updated": "2026-09-22",
       "related": [
         {
           "label": "SPOT key metrics",
