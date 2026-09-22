@@ -60,6 +60,47 @@
     return totals;
   }
 
+  function isDerivedIndex(payload, idx) {
+    var labs = payload.derivedLabels || [];
+    if (!labs.length) return false;
+    var lab = (payload.labels || [])[idx];
+    return labs.indexOf(lab) >= 0;
+  }
+
+  function hatchPattern(color) {
+    var canvas = document.createElement("canvas");
+    canvas.width = 10;
+    canvas.height = 10;
+    var g = canvas.getContext("2d");
+    g.fillStyle = color;
+    g.fillRect(0, 0, 10, 10);
+    g.strokeStyle = "rgba(27,26,23,0.78)";
+    g.lineWidth = 1.2;
+    g.beginPath();
+    g.moveTo(-2, 8);
+    g.lineTo(8, -2);
+    g.moveTo(2, 12);
+    g.lineTo(12, 2);
+    g.stroke();
+    return g.createPattern(canvas, "repeat");
+  }
+
+  function barFill(ds, payload) {
+    var labels = payload.labels || [];
+    var any = false;
+    for (var i = 0; i < labels.length; i++) {
+      if (isDerivedIndex(payload, i)) {
+        any = true;
+        break;
+      }
+    }
+    if (!any) return ds.color;
+    log("hatching DERIVED bars", payload.id, payload.derivedLabels);
+    return labels.map(function (_lab, i) {
+      return isDerivedIndex(payload, i) ? hatchPattern(ds.color) : ds.color;
+    });
+  }
+
   function asChartDatasets(payload, mode) {
     var totals = payload._totals || [];
     return (payload.datasets || []).map(function (ds) {
@@ -90,7 +131,7 @@
       var spec = {
         type: isLine ? "line" : "bar",
         label: ds.label,
-        backgroundColor: ds.color,
+        backgroundColor: isLine ? ds.color : barFill(ds, payload),
         borderColor: ds.color,
         borderWidth: isLine ? 2 : 0,
         pointRadius: isLine ? (ds.showLine === false ? 4 : data.length > 48 ? 0 : 3) : 0,
@@ -167,8 +208,9 @@
         title: function (items) {
           if (!items.length) return "";
           var raw = items[0].raw;
-          if (raw && raw.label) return String(raw.label);
-          return items[0].label || "";
+          var lab = raw && raw.label ? String(raw.label) : items[0].label || "";
+          if (isDerivedIndex(payload, items[0].dataIndex)) return lab + " · DERIVED";
+          return lab;
         },
         label: function (ctx) {
           if (payload.chartType === "scatter") {
