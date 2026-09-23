@@ -1,0 +1,37 @@
+{
+  "note": "Source of truth for the hub earnings table. Dates stay Estimated until the issuer's IR page posts them — then set status to Confirmed. Do not mark a row Confirmed from a calendar vendor or prior cadence. Edit this file and regenerate the hub (python -m pack publish, or the site index regen path).",
+  "events": [
+    {
+      "ticker": "IBKR",
+      "company": "Interactive Brokers",
+      "period": "Q3 2026",
+      "date": "2026-10-15",
+      "session": "AMC",
+      "status": "Estimated"
+    },
+    {
+      "ticker": "GOOGL",
+      "company": "Alphabet",
+      "period": "Q3 2026",
+      "date": "2026-10-28",
+      "session": "AMC",
+      "status": "Estimated"
+    },
+    {
+      "ticker": "Z",
+      "company": "Zillow Group",
+      "period": "Q3 2026",
+      "date": "2026-10-29",
+      "session": "AMC",
+      "status": "Estimated"
+    },
+    {
+      "ticker": "SPOT",
+      "company": "Spotify",
+      "period": "Q3 2026",
+      "date": "2026-11-03",
+      "session": "BMO",
+      "status": "Estimated"
+    }
+  ]
+}

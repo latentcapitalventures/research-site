@@ -262,6 +262,113 @@
 
     .empty { color: var(--soft-ink); margin: 0.35rem 0 0; }
 
+    /* Upcoming earnings — between the desk carousel and the ledger. */
+    .earnings { margin-top: 2.35rem; }
+    .earn-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 0.85rem;
+      background: var(--card);
+      border: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
+    }
+    .earn {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.96rem;
+      min-width: 40rem;
+    }
+    .earn th {
+      font-family: var(--sans);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 750;
+      color: var(--soft-ink);
+      text-align: left;
+      padding: 0.72rem 0.9rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+      background: color-mix(in srgb, var(--paper) 42%, var(--card));
+      white-space: nowrap;
+    }
+    .earn td {
+      padding: 0.82rem 0.9rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--line) 42%, transparent);
+      vertical-align: baseline;
+    }
+    .earn tbody tr:last-child td { border-bottom: none; }
+    .earn-ticker {
+      font-family: var(--sans);
+      font-weight: 750;
+      letter-spacing: 0.08em;
+      font-size: 0.78rem;
+      color: var(--ink);
+    }
+    .earn tr.is-estimated td { color: var(--soft-ink); }
+    .earn tr.is-confirmed {
+      color: var(--ink);
+      box-shadow: inset 3px 0 0 var(--signal);
+    }
+    .earn tr.is-confirmed .earn-status {
+      color: var(--signal);
+      font-weight: 650;
+    }
+    .earn-status {
+      font-family: var(--sans);
+      font-size: 0.78rem;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+    }
+    .earn-session { white-space: nowrap; }
+    .earn-code {
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: var(--soft-ink);
+      margin-left: 0.3rem;
+    }
+    .earn-note {
+      margin: 0.7rem 0 0;
+      font-size: 0.84rem;
+      color: var(--soft-ink);
+      max-width: 40rem;
+    }
+    @media (max-width: 640px) {
+      .earn { min-width: 0; }
+      .earn thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+      .earn, .earn tbody, .earn tr, .earn td { display: block; width: auto; }
+      .earn tr {
+        padding: 0.7rem 0.95rem 0.8rem;
+        border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+      }
+      .earn tbody tr:last-child { border-bottom: none; }
+      .earn td {
+        border: none;
+        padding: 0.16rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 1rem;
+      }
+      .earn td::before {
+        content: attr(data-label);
+        font-family: var(--sans);
+        font-size: 0.66rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--line);
+        font-weight: 700;
+        flex: none;
+      }
+    }
+
     footer {
       margin-top: 2.75rem; padding-top: 1.1rem; border-top: 1px solid var(--line);
       font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.08em;
@@ -497,6 +604,69 @@
         </div>
       </div>
       
+    </section>
+
+    <section class="rail earnings" id="earnings" aria-labelledby="earnings-heading">
+      <div class="rail-head">
+        <h2 id="earnings-heading">Upcoming earnings</h2>
+        <p class="note">Q3 2026</p>
+      </div>
+      
+      <div class="earn-scroll">
+        <table class="earn">
+          <thead>
+            <tr>
+              <th scope="col">Ticker</th>
+              <th scope="col">Company</th>
+              <th scope="col">Period</th>
+              <th scope="col">Date</th>
+              <th scope="col">Session</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            
+            <tr class="is-estimated">
+              <td data-label="Ticker"><span class="earn-ticker">IBKR</span></td>
+              <td data-label="Company">Interactive Brokers</td>
+              <td data-label="Period">Q3 2026</td>
+              <td data-label="Date"><time datetime="2026-10-15">2026-10-15</time></td>
+              <td data-label="Session"><span class="earn-session">After close<span class="earn-code">· AMC</span></span></td>
+              <td data-label="Status"><span class="earn-status">Estimated</span></td>
+            </tr>
+            
+            <tr class="is-estimated">
+              <td data-label="Ticker"><span class="earn-ticker">GOOGL</span></td>
+              <td data-label="Company">Alphabet</td>
+              <td data-label="Period">Q3 2026</td>
+              <td data-label="Date"><time datetime="2026-10-28">2026-10-28</time></td>
+              <td data-label="Session"><span class="earn-session">After close<span class="earn-code">· AMC</span></span></td>
+              <td data-label="Status"><span class="earn-status">Estimated</span></td>
+            </tr>
+            
+            <tr class="is-estimated">
+              <td data-label="Ticker"><span class="earn-ticker">Z</span></td>
+              <td data-label="Company">Zillow Group</td>
+              <td data-label="Period">Q3 2026</td>
+              <td data-label="Date"><time datetime="2026-10-29">2026-10-29</time></td>
+              <td data-label="Session"><span class="earn-session">After close<span class="earn-code">· AMC</span></span></td>
+              <td data-label="Status"><span class="earn-status">Estimated</span></td>
+            </tr>
+            
+            <tr class="is-estimated">
+              <td data-label="Ticker"><span class="earn-ticker">SPOT</span></td>
+              <td data-label="Company">Spotify</td>
+              <td data-label="Period">Q3 2026</td>
+              <td data-label="Date"><time datetime="2026-11-03">2026-11-03</time></td>
+              <td data-label="Session"><span class="earn-session">Before open<span class="earn-code">· BMO</span></span></td>
+              <td data-label="Status"><span class="earn-status">Estimated</span></td>
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+      
+      <p class="earn-note">Dates are estimated from the prior reporting cadence until the issuer confirms them. The status flips to Confirmed when investor relations posts the date.</p>
     </section>
 
     <section class="rail" id="desks" aria-labelledby="desks-heading">
