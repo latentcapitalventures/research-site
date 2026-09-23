@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Research",
-  "updated": "2026-09-22",
+  "updated": "2026-09-23",
   "packs": [
     {
       "ticker": "SPOT",
@@ -260,11 +260,11 @@
     },
     {
       "ticker": "SPOT-zbar-2026-09-21",
-      "name": "Spotify key metrics (zbar)",
+      "name": "Spotify key metrics — marketplace mix, ARPU, cash, multiple",
       "path": "SPOT-zbar-2026-09-21/",
       "kind": "dig",
-      "summary": "From-scratch Spotify key metrics — marketplace mix, ARPU, and falsifiers (2026-09-21). Fourth quarters come from the shareholder letter. Does not replace SPOT.",
-      "updated": "2026-09-22",
+      "summary": "From-scratch Spotify key metrics — marketplace mix, ARPU, cash, and the trailing multiple (2026-09-21). Fourth quarters come from the shareholder letter. Street forward sits on the trailing PE chart. Does not replace SPOT.",
+      "updated": "2026-09-23",
       "related": [
         {
           "label": "SPOT key metrics",

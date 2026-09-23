@@ -10,6 +10,11 @@
  * that do not sum (revenue vs Adj. EBITDA, visits vs AMUU), lines, and single
  * series, draw Chart.js with tooltips (grouped or line) and do not expose
  * stacked or stacked100.
+ *
+ * Pre-normalized %-share series (payload.percentShare / stackMode=percent,
+ * e.g. geo already in %): Stacked and 100% stacked draw identically, so
+ * Stacked is hidden. 100% uses the printed shares (no re-normalization).
+ * Grouped remains available.
  */
 (function () {
   "use strict";
@@ -41,6 +46,27 @@
   function fmtPct(share) {
     if (share === null || share === undefined || Number.isNaN(share)) return "—";
     return (share * 100).toFixed(1) + "%";
+  }
+
+  function isPercentShare(payload) {
+    return !!(
+      payload &&
+      (payload.percentShare || payload.stackMode === "percent")
+    );
+  }
+
+  function filterModes(payload, modes) {
+    var out = (modes || []).slice();
+    if (isPercentShare(payload)) {
+      out = out.filter(function (m) {
+        return m !== "stacked";
+      });
+      log("percent_share — hiding redundant Stacked", payload.id, "modes=", out);
+    }
+    if (payload.stackMode === "none" || payload.stackMode === "grouped") {
+      out = [];
+    }
+    return out;
   }
 
   function periodTotals(datasets, labelCount) {
@@ -120,7 +146,7 @@
       var values = ds.values || [];
       var data = values.map(function (v, i) {
         if (v === null || v === undefined || Number.isNaN(v)) return null;
-        if (mode === "stacked100") {
+        if (mode === "stacked100" && !isPercentShare(payload)) {
           var tot = totals[i];
           if (tot === null || tot === 0) return null;
           return (Number(v) / tot) * 100;
@@ -128,14 +154,24 @@
         return Number(v);
       });
       var isLine = kind === "line";
+      var radius =
+        ds.pointRadius !== undefined && ds.pointRadius !== null
+          ? ds.pointRadius
+          : isLine
+            ? ds.showLine === false
+              ? 4
+              : data.length > 48
+                ? 0
+                : 3
+            : 0;
       var spec = {
         type: isLine ? "line" : "bar",
         label: ds.label,
         backgroundColor: isLine ? ds.color : barFill(ds, payload),
         borderColor: ds.color,
         borderWidth: isLine ? 2 : 0,
-        pointRadius: isLine ? (ds.showLine === false ? 4 : data.length > 48 ? 0 : 3) : 0,
-        pointHoverRadius: 4,
+        pointRadius: radius,
+        pointHoverRadius: 5,
         spanGaps: !!ds.spanGaps,
         showLine: ds.showLine !== false,
         fill: false,
@@ -146,6 +182,16 @@
         unit: ds.unit || payload.unit || "",
         yAxisID: ds.yAxisID || "y",
       };
+      if (ds.borderDash && ds.borderDash.length) {
+        spec.borderDash = ds.borderDash.slice();
+      } else if (ds.dashed) {
+        spec.borderDash = [5, 4];
+      }
+      if (spec.borderDash) {
+        spec.borderWidth = isLine ? 2 : spec.borderWidth;
+        spec.pointRadius = isLine ? 4 : spec.pointRadius;
+        log("dashed dataset", payload.id, ds.key || ds.label);
+      }
       var statuses = spec.statuses;
       if (!isLine && statuses.some(function (s) { return s === "DERIVED"; })) {
         spec.backgroundColor = values.map(function (_v, i) {
@@ -166,20 +212,26 @@
     });
   }
 
-  function yScaleFor(mode, ylabel, composition, chartType) {
+  function yScaleFor(mode, ylabel, composition, chartType, payload) {
     if (mode === "stacked100" && composition) {
-      return {
+      var percentShare = isPercentShare(payload);
+      var scale = {
         stacked: true,
         beginAtZero: true,
-        max: 100,
         ticks: {
           callback: function (v) {
             return v + "%";
           },
         },
-        title: { display: true, text: "% of period total", color: "#5c574f" },
+        title: {
+          display: true,
+          text: percentShare ? ylabel || "% share" : "% of period total",
+          color: "#5c574f",
+        },
         grid: { color: "rgba(212,203,184,0.55)" },
       };
+      if (!percentShare) scale.max = 100;
+      return scale;
     }
     var isLine = chartType === "line";
     return {
@@ -204,6 +256,23 @@
       borderColor: "#d4cbb8",
       borderWidth: 1,
       displayColors: true,
+      filter: function (item) {
+        var sets = payload.datasets || [];
+        var ds = sets[item.datasetIndex] || {};
+        var values = ds.values || [];
+        var idx = item.dataIndex;
+        // Dotted-forward anchors share the last trailing week so the segment
+        // can be drawn. Hover on that week should show the trailing print only.
+        if (ds.overlay === "forward" && idx !== values.length - 1) return false;
+        var raw = values[idx];
+        if (
+          (raw === null || raw === undefined) &&
+          (payload.labels || [])[idx] === "Forward"
+        ) {
+          return false;
+        }
+        return true;
+      },
       callbacks: {
         title: function (items) {
           if (!items.length) return "";
@@ -229,7 +298,7 @@
           var unit = ctx.dataset.unit || payload.unit || "";
           var derived =
             (ctx.dataset.statuses || [])[idx] === "DERIVED" ? " · DERIVED" : "";
-          if (!composition) {
+          if (!composition || isPercentShare(payload)) {
             return " " + ctx.dataset.label + ": " + fmtMoney(raw, unit) + derived;
           }
           var totals = payload._totals || [];
@@ -274,7 +343,7 @@
           grid: { color: "rgba(212,203,184,0.35)" },
           title: { display: !!payload.xlabel, text: payload.xlabel || "", color: "#5c574f" },
         },
-        y: yScaleFor("grouped", payload.ylabel, false, "line"),
+        y: yScaleFor("grouped", payload.ylabel, false, "line", payload),
       };
     }
     var hasY1 = (payload.datasets || []).some(function (ds) {
@@ -293,7 +362,7 @@
         },
         grid: { display: false },
       },
-      y: yScaleFor(mode, payload.ylabel, payload.composition, payload.chartType),
+      y: yScaleFor(mode, payload.ylabel, payload.composition, payload.chartType, payload),
     };
     if (hasY1) {
       scales.y1 = {
@@ -322,16 +391,21 @@
       return null;
     }
     var composition = !!payload.composition;
-    var modes =
-      composition && payload.modes && payload.modes.length
-        ? payload.modes
-        : [];
+    var modes = filterModes(
+      payload,
+      composition && payload.modes && payload.modes.length ? payload.modes : []
+    );
+    payload.modes = modes;
     var mode = "grouped";
     if (composition) {
       mode =
         payload.defaultMode && modes.indexOf(payload.defaultMode) >= 0
           ? payload.defaultMode
-          : modes[0] || "stacked";
+          : modes[0] || "stacked100";
+      if (isPercentShare(payload) && mode === "stacked") {
+        mode = modes.indexOf("stacked100") >= 0 ? "stacked100" : modes[0] || "grouped";
+        log("percent_share defaulted off Stacked", payload.id, "mode=", mode);
+      }
     }
     if (!payload.chartType) payload.chartType = "bar";
     var labelCount = (payload.labels || []).length;
@@ -409,6 +483,11 @@
     var mode = chart._packMode;
     toolbar.querySelectorAll("button[data-mode]").forEach(function (btn) {
       var m = btn.getAttribute("data-mode");
+      if (isPercentShare(payload) && m === "stacked") {
+        btn.hidden = true;
+        btn.setAttribute("aria-hidden", "true");
+        log("hiding Stacked button on percent_share", payload.id);
+      }
       btn.setAttribute("aria-pressed", m === mode ? "true" : "false");
       btn.addEventListener("click", function () {
         setMode(m);
@@ -423,6 +502,10 @@
 
     function setMode(next) {
       if (chart._packModes.indexOf(next) < 0 || next === chart._packMode) return;
+      if (next === "stacked" && isPercentShare(payload)) {
+        log("refusing redundant Stacked on percent_share", payload.id);
+        return;
+      }
       if (next === "stacked" || next === "stacked100") {
         if (!payload.composition) {
           log("refusing non-composition mode", payload.id, next);
