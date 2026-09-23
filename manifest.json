@@ -3,27 +3,6 @@
   "updated": "2026-09-23",
   "packs": [
     {
-      "ticker": "SPOT",
-      "name": "Spotify",
-      "path": "SPOT/",
-      "kind": "key-metrics",
-      "summary": "Users, monetization, P&L trajectory, and weekly trailing / forward PE.",
-      "updated": "2026-09-17",
-      "related": [
-        {
-          "label": "Premium conversion dig",
-          "path": "SPOT-conversion/",
-          "kind": "dig"
-        },
-        {
-          "label": "Key metrics zbar (2026-09-21)",
-          "path": "SPOT-zbar-2026-09-21/",
-          "kind": "dig"
-        }
-      ],
-      "pdf": false
-    },
-    {
       "ticker": "SPOT-conversion",
       "name": "Spotify conversion",
       "path": "SPOT-conversion/",
@@ -33,24 +12,8 @@
       "related": [
         {
           "label": "SPOT key metrics",
-          "path": "SPOT/",
+          "path": "SPOT-zbar-2026-09-21/",
           "kind": "key-metrics"
-        }
-      ],
-      "pdf": false
-    },
-    {
-      "ticker": "GOOGL",
-      "name": "Alphabet",
-      "path": "GOOGL/",
-      "kind": "key-metrics",
-      "summary": "Search & ads scoreboard, Cloud, FCF, TAC, and weekly trailing / forward PE.",
-      "updated": "2026-09-17",
-      "related": [
-        {
-          "label": "Search durability dig (2026-09-21)",
-          "path": "GOOGL-zbar-2026-09-21/",
-          "kind": "dig"
         }
       ],
       "pdf": false
@@ -59,160 +22,12 @@
       "ticker": "GOOGL-zbar-2026-09-21",
       "name": "Alphabet Search durability dig",
       "path": "GOOGL-zbar-2026-09-21/",
-      "kind": "dig",
+      "kind": "key-metrics",
       "summary": "From-scratch dig — Search durability, ads moat, and Cloud upside (2026-09-21).",
       "updated": "2026-09-22",
-      "related": [
-        {
-          "label": "GOOGL key metrics",
-          "path": "GOOGL/",
-          "kind": "key-metrics"
-        }
-      ],
-      "pdf": false
-    },
-    {
-      "ticker": "IBKR",
-      "name": "Interactive Brokers",
-      "path": "IBKR/",
-      "kind": "key-metrics",
-      "summary": "Fee tollbooth, account growth, and weekly trailing / forward PE.",
-      "updated": "2026-09-17",
-      "related": [
-        {
-          "label": "Fee-toll intensity dig",
-          "path": "IBKR-intensity/",
-          "kind": "dig"
-        },
-        {
-          "label": "Key metrics zbar (2026-09-21)",
-          "path": "IBKR-zbar-2026-09-21/",
-          "kind": "dig"
-        }
-      ],
-      "pdf": false
-    },
-    {
-      "ticker": "Z",
-      "name": "Zillow Group",
-      "path": "Z/",
-      "kind": "key-metrics",
-      "summary": "Visits, TTV bps, Rentals/ZHL, PE unlock, Preferred mix, and Comscore reach.",
-      "updated": "2026-09-20",
-      "related": [
-        {
-          "label": "Marketplace mix pilot (2026-09-21)",
-          "path": "Z-pilot-2026-09-21/",
-          "kind": "dig"
-        },
-        {
-          "label": "Marketplace mix pilot v2 (2026-09-21)",
-          "path": "Z-pilot-2026-09-21-v2/",
-          "kind": "dig"
-        },
-        {
-          "label": "Marketplace mix pilot v3 (2026-09-21)",
-          "path": "Z-pilot-2026-09-21-v3/",
-          "kind": "dig"
-        },
-        {
-          "label": "Marketplace mix pilot v5 (2026-09-21)",
-          "path": "Z-pilot-2026-09-21-v5/",
-          "kind": "dig"
-        }
-      ],
-      "pdf": false
-    },
-    {
-      "ticker": "Z-pilot-2026-09-21",
-      "name": "Zillow marketplace mix pilot",
-      "path": "Z-pilot-2026-09-21/",
-      "kind": "dig",
-      "summary": "From-scratch pilot — marketplace mix, take-rate, Preferred attachment, and falsifiers (2026-09-21).",
-      "updated": "2026-09-21",
-      "related": [
-        {
-          "label": "Z key metrics",
-          "path": "Z/",
-          "kind": "key-metrics"
-        },
-        {
-          "label": "Marketplace mix pilot v2",
-          "path": "Z-pilot-2026-09-21-v2/",
-          "kind": "dig"
-        },
-        {
-          "label": "Marketplace mix pilot v3",
-          "path": "Z-pilot-2026-09-21-v3/",
-          "kind": "dig"
-        },
-        {
-          "label": "Marketplace mix pilot v5",
-          "path": "Z-pilot-2026-09-21-v5/",
-          "kind": "dig"
-        }
-      ],
-      "pdf": false
-    },
-    {
-      "ticker": "Z-pilot-2026-09-21-v2",
-      "name": "Zillow key metrics — marketplace mix, take-rate, falsifiers (v2)",
-      "path": "Z-pilot-2026-09-21-v2/",
-      "kind": "dig",
-      "summary": "Pilot v2 — derived For Sale marked on the chart, GAAP net income grouped with revenue and adjusted EBITDA, falsifiers.",
-      "updated": "2026-09-21",
-      "related": [
-        {
-          "label": "Z key metrics",
-          "path": "Z/",
-          "kind": "key-metrics"
-        },
-        {
-          "label": "Marketplace mix pilot v1",
-          "path": "Z-pilot-2026-09-21/",
-          "kind": "dig"
-        },
-        {
-          "label": "Marketplace mix pilot v3",
-          "path": "Z-pilot-2026-09-21-v3/",
-          "kind": "dig"
-        },
-        {
-          "label": "Marketplace mix pilot v5",
-          "path": "Z-pilot-2026-09-21-v5/",
-          "kind": "dig"
-        }
-      ],
-      "pdf": false
-    },
-    {
-      "ticker": "Z-pilot-2026-09-21-v3",
-      "name": "Zillow key metrics — marketplace mix, take-rate, falsifiers (v3)",
-      "path": "Z-pilot-2026-09-21-v3/",
-      "kind": "dig",
-      "summary": "Pilot v3 — For Sale is the printed figure from fourth-quarter 2024; earlier quarters stay blank. Residential, Mortgages, and Rentals chart as themselves.",
-      "updated": "2026-09-22",
-      "related": [
-        {
-          "label": "Z key metrics",
-          "path": "Z/",
-          "kind": "key-metrics"
-        },
-        {
-          "label": "Marketplace mix pilot v2",
-          "path": "Z-pilot-2026-09-21-v2/",
-          "kind": "dig"
-        },
-        {
-          "label": "Marketplace mix pilot v1",
-          "path": "Z-pilot-2026-09-21/",
-          "kind": "dig"
-        },
-        {
-          "label": "Marketplace mix pilot v5",
-          "path": "Z-pilot-2026-09-21-v5/",
-          "kind": "dig"
-        }
+      "lineage": "googl-key-metrics",
+      "supersedes": [
+        "GOOGL"
       ],
       "pdf": false
     },
@@ -220,25 +35,15 @@
       "ticker": "Z-pilot-2026-09-21-v5",
       "name": "Zillow key metrics — marketplace mix, take-rate, falsifiers (v5)",
       "path": "Z-pilot-2026-09-21-v5/",
-      "kind": "dig",
+      "kind": "key-metrics",
       "summary": "Pilot v5 — For Sale is the cabinet figure wherever it is filled, including 2022, 2023, and early 2024. First through third quarter 2023 stay Residential plus Mortgages, marked derived, and are not written into the fact column.",
       "updated": "2026-09-22",
-      "related": [
-        {
-          "label": "Z key metrics",
-          "path": "Z/",
-          "kind": "key-metrics"
-        },
-        {
-          "label": "Marketplace mix pilot v3",
-          "path": "Z-pilot-2026-09-21-v3/",
-          "kind": "dig"
-        },
-        {
-          "label": "Marketplace mix pilot v2",
-          "path": "Z-pilot-2026-09-21-v2/",
-          "kind": "dig"
-        }
+      "lineage": "z-key-metrics",
+      "supersedes": [
+        "Z",
+        "Z-pilot-2026-09-21",
+        "Z-pilot-2026-09-21-v2",
+        "Z-pilot-2026-09-21-v3"
       ],
       "pdf": false
     },
@@ -252,7 +57,7 @@
       "related": [
         {
           "label": "IBKR key metrics",
-          "path": "IBKR/",
+          "path": "IBKR-zbar-2026-09-21/",
           "kind": "key-metrics"
         }
       ],
@@ -262,15 +67,14 @@
       "ticker": "SPOT-zbar-2026-09-21",
       "name": "Spotify key metrics — marketplace mix, ARPU, cash, multiple",
       "path": "SPOT-zbar-2026-09-21/",
-      "kind": "dig",
+      "kind": "key-metrics",
       "summary": "From-scratch Spotify key metrics — marketplace mix, ARPU, cash, and the trailing multiple (2026-09-21). Fourth quarters come from the shareholder letter. Street forward sits on the trailing PE chart. Does not replace SPOT.",
       "updated": "2026-09-23",
+      "lineage": "spot-key-metrics",
+      "supersedes": [
+        "SPOT"
+      ],
       "related": [
-        {
-          "label": "SPOT key metrics",
-          "path": "SPOT/",
-          "kind": "key-metrics"
-        },
         {
           "label": "Premium conversion dig",
           "path": "SPOT-conversion/",
@@ -283,15 +87,14 @@
       "ticker": "IBKR-zbar-2026-09-21",
       "name": "IBKR key metrics (zbar)",
       "path": "IBKR-zbar-2026-09-21/",
-      "kind": "dig",
+      "kind": "key-metrics",
       "summary": "From-scratch key metrics — fee toll, franchise scale, and API moat (2026-09-21).",
       "updated": "2026-09-21",
+      "lineage": "ibkr-key-metrics",
+      "supersedes": [
+        "IBKR"
+      ],
       "related": [
-        {
-          "label": "IBKR key metrics",
-          "path": "IBKR/",
-          "kind": "key-metrics"
-        },
         {
           "label": "Fee-toll intensity dig",
           "path": "IBKR-intensity/",
