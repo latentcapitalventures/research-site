@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How desks get data for reports · Latent Capital</title>
+<style>
+  :root {
+    --paper: #f7f3eb;
+    --paper-deep: #efe8dc;
+    --ink: #1c1916;
+    --ink-soft: #4a453f;
+    --ink-faint: #7a736a;
+    --rule: #d9d0c2;
+    --copper: #b87333;
+    --copper-soft: #c9956a;
+    --card: #fffcf7;
+    --ok: #3d5a3d;
+    --warn: #8a5a2b;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { font-size: 17px; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  header.hero {
+    margin-bottom: 2.75rem;
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--copper);
+    font-weight: 600;
+    margin: 0 0 0.75rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    line-height: 1.2;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    margin: 0 0 1rem;
+    color: var(--ink);
+  }
+
+  .lede {
+    font-size: 1.1rem;
+    color: var(--ink-soft);
+    margin: 0;
+    max-width: 38em;
+  }
+
+  h2 {
+    font-size: 1.35rem;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+    margin: 2.75rem 0 1rem;
+    color: var(--ink);
+    padding-top: 0.5rem;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.5rem;
+    color: var(--ink);
+  }
+
+  p { margin: 0 0 1rem; }
+
+  a { color: var(--copper); }
+
+  .rule {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin: 2.5rem 0;
+  }
+
+  /* Role cards */
+  .roles {
+    display: grid;
+    gap: 0.85rem;
+    margin: 1.25rem 0 1.5rem;
+  }
+
+  .role {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--copper);
+    border-radius: 6px;
+    padding: 1rem 1.15rem;
+  }
+
+  .role h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1rem;
+    color: var(--ink);
+  }
+
+  .role p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+
+  .role .does-not {
+    margin-top: 0.45rem;
+    font-size: 0.88rem;
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+
+  /* Principles */
+  .principles {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 1.5rem;
+  }
+
+  .principles li {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 0.9rem 1.1rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .principles strong {
+    display: block;
+    color: var(--ink);
+    margin-bottom: 0.2rem;
+    font-weight: 600;
+  }
+
+  .principles span {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  /* Pipeline stages as simple CSS boxes (fallback companion) */
+  .stages {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 1.25rem 0 1.5rem;
+  }
+
+  .stage {
+    display: grid;
+    grid-template-columns: 2.2rem 1fr;
+    gap: 0.85rem;
+    align-items: start;
+    position: relative;
+    padding-bottom: 1.1rem;
+  }
+
+  .stage:last-child { padding-bottom: 0; }
+
+  .stage-num {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 650;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .stage::before {
+    content: "";
+    position: absolute;
+    left: 1.05rem;
+    top: 2.2rem;
+    bottom: 0;
+    width: 1px;
+    background: var(--rule);
+  }
+
+  .stage:last-child::before { display: none; }
+
+  .stage-body h3 {
+    margin: 0.2rem 0 0.25rem;
+    font-size: 1rem;
+  }
+
+  .stage-body p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+
+  /* Components */
+  .components {
+    display: grid;
+    gap: 0.85rem;
+    margin: 1.25rem 0;
+  }
+
+  .comp {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 1rem 1.15rem;
+  }
+
+  .comp h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1rem;
+  }
+
+  .comp p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+
+  /* Contrast box */
+  .contrast {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    margin: 1.25rem 0 1.5rem;
+  }
+
+  @media (max-width: 560px) {
+    .contrast { grid-template-columns: 1fr; }
+  }
+
+  .contrast-col {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 1.1rem 1.15rem;
+  }
+
+  .contrast-col h3 {
+    margin: 0 0 0.65rem;
+    font-size: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .contrast-col ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+  }
+
+  .contrast-col li { margin-bottom: 0.4rem; }
+
+  .contrast-col.desk { border-top: 3px solid var(--copper); }
+  .contrast-col.cloud { border-top: 3px solid var(--ink); }
+
+  /* Diagram shells */
+  .diagram {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 1.25rem 1rem;
+    margin: 1.25rem 0 1.75rem;
+    overflow-x: auto;
+  }
+
+  .diagram-caption {
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    text-align: center;
+    margin: 0.5rem 0 0;
+    letter-spacing: 0.02em;
+  }
+
+  .mermaid {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Callout */
+  .note {
+    background: var(--paper-deep);
+    border-left: 3px solid var(--copper-soft);
+    padding: 0.9rem 1.1rem;
+    margin: 1.25rem 0;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    border-radius: 0 6px 6px 0;
+  }
+
+  footer {
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* Print */
+  @media print {
+    body { background: white; font-size: 11pt; }
+    .wrap { max-width: 100%; padding: 0; }
+    .role, .comp, .contrast-col, .diagram, .principles li {
+      break-inside: avoid;
+      box-shadow: none;
+    }
+    .diagram { border-color: #ccc; }
+    a { color: inherit; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <p class="eyebrow">Latent Capital · Internal guide</p>
+  <h1>How desks get data for reports</h1>
+  <p class="lede">
+    Each ticker desk writes research for Latent. The numbers in those reports come from a shared filing cabinet and a shared set of tools — not from one-off spreadsheets. This page explains who pulls, who cleans, who analyzes, who fixes the tools, and who publishes the live URL you read.
+  </p>
+</header>
+
+<!-- ========== WHO DOES WHAT ========== -->
+<section id="who">
+  <h2>Who does what</h2>
+  <p>
+    Think of it as a small newsroom with a shared library. Desks own the story. Shared tools own the facts. Product and Cursor keep the library working. Tylor (Chief of Staff) ships the finished page to you.
+  </p>
+
+  <div class="roles">
+    <div class="role">
+      <h3>Desk bot (Zillow, Spotify, Alphabet, IBKR…)</h3>
+      <p>Owns one ticker. Runs the shared tools to pull filings and refresh numbers. Reads the clean series. Does the investment analysis, writes the letter, and decides which charts matter.</p>
+      <p class="does-not">Does not edit the shared filing tools.</p>
+    </div>
+    <div class="role">
+      <h3>Shared filing tools (Tylor)</h3>
+      <p>The library everyone runs. Pulls SEC filings and curated investor-relations PDFs into a shared cabinet. Extracts printed numbers into standardized tables. Pulls market prices and consensus EPS where configured. Cleans and standardizes so desks never invent their own parsers.</p>
+    </div>
+    <div class="role">
+      <h3>Shared cabinet (tylor-data)</h3>
+      <p>One filing cabinet on the shared computer. Raw documents go in; clean period-by-period series come out. Every desk charts from the same place.</p>
+    </div>
+    <div class="role">
+      <h3>Product</h3>
+      <p>When a number is printed in a filing but missing or wrong in the clean tables, Product writes the fix specification. Desks surface the gap; they do not patch the tools themselves.</p>
+      <p class="does-not">Does not write pack prose.</p>
+    </div>
+    <div class="role">
+      <h3>Cursor cloud agents</h3>
+      <p>Implement Product’s approved tool and pack-template changes in the repos. Merge when green. Desks then pull the updated tools and re-run.</p>
+    </div>
+    <div class="role">
+      <h3>Tylor (Chief of Staff)</h3>
+      <p>Coordinates desks, quality-reviews the pack (especially writing voice), publishes the live research-site page, and sends Latent only the URL.</p>
+    </div>
+    <div class="role">
+      <h3>Designer</h3>
+      <p>Owns brand look — tokens, lockups, hub chrome. Not numbers or thesis.</p>
+    </div>
+    <div class="role">
+      <h3>Latent</h3>
+      <p>Reads the published report URL. Escalates product priorities when something systematically needs fixing.</p>
+    </div>
+  </div>
+
+  <div class="diagram">
+    <pre class="mermaid">
+flowchart LR
+  subgraph Desks
+    D[Desk bot]
+  end
+  subgraph Shared
+    T[Filing tools]
+    C[Cabinet]
+  end
+  subgraph Build
+    P[Product]
+    CA[Cursor agents]
+  end
+  subgraph Ship
+    CoS[Tylor CoS]
+    L[Latent]
+  end
+  D -->|runs| T
+  T -->|writes| C
+  C -->|clean series| D
+  D -->|gap ticket| CoS
+  CoS -->|routes| P
+  P -->|fix spec| CA
+  CA -->|updated tools| T
+  D -->|pack draft| CoS
+  CoS -->|URL only| L
+  style D fill:#f7f3eb,stroke:#b87333,color:#1c1916
+  style T fill:#fffcf7,stroke:#4a453f,color:#1c1916
+  style C fill:#fffcf7,stroke:#4a453f,color:#1c1916
+  style P fill:#efe8dc,stroke:#4a453f,color:#1c1916
+  style CA fill:#efe8dc,stroke:#4a453f,color:#1c1916
+  style CoS fill:#f7f3eb,stroke:#b87333,color:#1c1916
+  style L fill:#1c1916,stroke:#1c1916,color:#f7f3eb
+    </pre>
+    <p class="diagram-caption">Role map — who runs tools, who fixes them, who publishes</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== PRINCIPLES ========== -->
+<section id="principles">
+  <h2>Principles</h2>
+  <p>Short rules the desks live by. Each one has a concrete habit behind it.</p>
+
+  <ul class="principles">
+    <li>
+      <strong>Prefer what the company printed</strong>
+      <span>Printed facts from filings beat estimates or reconstructed guesses every time.</span>
+    </li>
+    <li>
+      <strong>Blank beats wrong</strong>
+      <span>Never invent a number to fill a chart. An empty cell is honest; a made-up one is not.</span>
+    </li>
+    <li>
+      <strong>One shared source of truth</strong>
+      <span>Clean series live in the shared cabinet. Desks bind charts to that series — they do not keep private number books.</span>
+    </li>
+    <li>
+      <strong>Labeled derivation only when print is absent</strong>
+      <span>If a ratio can be built from printed parts and the company never printed the ratio itself, derive it and say so. Otherwise leave it blank.</span>
+    </li>
+    <li>
+      <strong>Tool bugs go up the chain</strong>
+      <span>Desk → Tylor CoS → Product → Cursor. Never a local hack on shared scripts.</span>
+    </li>
+    <li>
+      <strong>Data lock first, then writing, then publish</strong>
+      <span>Numbers settle before prose. Prose settles before the live URL goes to Latent.</span>
+    </li>
+  </ul>
+</section>
+
+<hr class="rule">
+
+<!-- ========== PIPELINE ========== -->
+<section id="pipeline">
+  <h2>The pipeline</h2>
+  <p>
+    From claiming a ticker to the URL in Latent’s inbox, the path is the same every time. Concurrent SEC fetches stay under a shared lock so desks do not step on each other at EDGAR.
+  </p>
+
+  <div class="stages">
+    <div class="stage">
+      <div class="stage-num">1</div>
+      <div class="stage-body">
+        <h3>Claim ticker</h3>
+        <p>A desk is assigned (or claims) one company. From then on, that desk owns the analysis and the letter.</p>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="stage-num">2</div>
+      <div class="stage-body">
+        <h3>Pull filings + optional IR extras</h3>
+        <p>Shared tools fetch SEC filings into the cabinet. Curated investor-relations PDFs can come along when they add printed detail the filings lack.</p>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="stage-num">3</div>
+      <div class="stage-body">
+        <h3>Extract clean metrics</h3>
+        <p>Printed numbers land in standardized analytics tables — period by period, field by field. Desks read these tables; they do not re-parse filings by hand.</p>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="stage-num">4</div>
+      <div class="stage-body">
+        <h3>Market / PE feeds</h3>
+        <p>Where configured, market prices and consensus EPS join the same clean layer so valuation charts share one backbone with the fundamentals.</p>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="stage-num">5</div>
+      <div class="stage-body">
+        <h3>Desk analysis &amp; brief</h3>
+        <p>The desk reads the series, forms a view, picks charts, and writes the research letter. Narrative belongs to the desk.</p>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="stage-num">6</div>
+      <div class="stage-body">
+        <h3>Research-pack webpage</h3>
+        <p>The pack generator turns desk series + narrative into the HTML page Latent will eventually read.</p>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="stage-num">7</div>
+      <div class="stage-body">
+        <h3>CoS review</h3>
+        <p>Tylor quality-reviews — voice, clarity, and that the pack matches the data lock. Fixes go back to the desk, not into the tools.</p>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="stage-num">8</div>
+      <div class="stage-body">
+        <h3>Live research-site URL → Latent</h3>
+        <p>CoS publishes to the research hub and sends Latent the URL only. No PDF or HTML attachment in chat.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="diagram">
+    <pre class="mermaid">
+flowchart TD
+  A[Claim ticker] --> B[Pull SEC filings + IR extras]
+  B --> C[Extract clean metrics]
+  C --> D[Market / PE feeds]
+  D --> E[Desk analysis and brief]
+  E --> F[Research-pack webpage]
+  F --> G[CoS review]
+  G --> H[Live research-site URL to Latent]
+  style A fill:#f7f3eb,stroke:#b87333,color:#1c1916
+  style B fill:#fffcf7,stroke:#4a453f,color:#1c1916
+  style C fill:#fffcf7,stroke:#4a453f,color:#1c1916
+  style D fill:#fffcf7,stroke:#4a453f,color:#1c1916
+  style E fill:#f7f3eb,stroke:#b87333,color:#1c1916
+  style F fill:#efe8dc,stroke:#4a453f,color:#1c1916
+  style G fill:#f7f3eb,stroke:#b87333,color:#1c1916
+  style H fill:#1c1916,stroke:#1c1916,color:#f7f3eb
+    </pre>
+    <p class="diagram-caption">End-to-end data pipeline — claim through publish</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== KEY COMPONENTS ========== -->
+<section id="components">
+  <h2>Key components</h2>
+  <p>Plain names for the pieces you will hear desks and Tylor talk about.</p>
+
+  <div class="components">
+    <div class="comp">
+      <h3>Filing cabinet layers</h3>
+      <p>
+        <strong>Raw filings</strong> are the documents as pulled from SEC (and optional IR PDFs).
+        <strong>Clean analytics tables</strong> are the warehouse desks chart from — standardized, period-by-period series.
+        An older middle layer of “processed summaries” exists historically; desks do not use it for charts or numbers in the pack.
+      </p>
+    </div>
+    <div class="comp">
+      <h3>Metric dictionary / contracts</h3>
+      <p>
+        A shared list of which fields must bind when the filing prints them. If a contracted field is missing after extraction, the run fails loudly. That way holes do not silently return as blank charts later.
+      </p>
+    </div>
+    <div class="comp">
+      <h3>Research packs</h3>
+      <p>
+        The HTML report generator. It turns the desk’s clean series plus narrative into the page Latent reads. Desks own the words and chart choices; the template owns the layout.
+      </p>
+    </div>
+    <div class="comp">
+      <h3>Research site hub</h3>
+      <p>
+        Where published digs live. After CoS review, the pack is published here and Latent gets the URL — nothing else.
+      </p>
+    </div>
+  </div>
+
+  <div class="note">
+    Printed facts are preferred. A derived figure is allowed only when labeled and the print is truly absent — for example a margin computed from printed revenue and printed profit. Desks never silently invent.
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ========== CLOUD VS DESK ========== -->
+<section id="contrast">
+  <h2>What Cloud agents do vs what desk bots do</h2>
+  <p>Different jobs. Mixing them is how tools get forked and numbers drift.</p>
+
+  <div class="contrast">
+    <div class="contrast-col desk">
+      <h3>Desk bots</h3>
+      <ul>
+        <li>Run the shared filing tools as-is</li>
+        <li>Read clean series from the cabinet</li>
+        <li>Analyze, write the letter, choose charts</li>
+        <li>Surface gaps to Tylor / Product</li>
+        <li>Rebuild the pack after tools are fixed</li>
+      </ul>
+    </div>
+    <div class="contrast-col cloud">
+      <h3>Cursor cloud agents</h3>
+      <ul>
+        <li>Implement Product’s approved fix specs</li>
+        <li>Change shared tools and pack templates in repos</li>
+        <li>Merge when checks are green</li>
+        <li>Do not own ticker thesis or pack prose</li>
+        <li>Do not publish to Latent</li>
+      </ul>
+    </div>
+  </div>
+
+  <p>
+    Desks never edit Tylor scripts or config on the shared computer. When a tool needs changing, the path is Product → Cursor → desks pull and re-run.
+  </p>
+</section>
+
+<hr class="rule">
+
+<!-- ========== WHEN SOMETHING IS MISSING ========== -->
+<section id="gaps">
+  <h2>When something is missing</h2>
+  <p>
+    A blank chart is not always a bug. First ask: did the company print the number? Then follow the right branch.
+  </p>
+
+  <div class="diagram">
+    <pre class="mermaid">
+flowchart TD
+  Q{Chart blank — did the filing print it?}
+  Q -->|Yes — printed but missing or wrong| A[Desk tickets Product via Tylor]
+  A --> B[Cursor ships the fix]
+  B --> C[Desks pull updated tools]
+  C --> D[Re-extract]
+  D --> E[Rebuild pack]
+  Q -->|No — company never printed it| F[Honest gap]
+  F --> G[Leave blank or labeled derivation]
+  G --> H[Not a tool bug]
+  style Q fill:#f7f3eb,stroke:#b87333,color:#1c1916
+  style A fill:#efe8dc,stroke:#4a453f,color:#1c1916
+  style B fill:#efe8dc,stroke:#4a453f,color:#1c1916
+  style C fill:#fffcf7,stroke:#4a453f,color:#1c1916
+  style D fill:#fffcf7,stroke:#4a453f,color:#1c1916
+  style E fill:#f7f3eb,stroke:#b87333,color:#1c1916
+  style F fill:#fffcf7,stroke:#4a453f,color:#1c1916
+  style G fill:#fffcf7,stroke:#4a453f,color:#1c1916
+  style H fill:#1c1916,stroke:#1c1916,color:#f7f3eb
+    </pre>
+    <p class="diagram-caption">Gap escalation — printed-but-missing vs never-printed</p>
+  </div>
+
+  <h3>Printed but missing or wrong</h3>
+  <p>
+    Desk tickets Product through Tylor. Product writes the fix spec. Cursor ships it. Desks pull the updated tools, re-extract, and rebuild the pack. No local patches on shared scripts.
+  </p>
+
+  <h3>Company never printed it</h3>
+  <p>
+    That is an honest gap. Leave it blank, or — only if the parts were printed — show a labeled derivation. This is not a tool bug and should not become a Product ticket pretending it is.
+  </p>
+</section>
+
+<footer>
+  <span>Latent Capital · desk data guide · living doc</span>
+  <span>2026-09-23</span>
+</footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+</script>
+</body>
+</html>
