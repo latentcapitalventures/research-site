@@ -77,10 +77,11 @@
     }
 
     .desk-spot {
-      margin: 2.25rem 0 0.5rem;
+      margin: 2.85rem 0 0;
       border: 1px solid color-mix(in srgb, var(--line) 75%, transparent);
-      background: color-mix(in srgb, var(--card) 88%, var(--paper));
+      background: color-mix(in srgb, var(--card) 92%, var(--paper));
       position: relative; overflow: hidden;
+      box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 6%, transparent);
     }
     .desk-spot::before {
       content: "";
@@ -182,17 +183,41 @@
     }
     .btn:hover { background: var(--signal); border-color: var(--signal); color: var(--paper); }
 
-    .rail { margin: 2.5rem 0 0; }
+    .rail {
+      margin: 3.35rem 0 0;
+      padding: 1.15rem 1.2rem 1.3rem;
+      background: var(--card);
+      border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+      border-top: 3px solid var(--ink);
+      position: relative;
+    }
+    .rail.earnings {
+      background: color-mix(in srgb, var(--paper) 38%, var(--card));
+      border-top-color: var(--line);
+    }
+    #desks {
+      background: color-mix(in srgb, var(--card) 96%, var(--ink));
+      border-top-color: var(--ink);
+    }
+    #digs {
+      background: color-mix(in srgb, var(--paper) 62%, var(--card));
+      border-top-color: var(--alert);
+    }
     .rail-head {
       display: flex; align-items: baseline; justify-content: space-between;
-      gap: 1rem; flex-wrap: wrap; margin: 0 0 0.15rem; padding-bottom: 0.55rem;
-      border-bottom: 2px solid var(--ink);
+      gap: 1rem; flex-wrap: wrap; margin: 0 0 0.35rem; padding-bottom: 0.7rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
     }
-    .rail-head h2 { font-size: 1.05rem; font-weight: 650; margin: 0; letter-spacing: 0.02em; }
+    .rail-head h2 {
+      font-size: 1.2rem; font-weight: 650; margin: 0; letter-spacing: -0.01em;
+    }
+    #desks .rail-head h2 { letter-spacing: 0.04em; text-transform: uppercase; font-size: 1.05rem; }
+    #digs .rail-head h2 { font-style: italic; font-weight: 550; }
     .rail-head .note {
-      font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.08em;
+      font-family: var(--sans); font-size: 0.72rem; letter-spacing: 0.1em;
       text-transform: uppercase; color: var(--soft-ink); margin: 0;
     }
+    #digs .rail-head .note { color: var(--alert); }
 
     .index { list-style: none; margin: 0; padding: 0; }
     .index > li { border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
@@ -262,8 +287,8 @@
 
     .empty { color: var(--soft-ink); margin: 0.35rem 0 0; }
 
-    /* Upcoming earnings — between the desk carousel and the ledger. */
-    .earnings { margin-top: 2.35rem; }
+    /* Upcoming earnings — its own panel between the desk carousel and the ledger. */
+    .earnings { margin-top: 3.35rem; }
     .earn-scroll {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -398,6 +423,19 @@
         
         <article class="slide is-active" data-i="0">
           <div class="slide-brand">
+            <img class="co" src="logos/alphabet.svg" width="88" height="88" alt=""/>
+            <div>
+              <p class="slide-kind">Desk · 2026-09-24</p>
+              <h3><a href="GOOGL/">Alphabet</a></h3>
+              <p class="ticker">GOOGL</p>
+            </div>
+          </div>
+          <p class="slide-blurb">Search &amp; ads scoreboard, Cloud, FCF, TAC, and weekly trailing / forward PE.</p>
+          <a class="btn" href="GOOGL/">Open report</a>
+        </article>
+        
+        <article class="slide" data-i="1" hidden>
+          <div class="slide-brand">
             <img class="co" src="logos/spotify.svg" width="88" height="88" alt=""/>
             <div>
               <p class="slide-kind">Desk · 2026-09-23</p>
@@ -409,7 +447,7 @@
           <a class="btn" href="SPOT-zbar-2026-09-21/">Open report</a>
         </article>
         
-        <article class="slide" data-i="1" hidden>
+        <article class="slide" data-i="2" hidden>
           <div class="slide-brand">
             
             <div>
@@ -420,19 +458,6 @@
           </div>
           <p class="slide-blurb">First Booking Holdings key-metrics pack — revenue, operating income, and net income from 2015, plus trailing PE for about the last twelve months. Forward earnings stay open. Room nights and gross bookings are a separate dig.</p>
           <a class="btn" href="BKNG-zbar-2026-09-21/">Open report</a>
-        </article>
-        
-        <article class="slide" data-i="2" hidden>
-          <div class="slide-brand">
-            
-            <div>
-              <p class="slide-kind">Desk · 2026-09-23</p>
-              <h3><a href="desk-data/">desk-data</a></h3>
-              <p class="ticker">desk-data</p>
-            </div>
-          </div>
-          <p class="slide-blurb">Published research pack for desk-data.</p>
-          <a class="btn" href="desk-data/">Open report</a>
         </article>
         
         <article class="slide" data-i="3" hidden>
@@ -450,19 +475,6 @@
         
         <article class="slide" data-i="4" hidden>
           <div class="slide-brand">
-            <img class="co" src="logos/alphabet.svg" width="88" height="88" alt=""/>
-            <div>
-              <p class="slide-kind">Desk · 2026-09-22</p>
-              <h3><a href="GOOGL-zbar-2026-09-21/">Alphabet Search durability dig</a></h3>
-              <p class="ticker">GOOGL-zbar-2026-09-21</p>
-            </div>
-          </div>
-          <p class="slide-blurb">From-scratch dig — Search durability, ads moat, and Cloud upside (2026-09-21).</p>
-          <a class="btn" href="GOOGL-zbar-2026-09-21/">Open report</a>
-        </article>
-        
-        <article class="slide" data-i="5" hidden>
-          <div class="slide-brand">
             <img class="co" src="logos/zillow.svg" width="88" height="88" alt=""/>
             <div>
               <p class="slide-kind">Desk · 2026-09-22</p>
@@ -472,6 +484,19 @@
           </div>
           <p class="slide-blurb">Pilot v5 — For Sale is the cabinet figure wherever it is filled, including 2022, 2023, and early 2024. First through third quarter 2023 stay Residential plus Mortgages, marked derived, and are not written into the fact column.</p>
           <a class="btn" href="Z-pilot-2026-09-21-v5/">Open report</a>
+        </article>
+        
+        <article class="slide" data-i="5" hidden>
+          <div class="slide-brand">
+            <img class="co" src="logos/alphabet.svg" width="88" height="88" alt=""/>
+            <div>
+              <p class="slide-kind">Dig · 2026-09-22</p>
+              <h3><a href="GOOGL-zbar-2026-09-21/">Alphabet Search durability dig</a></h3>
+              <p class="ticker">GOOGL-zbar-2026-09-21</p>
+            </div>
+          </div>
+          <p class="slide-blurb">From-scratch dig — Search durability, ads moat, and Cloud upside (2026-09-21).</p>
+          <a class="btn" href="GOOGL-zbar-2026-09-21/">Open report</a>
         </article>
         
         <article class="slide" data-i="6" hidden>
@@ -519,17 +544,17 @@
       <div class="carousel-nav">
         <div class="dots" role="tablist" aria-label="Recent reports">
           
-          <button type="button" class="dot is-active" data-i="0" aria-label="Show Spotify key metrics — marketplace mix, ARPU, cash, multiple"></button>
+          <button type="button" class="dot is-active" data-i="0" aria-label="Show Alphabet"></button>
           
-          <button type="button" class="dot" data-i="1" aria-label="Show Booking Holdings key metrics — revenue, earnings, trailing PE"></button>
+          <button type="button" class="dot" data-i="1" aria-label="Show Spotify key metrics — marketplace mix, ARPU, cash, multiple"></button>
           
-          <button type="button" class="dot" data-i="2" aria-label="Show desk-data"></button>
+          <button type="button" class="dot" data-i="2" aria-label="Show Booking Holdings key metrics — revenue, earnings, trailing PE"></button>
           
           <button type="button" class="dot" data-i="3" aria-label="Show Booking Holdings unit economics — nights, bookings, take rate"></button>
           
-          <button type="button" class="dot" data-i="4" aria-label="Show Alphabet Search durability dig"></button>
+          <button type="button" class="dot" data-i="4" aria-label="Show Zillow key metrics — marketplace mix, take-rate, falsifiers (v5)"></button>
           
-          <button type="button" class="dot" data-i="5" aria-label="Show Zillow key metrics — marketplace mix, take-rate, falsifiers (v5)"></button>
+          <button type="button" class="dot" data-i="5" aria-label="Show Alphabet Search durability dig"></button>
           
           <button type="button" class="dot" data-i="6" aria-label="Show IBKR key metrics (zbar)"></button>
           
@@ -631,14 +656,14 @@
         </li>
         
         <li>
-          <a class="row" href="GOOGL-zbar-2026-09-21/" id="GOOGL-zbar-2026-09-21">
+          <a class="row" href="GOOGL/" id="GOOGL">
             <span class="idx">02</span>
             <img class="co" src="logos/alphabet.svg" width="28" height="28" alt=""/>
             <div class="who">
-              <h3 class="name">Alphabet Search durability dig</h3>
-              <span class="ticker">GOOGL-zbar-2026-09-21</span>
+              <h3 class="name">Alphabet</h3>
+              <span class="ticker">GOOGL</span>
             </div>
-            <p class="blurb">From-scratch dig — Search durability, ads moat, and Cloud upside (2026-09-21).</p>
+            <p class="blurb">Search &amp; ads scoreboard, Cloud, FCF, TAC, and weekly trailing / forward PE.</p>
             <span class="go">Open</span>
           </a>
         </li>
@@ -682,19 +707,6 @@
           </a>
         </li>
         
-        <li>
-          <a class="row" href="desk-data/" id="desk-data">
-            <span class="idx">06</span>
-            
-            <div class="who">
-              <h3 class="name">desk-data</h3>
-              <span class="ticker">desk-data</span>
-            </div>
-            <p class="blurb">Published research pack for desk-data.</p>
-            <span class="go">Open</span>
-          </a>
-        </li>
-        
       </ol>
       
     </section>
@@ -716,6 +728,18 @@
               <p>Premium conversion dig — lag test, seasonal calendar, growth wedge, and hike overlay.</p>
             </div>
             <span class="meta">SPOT-conversion · 2026-09-17</span>
+          </a>
+        </li>
+        
+        <li>
+          <a class="dig" href="GOOGL-zbar-2026-09-21/" id="GOOGL-zbar-2026-09-21">
+            <img class="co" src="logos/alphabet.svg" width="28" height="28" alt=""/>
+            <span class="dig-mark">Dig</span>
+            <div>
+              <h3>Alphabet Search durability dig</h3>
+              <p>From-scratch dig — Search durability, ads moat, and Cloud upside (2026-09-21).</p>
+            </div>
+            <span class="meta">GOOGL-zbar-2026-09-21 · 2026-09-22</span>
           </a>
         </li>
         

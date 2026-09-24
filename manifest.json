@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Research",
-  "updated": "2026-09-23",
+  "updated": "2026-09-24",
   "packs": [
     {
       "ticker": "SPOT-conversion",
@@ -19,15 +19,36 @@
       "pdf": true
     },
     {
+      "ticker": "GOOGL",
+      "name": "Alphabet",
+      "path": "GOOGL/",
+      "kind": "key-metrics",
+      "summary": "Search & ads scoreboard, Cloud, FCF, TAC, and weekly trailing / forward PE.",
+      "updated": "2026-09-24",
+      "lineage": "googl-key-metrics",
+      "related": [
+        {
+          "label": "Search durability dig (2026-09-21)",
+          "path": "GOOGL-zbar-2026-09-21/",
+          "kind": "dig"
+        }
+      ],
+      "pdf": false
+    },
+    {
       "ticker": "GOOGL-zbar-2026-09-21",
       "name": "Alphabet Search durability dig",
       "path": "GOOGL-zbar-2026-09-21/",
-      "kind": "key-metrics",
+      "kind": "dig",
       "summary": "From-scratch dig — Search durability, ads moat, and Cloud upside (2026-09-21).",
       "updated": "2026-09-22",
-      "lineage": "googl-key-metrics",
-      "supersedes": [
-        "GOOGL"
+      "lineage": "googl-search-durability",
+      "related": [
+        {
+          "label": "GOOGL key metrics",
+          "path": "GOOGL/",
+          "kind": "key-metrics"
+        }
       ],
       "pdf": false
     },
@@ -135,15 +156,6 @@
           "kind": "key-metrics"
         }
       ],
-      "pdf": false
-    },
-    {
-      "ticker": "desk-data",
-      "name": "desk-data",
-      "path": "desk-data/",
-      "kind": "key-metrics",
-      "summary": "Published research pack for desk-data.",
-      "updated": "2026-09-23",
       "pdf": false
     }
   ]
