@@ -147,28 +147,11 @@
       "path": "BKNG-unit-econ-2026-09-24/",
       "kind": "dig",
       "summary": "Operating scale dig — room nights, gross bookings, merchant mix, take rate, year-over-year growth, and a trailing-twelve-month take rate. Income levels and trailing PE stay on the key-metrics page.",
-      "updated": "2026-09-25",
+      "updated": "2026-09-24",
       "lineage": "bkng-unit-econ",
       "supersedes": [
         "BKNG-unit-econ-2026-09-23"
       ],
-      "related": [
-        {
-          "label": "Key metrics",
-          "path": "BKNG-zbar-2026-09-21/",
-          "kind": "key-metrics"
-        }
-      ],
-      "pdf": false
-    },
-    {
-      "ticker": "BKNG-unit-econ-2026-09-23",
-      "name": "Booking Holdings unit economics — nights, bookings, take rate",
-      "path": "BKNG-unit-econ-2026-09-23/",
-      "kind": "unit-econ",
-      "summary": "Operating scale dig — room nights, gross bookings, merchant mix, and a calculated take rate. Income and trailing PE stay on the key-metrics page.",
-      "updated": "2026-09-23",
-      "lineage": "bkng-unit-econ",
       "related": [
         {
           "label": "Key metrics",
