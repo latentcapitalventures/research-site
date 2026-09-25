@@ -116,7 +116,7 @@
       }
     }
     .slide-brand { align-items: center; }
-    .slide-brand .co { flex-shrink: 0; }
+    .slide-brand .co, .slide-brand .co-slot { flex-shrink: 0; }
     @keyframes fade {
       from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: none; }
@@ -190,6 +190,7 @@
       border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
       border-top: 3px solid var(--ink);
       position: relative;
+      min-width: 0;
     }
     .rail.earnings {
       background: color-mix(in srgb, var(--paper) 38%, var(--card));
@@ -198,10 +199,12 @@
     #desks {
       background: color-mix(in srgb, var(--card) 96%, var(--ink));
       border-top-color: var(--ink);
+      overflow-x: clip;
     }
     #digs {
       background: color-mix(in srgb, var(--paper) 62%, var(--card));
       border-top-color: var(--alert);
+      overflow-x: clip;
     }
     .rail-head {
       display: flex; align-items: baseline; justify-content: space-between;
@@ -219,38 +222,54 @@
     }
     #digs .rail-head .note { color: var(--alert); }
 
-    .index { list-style: none; margin: 0; padding: 0; }
-    .index > li { border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); }
+    .index { list-style: none; margin: 0; padding: 0; min-width: 0; }
+    .index > li { border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent); min-width: 0; }
+    /* Named areas keep idx / logo / title / blurb / Open in place even when
+       the logo img is omitted. Auto-placement was collapsing long titles
+       into the 2rem logo column. */
     .row {
       display: grid;
       grid-template-columns: 2.2rem 2rem minmax(0, 1fr) auto;
+      grid-template-areas:
+        "idx logo who go"
+        ". blurb blurb blurb";
       gap: 0.55rem 0.75rem; align-items: center;
       padding: 1rem 0.2rem 1.05rem 0;
       text-decoration: none; color: inherit;
       transition: background 0.15s ease;
+      min-width: 0; max-width: 100%;
     }
     @media (min-width: 780px) {
-      .row { grid-template-columns: 2.4rem 2rem minmax(8rem, 12rem) minmax(0, 1fr) auto; }
+      .row {
+        grid-template-columns: 2.4rem 2rem minmax(8rem, 12rem) minmax(0, 1fr) auto;
+        grid-template-areas: "idx logo who blurb go";
+      }
     }
     .row:hover { background: color-mix(in srgb, var(--signal) 7%, transparent); }
     .row:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+    .row .idx { grid-area: idx; }
+    .row .co-slot { grid-area: logo; }
+    .row .who { grid-area: who; min-width: 0; }
+    .row .blurb { grid-area: blurb; min-width: 0; }
+    .row .go { grid-area: go; }
     .idx {
       font-family: var(--sans); font-size: 0.78rem; font-weight: 700;
       color: var(--line); letter-spacing: 0.04em;
     }
     .who .name {
       margin: 0; font-size: 1.15rem; font-weight: 600; letter-spacing: -0.015em; line-height: 1.15;
+      overflow-wrap: break-word; hyphens: auto;
     }
     .who .ticker {
-      display: inline-block; margin-top: 0.22rem;
+      display: inline-block; margin-top: 0.22rem; max-width: 100%;
       font-family: var(--sans); font-size: 0.7rem; font-weight: 750;
       letter-spacing: 0.12em; color: var(--signal);
+      overflow-wrap: break-word;
     }
     .blurb {
       margin: 0; color: var(--soft-ink); font-size: 0.94rem;
-      text-align: justify; hyphens: auto; grid-column: 2 / -1;
+      text-align: justify; hyphens: auto; overflow-wrap: break-word;
     }
-    @media (min-width: 780px) { .blurb { grid-column: auto; } }
     .go {
       font-family: var(--sans); font-size: 0.75rem; font-weight: 700;
       letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink);
@@ -258,31 +277,60 @@
     }
     .row:hover .go { color: var(--signal); border-bottom-color: var(--signal); }
 
-    .digs { list-style: none; margin: 0; padding: 0; }
+    .digs { list-style: none; margin: 0; padding: 0; min-width: 0; overflow: hidden; }
+    .digs > li { min-width: 0; }
     .dig {
-      display: grid; grid-template-columns: 2rem auto minmax(0, 1fr) auto;
+      display: grid;
+      grid-template-columns: 2rem auto minmax(0, 1fr) minmax(0, 16rem);
+      grid-template-areas: "logo mark body meta";
       gap: 0.65rem 0.85rem; align-items: center;
       padding: 1rem 0.15rem;
       border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
       text-decoration: none; color: inherit;
+      min-width: 0; max-width: 100%;
     }
     .dig:hover { background: color-mix(in srgb, var(--signal) 5%, transparent); }
+    .dig .co-slot { grid-area: logo; }
+    .dig .dig-mark { grid-area: mark; }
+    .dig .dig-body { grid-area: body; min-width: 0; }
+    .dig .meta { grid-area: meta; }
     .dig-mark {
       font-family: var(--sans); font-size: 0.68rem; font-weight: 800;
       letter-spacing: 0.12em; text-transform: uppercase; color: var(--alert);
     }
-    .dig h3 { margin: 0; font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
+    .dig h3 {
+      margin: 0; font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em;
+      overflow-wrap: break-word;
+    }
     .dig p {
       margin: 0.28rem 0 0; color: var(--soft-ink); font-size: 0.92rem;
-      text-align: justify; hyphens: auto;
+      text-align: justify; hyphens: auto; overflow-wrap: break-word;
     }
     .dig .meta {
-      font-family: var(--sans); font-size: 0.72rem; color: var(--soft-ink); white-space: nowrap;
+      font-family: var(--sans); font-size: 0.72rem; color: var(--soft-ink);
+      min-width: 0; max-width: 100%;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      justify-self: end;
     }
     @media (max-width: 700px) {
-      .dig { grid-template-columns: 2rem auto minmax(0, 1fr); }
-      .dig .meta { grid-column: 3; }
-      .dig p { grid-column: 1 / -1; }
+      .dig {
+        grid-template-columns: 2rem auto minmax(0, 1fr);
+        grid-template-areas:
+          "logo mark body"
+          ". . meta";
+      }
+      .dig .meta { justify-self: start; }
+    }
+
+    /* Logo cell is always reserved. Missing img must not collapse the grid. */
+    .co-slot {
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; min-width: 28px; min-height: 28px;
+      flex: none;
+    }
+    .slide .co-slot { width: 88px; height: 88px; min-width: 88px; min-height: 88px; }
+    @media (max-width: 640px) {
+      .slide .co-slot { width: 64px; height: 64px; min-width: 64px; min-height: 64px; }
     }
 
     .empty { color: var(--soft-ink); margin: 0.35rem 0 0; }
@@ -423,7 +471,7 @@
         
         <article class="slide is-active" data-i="0">
           <div class="slide-brand">
-            
+            <span class="co-slot"><img class="co" src="logos/amazon.svg" width="88" height="88" alt=""/></span>
             <div>
               <p class="slide-kind">Desk · 2026-09-25</p>
               <h3><a href="AMZN-zbar-2026-09-25/">Amazon key metrics — income, free cash flow, trailing PE</a></h3>
@@ -436,7 +484,7 @@
         
         <article class="slide" data-i="1" hidden>
           <div class="slide-brand">
-            
+            <span class="co-slot"><img class="co" src="logos/booking.svg" width="88" height="88" alt=""/></span>
             <div>
               <p class="slide-kind">Desk · 2026-09-25</p>
               <h3><a href="BKNG-zbar-2026-09-24/">Booking Holdings key metrics — income, growth, trailing PE</a></h3>
@@ -449,7 +497,7 @@
         
         <article class="slide" data-i="2" hidden>
           <div class="slide-brand">
-            
+            <span class="co-slot"><img class="co" src="logos/booking.svg" width="88" height="88" alt=""/></span>
             <div>
               <p class="slide-kind">Dig · 2026-09-25</p>
               <h3><a href="BKNG-unit-econ-2026-09-24/">Booking Holdings unit economics — nights, bookings, take rate</a></h3>
@@ -462,7 +510,7 @@
         
         <article class="slide" data-i="3" hidden>
           <div class="slide-brand">
-            <img class="co" src="logos/spotify.svg" width="88" height="88" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/spotify.svg" width="88" height="88" alt=""/></span>
             <div>
               <p class="slide-kind">Desk · 2026-09-23</p>
               <h3><a href="SPOT-zbar-2026-09-21/">Spotify key metrics — marketplace mix, ARPU, cash, multiple</a></h3>
@@ -475,7 +523,7 @@
         
         <article class="slide" data-i="4" hidden>
           <div class="slide-brand">
-            <img class="co" src="logos/zillow.svg" width="88" height="88" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/zillow.svg" width="88" height="88" alt=""/></span>
             <div>
               <p class="slide-kind">Desk · 2026-09-22</p>
               <h3><a href="Z-pilot-2026-09-21-v5/">Zillow key metrics — marketplace mix, take-rate, falsifiers (v5)</a></h3>
@@ -488,7 +536,7 @@
         
         <article class="slide" data-i="5" hidden>
           <div class="slide-brand">
-            <img class="co" src="logos/alphabet.svg" width="88" height="88" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/alphabet.svg" width="88" height="88" alt=""/></span>
             <div>
               <p class="slide-kind">Dig · 2026-09-22</p>
               <h3><a href="GOOGL-zbar-2026-09-21/">Alphabet Search durability dig</a></h3>
@@ -501,7 +549,7 @@
         
         <article class="slide" data-i="6" hidden>
           <div class="slide-brand">
-            <img class="co" src="logos/ibkr.svg" width="88" height="88" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/ibkr.svg" width="88" height="88" alt=""/></span>
             <div>
               <p class="slide-kind">Desk · 2026-09-21</p>
               <h3><a href="IBKR-zbar-2026-09-21/">IBKR key metrics (zbar)</a></h3>
@@ -514,7 +562,7 @@
         
         <article class="slide" data-i="7" hidden>
           <div class="slide-brand">
-            <img class="co" src="logos/alphabet.svg" width="88" height="88" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/alphabet.svg" width="88" height="88" alt=""/></span>
             <div>
               <p class="slide-kind">Desk · 2026-09-17</p>
               <h3><a href="GOOGL/">Alphabet</a></h3>
@@ -527,7 +575,7 @@
         
         <article class="slide" data-i="8" hidden>
           <div class="slide-brand">
-            <img class="co" src="logos/spotify.svg" width="88" height="88" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/spotify.svg" width="88" height="88" alt=""/></span>
             <div>
               <p class="slide-kind">Dig · 2026-09-17</p>
               <h3><a href="SPOT-conversion/">Spotify conversion</a></h3>
@@ -540,7 +588,7 @@
         
         <article class="slide" data-i="9" hidden>
           <div class="slide-brand">
-            <img class="co" src="logos/ibkr.svg" width="88" height="88" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/ibkr.svg" width="88" height="88" alt=""/></span>
             <div>
               <p class="slide-kind">Dig · 2026-09-17</p>
               <h3><a href="IBKR-intensity/">IBKR fee-toll intensity</a></h3>
@@ -660,7 +708,7 @@
         <li>
           <a class="row" href="SPOT-zbar-2026-09-21/" id="SPOT-zbar-2026-09-21">
             <span class="idx">01</span>
-            <img class="co" src="logos/spotify.svg" width="28" height="28" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/spotify.svg" width="28" height="28" alt=""/></span>
             <div class="who">
               <h3 class="name">Spotify key metrics — marketplace mix, ARPU, cash, multiple</h3>
               <span class="ticker">SPOT-zbar-2026-09-21</span>
@@ -673,7 +721,7 @@
         <li>
           <a class="row" href="GOOGL/" id="GOOGL">
             <span class="idx">02</span>
-            <img class="co" src="logos/alphabet.svg" width="28" height="28" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/alphabet.svg" width="28" height="28" alt=""/></span>
             <div class="who">
               <h3 class="name">Alphabet</h3>
               <span class="ticker">GOOGL</span>
@@ -686,7 +734,7 @@
         <li>
           <a class="row" href="IBKR-zbar-2026-09-21/" id="IBKR-zbar-2026-09-21">
             <span class="idx">03</span>
-            <img class="co" src="logos/ibkr.svg" width="28" height="28" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/ibkr.svg" width="28" height="28" alt=""/></span>
             <div class="who">
               <h3 class="name">IBKR key metrics (zbar)</h3>
               <span class="ticker">IBKR-zbar-2026-09-21</span>
@@ -699,7 +747,7 @@
         <li>
           <a class="row" href="Z-pilot-2026-09-21-v5/" id="Z-pilot-2026-09-21-v5">
             <span class="idx">04</span>
-            <img class="co" src="logos/zillow.svg" width="28" height="28" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/zillow.svg" width="28" height="28" alt=""/></span>
             <div class="who">
               <h3 class="name">Zillow key metrics — marketplace mix, take-rate, falsifiers (v5)</h3>
               <span class="ticker">Z-pilot-2026-09-21-v5</span>
@@ -712,7 +760,7 @@
         <li>
           <a class="row" href="AMZN-zbar-2026-09-25/" id="AMZN-zbar-2026-09-25">
             <span class="idx">05</span>
-            
+            <span class="co-slot"><img class="co" src="logos/amazon.svg" width="28" height="28" alt=""/></span>
             <div class="who">
               <h3 class="name">Amazon key metrics — income, free cash flow, trailing PE</h3>
               <span class="ticker">AMZN-zbar-2026-09-25</span>
@@ -725,7 +773,7 @@
         <li>
           <a class="row" href="BKNG-zbar-2026-09-24/" id="BKNG-zbar-2026-09-24">
             <span class="idx">06</span>
-            
+            <span class="co-slot"><img class="co" src="logos/booking.svg" width="28" height="28" alt=""/></span>
             <div class="who">
               <h3 class="name">Booking Holdings key metrics — income, growth, trailing PE</h3>
               <span class="ticker">BKNG-zbar-2026-09-24</span>
@@ -749,9 +797,9 @@
         
         <li>
           <a class="dig" href="SPOT-conversion/" id="SPOT-conversion">
-            <img class="co" src="logos/spotify.svg" width="28" height="28" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/spotify.svg" width="28" height="28" alt=""/></span>
             <span class="dig-mark">Dig</span>
-            <div>
+            <div class="dig-body">
               <h3>Spotify conversion</h3>
               <p>Premium conversion dig — lag test, seasonal calendar, growth wedge, and hike overlay.</p>
             </div>
@@ -761,9 +809,9 @@
         
         <li>
           <a class="dig" href="GOOGL-zbar-2026-09-21/" id="GOOGL-zbar-2026-09-21">
-            <img class="co" src="logos/alphabet.svg" width="28" height="28" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/alphabet.svg" width="28" height="28" alt=""/></span>
             <span class="dig-mark">Dig</span>
-            <div>
+            <div class="dig-body">
               <h3>Alphabet Search durability dig</h3>
               <p>From-scratch dig — Search durability, ads moat, and Cloud upside (2026-09-21).</p>
             </div>
@@ -773,9 +821,9 @@
         
         <li>
           <a class="dig" href="IBKR-intensity/" id="IBKR-intensity">
-            <img class="co" src="logos/ibkr.svg" width="28" height="28" alt=""/>
+            <span class="co-slot"><img class="co" src="logos/ibkr.svg" width="28" height="28" alt=""/></span>
             <span class="dig-mark">Dig</span>
-            <div>
+            <div class="dig-body">
               <h3>IBKR fee-toll intensity</h3>
               <p>Fee-toll intensity dig — per-account / per-order / per-equity take, growth decomposition, and real-vs-nominal reads.</p>
             </div>
@@ -785,9 +833,9 @@
         
         <li>
           <a class="dig" href="BKNG-unit-econ-2026-09-24/" id="BKNG-unit-econ-2026-09-24">
-            
+            <span class="co-slot"><img class="co" src="logos/booking.svg" width="28" height="28" alt=""/></span>
             <span class="dig-mark">Dig</span>
-            <div>
+            <div class="dig-body">
               <h3>Booking Holdings unit economics — nights, bookings, take rate</h3>
               <p>Operating scale dig — room nights, gross bookings, merchant mix, take rate, year-over-year growth, and a trailing-twelve-month take rate. Income levels and trailing PE stay on the key-metrics page.</p>
             </div>
