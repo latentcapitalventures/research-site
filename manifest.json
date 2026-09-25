@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Research",
-  "updated": "2026-09-24",
+  "updated": "2026-09-25",
   "packs": [
     {
       "ticker": "SPOT-conversion",
@@ -130,7 +130,7 @@
       "path": "BKNG-zbar-2026-09-24/",
       "kind": "key-metrics",
       "summary": "Booking Holdings key metrics — revenue, operating income, net income, revenue and net-income growth, and trailing PE through the week of September 14–20, 2026 (about 18.3×). Forward earnings stay open. Room nights and gross bookings stay on the unit-econ dig.",
-      "updated": "2026-09-24",
+      "updated": "2026-09-25",
       "lineage": "bkng-key-metrics",
       "supersedes": [
         "BKNG-zbar-2026-09-21"
@@ -162,6 +162,16 @@
           "kind": "key-metrics"
         }
       ],
+      "pdf": false
+    },
+    {
+      "ticker": "AMZN-zbar-2026-09-25",
+      "name": "Amazon key metrics — income, free cash flow, trailing PE",
+      "path": "AMZN-zbar-2026-09-25/",
+      "kind": "key-metrics",
+      "summary": "Amazon key metrics — net sales, operating income, net income, free cash flow, and trailing weekly PE through the week of September 14–20, 2026 (about 20.2×). Forward earnings stay open. Segment dollars are not in this cut.",
+      "updated": "2026-09-25",
+      "lineage": "amzn-key-metrics",
       "pdf": false
     }
   ]
