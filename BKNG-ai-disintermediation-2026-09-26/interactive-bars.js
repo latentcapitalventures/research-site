@@ -968,6 +968,7 @@
     chart._packMode = mode;
     chart._packModes = modes;
     chart._packPayload = payload;
+    canvas._packChart = chart;
     registerChart(chart);
     attachZoom(chart);
     return chart;
@@ -1087,12 +1088,149 @@
     log("wired DERIVED chrome toggle", box.checked ? "on" : "off");
   }
 
+  function wireWindowToggles() {
+    var node = document.getElementById("win-toggle-data");
+    if (!node) {
+      log("no CAGR window toggles on this page");
+      return;
+    }
+    var spec;
+    try {
+      spec = JSON.parse(node.textContent);
+    } catch (err) {
+      log("window toggle JSON failed", err);
+      return;
+    }
+    var root = document.querySelector("[data-win-toggles]");
+    if (!root) {
+      log("window toggle JSON without controls");
+      return;
+    }
+    var state = {
+      pre: spec.defaults.pre,
+      post: spec.defaults.post,
+      ttm: spec.defaults.ttm,
+    };
+    log(
+      "window toggles ready",
+      "pre=" + state.pre,
+      "post=" + state.post,
+      "ttm=" + state.ttm
+    );
+
+    function cellCopy(metric, windowId, field) {
+      var row = (spec.cells && spec.cells[metric]) || {};
+      var cell = row[windowId];
+      if (!cell || !cell[field]) return "—";
+      return cell[field];
+    }
+
+    function applyCagrChart() {
+      var fig = document.querySelector('figure.chart-interactive[data-chart-id="chart_cagr"]');
+      if (!fig) {
+        log("CAGR chart figure missing");
+        return;
+      }
+      var canvas = fig.querySelector("canvas");
+      var chart = canvas && canvas._packChart;
+      if (!chart || !chart._packPayload) {
+        log("CAGR chart not mounted — bars stay on the default image");
+        return;
+      }
+      var payload = chart._packPayload;
+      var ids = [state.pre, state.post, state.ttm];
+      payload.labels = ids.map(function (id) {
+        return spec.chartLabels[id];
+      });
+      (payload.datasets || []).forEach(function (ds) {
+        var series = spec.bars && spec.bars[ds.key];
+        if (!series) return;
+        ds.values = ids.map(function (id) {
+          return series[id] === undefined ? null : series[id];
+        });
+        log("CAGR series rebound", ds.key, ds.values.join(","));
+      });
+      chart.data.labels = payload.labels.slice();
+      chart.data.datasets = asChartDatasets(payload, chart._packMode || "grouped");
+      chart.update();
+      log("CAGR bars rebound", payload.labels.join(" | "));
+    }
+
+    function applyBoard() {
+      document.querySelectorAll("td[data-win-metric]").forEach(function (td) {
+        var metric = td.getAttribute("data-win-metric");
+        var role = td.getAttribute("data-win-role");
+        var windowId = state[role];
+        if (windowId === spec.defaults[role]) {
+          td.textContent = td.getAttribute("data-win-default");
+          return;
+        }
+        td.textContent = cellCopy(metric, windowId, "text");
+      });
+      document.querySelectorAll("th[data-win-header]").forEach(function (th) {
+        var role = th.getAttribute("data-win-header");
+        var label = spec.headers && spec.headers[state[role]];
+        if (label) th.textContent = label;
+      });
+      document.querySelectorAll("td[data-win-liner]").forEach(function (td) {
+        var metric = td.getAttribute("data-win-liner");
+        if (state.pre === spec.defaults.pre && state.post === spec.defaults.post) {
+          td.textContent = td.getAttribute("data-win-default");
+          return;
+        }
+        var tmpl = (spec.liners && spec.liners[metric]) || "";
+        td.textContent = tmpl
+          .replace("{pre}", cellCopy(metric, state.pre, "pct"))
+          .replace("{post}", cellCopy(metric, state.post, "pct"));
+      });
+      var hint = document.querySelector("[data-win-hint]");
+      if (hint) {
+        if (state.pre === "pre_2017_2019" && spec.hint) {
+          hint.hidden = false;
+          hint.textContent = spec.hint;
+          log("late-pre hint shown");
+        } else {
+          hint.hidden = true;
+          hint.textContent = "";
+        }
+      }
+      applyCagrChart();
+      log(
+        "window board applied",
+        "pre=" + state.pre,
+        "post=" + state.post,
+        "ttm=" + state.ttm
+      );
+    }
+
+    root.querySelectorAll("button[data-win-id]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var role = btn.getAttribute("data-win-role");
+        var id = btn.getAttribute("data-win-id");
+        if (!role || !id || state[role] === id) {
+          log("window toggle unchanged", role, id);
+          return;
+        }
+        state[role] = id;
+        root.querySelectorAll('button[data-win-role="' + role + '"]').forEach(function (peer) {
+          peer.setAttribute(
+            "aria-pressed",
+            peer.getAttribute("data-win-id") === id ? "true" : "false"
+          );
+        });
+        log("window toggle", role, id);
+        applyBoard();
+      });
+    });
+  }
+
   function boot() {
     setDerivedChrome(readDerivedChromePref(), false);
     wireDerivedToggle();
     var figs = document.querySelectorAll("figure.chart-interactive");
     log("boot interactive figures=", figs.length, "derivedChrome=", derivedChromeOn());
     figs.forEach(mount);
+    wireWindowToggles();
   }
 
   if (document.readyState === "loading") {

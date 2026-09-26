@@ -16,7 +16,7 @@
           "kind": "key-metrics"
         }
       ],
-      "pdf": false
+      "pdf": true
     },
     {
       "ticker": "GOOGL-zbar-2026-09-21",
@@ -148,7 +148,7 @@
       "name": "Booking Holdings — agentic AI and the growth machine",
       "path": "BKNG-ai-disintermediation-2026-09-26/",
       "kind": "ai-disintermediation",
-      "summary": "Open dig — has agentic AI already broken the growth machine? Cleaned pre- and post-COVID growth, absolute room-night adds, room nights and gross bookings with a calendar of AI launches, and take rate with marketing as a share of revenue. No thesis locked. Income levels and trailing PE stay on the key-metrics page.",
+      "summary": "Open dig — has agentic AI already broken the growth machine? Cleaned growth, 2015–2019 against 2023–2025, absolute room-night adds, room nights and gross bookings with a calendar of AI launches, and take rate with marketing as a share of revenue. No thesis locked. Income levels and trailing PE stay on the key-metrics page.",
       "updated": "2026-09-26",
       "lineage": "bkng-ai-disintermediation",
       "related": [
