@@ -374,16 +374,25 @@
           return s === "DERIVED";
         })
       ) {
-        spec.backgroundColor = values.map(function (_v, i) {
-          return statuses[i] === "DERIVED" ? "rgba(168,72,60,0.42)" : ds.color;
-        });
-        spec.borderColor = values.map(function (_v, i) {
-          return statuses[i] === "DERIVED" ? "#A8483C" : ds.color;
-        });
-        spec.borderWidth = values.map(function (_v, i) {
-          return statuses[i] === "DERIVED" ? 1.5 : (isLine ? 2 : 0);
-        });
-        log("DERIVED bar styling", payload.id, ds.key || ds.label);
+        if (payload.preserveSeriesTint) {
+          spec.backgroundColor = values.map(function (_v, i) {
+            return statuses[i] === "DERIVED" ? hatchPattern(ds.color) : ds.color;
+          });
+          spec.borderColor = ds.color;
+          spec.borderWidth = 0;
+          log("DERIVED tint kept (series color + hatch)", payload.id, ds.key || ds.label);
+        } else {
+          spec.backgroundColor = values.map(function (_v, i) {
+            return statuses[i] === "DERIVED" ? "rgba(168,72,60,0.42)" : ds.color;
+          });
+          spec.borderColor = values.map(function (_v, i) {
+            return statuses[i] === "DERIVED" ? "#A8483C" : ds.color;
+          });
+          spec.borderWidth = values.map(function (_v, i) {
+            return statuses[i] === "DERIVED" ? 1.5 : (isLine ? 2 : 0);
+          });
+          log("DERIVED bar styling", payload.id, ds.key || ds.label);
+        }
       }
       if (!isLine && payload.composition && mode !== "grouped") {
         spec.stack = "pack";
