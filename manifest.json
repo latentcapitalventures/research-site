@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Research",
-  "updated": "2026-09-25",
+  "updated": "2026-09-26",
   "packs": [
     {
       "ticker": "SPOT-conversion",
@@ -160,6 +160,28 @@
           "label": "Key metrics",
           "path": "BKNG-zbar-2026-09-24/",
           "kind": "key-metrics"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "BKNG-ai-disintermediation-2026-09-26",
+      "name": "Booking Holdings — agentic AI and the growth machine",
+      "path": "BKNG-ai-disintermediation-2026-09-26/",
+      "kind": "ai-disintermediation",
+      "summary": "Open dig — cleaned pre- and post-COVID growth, room nights and gross bookings with a calendar of AI launches, take rate and marketing intensity, and management’s AI posture. No thesis locked. Income levels and trailing PE stay on the key-metrics page.",
+      "updated": "2026-09-26",
+      "lineage": "bkng-ai-disintermediation",
+      "related": [
+        {
+          "label": "Key metrics",
+          "path": "BKNG-zbar-2026-09-24/",
+          "kind": "key-metrics"
+        },
+        {
+          "label": "Unit economics",
+          "path": "BKNG-unit-econ-2026-09-24/",
+          "kind": "dig"
         }
       ],
       "pdf": false
