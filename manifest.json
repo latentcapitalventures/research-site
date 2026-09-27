@@ -206,6 +206,16 @@
       "updated": "2026-09-25",
       "lineage": "amzn-key-metrics",
       "pdf": false
+    },
+    {
+      "ticker": "UBER-zbar-2026-09-27",
+      "name": "Uber key metrics — income, free cash flow, trailing PE",
+      "path": "UBER-zbar-2026-09-27/",
+      "kind": "key-metrics",
+      "summary": "Uber key metrics — revenue, operating income, net income, free cash flow, and trailing weekly PE through the week ending September 20, 2026 (15.29×). Forward earnings stay open. Gross bookings, trips, and segment cuts are not in this cut.",
+      "updated": "2026-09-27",
+      "lineage": "uber-key-metrics",
+      "pdf": false
     }
   ]
 }
