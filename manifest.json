@@ -215,6 +215,30 @@
       "summary": "Uber key metrics — revenue, operating income, net income, free cash flow, and trailing weekly PE through the week ending September 20, 2026 (15.29×). Forward earnings stay open. Gross bookings, trips, and segment cuts are not in this cut.",
       "updated": "2026-09-27",
       "lineage": "uber-key-metrics",
+      "related": [
+        {
+          "label": "EV / operating income dig",
+          "path": "UBER-ev-oi-2026-09-27/",
+          "kind": "valuation"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "UBER-ev-oi-2026-09-27",
+      "name": "Uber — EV / operating income",
+      "path": "UBER-ev-oi-2026-09-27/",
+      "kind": "valuation",
+      "summary": "Valuation dig — enterprise value over GAAP operating income beside trailing PE. About 23.35× at June 30, 2026, against a trailing PE near 15.3× on the key-metrics letter. Adjusted EBITDA is deferred. Not a second income-and-PE pack.",
+      "updated": "2026-09-27",
+      "lineage": "uber-ev-oi",
+      "related": [
+        {
+          "label": "Key metrics",
+          "path": "UBER-zbar-2026-09-27/",
+          "kind": "key-metrics"
+        }
+      ],
       "pdf": false
     }
   ]
