@@ -109,6 +109,11 @@
           "label": "Quarterly metrics dig",
           "path": "IBKR-quarterly-metrics-2026-09-27/",
           "kind": "quarterly-metrics"
+        },
+        {
+          "label": "Peer KPI dig",
+          "path": "IBKR-peer-kpi-2026-09-27/",
+          "kind": "peer-kpi"
         }
       ],
       "pdf": false
@@ -131,6 +136,33 @@
           "label": "Fee-toll intensity dig",
           "path": "IBKR-intensity/",
           "kind": "dig"
+        },
+        {
+          "label": "Peer KPI dig",
+          "path": "IBKR-peer-kpi-2026-09-27/",
+          "kind": "peer-kpi"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "IBKR-peer-kpi-2026-09-27",
+      "name": "Interactive Brokers — peer KPIs",
+      "path": "IBKR-peer-kpi-2026-09-27/",
+      "kind": "peer-kpi",
+      "summary": "Peer KPI dig — pretax margin, client scale, and fee lines for Interactive Brokers, Schwab, and Robinhood through the second quarter of 2026. Mixed: pretax margin favors IBKR; scale favors Schwab; fee intensity and activity lack a fair three-way unit. Not a second key-metrics page.",
+      "updated": "2026-09-27",
+      "lineage": "ibkr-peer-kpi",
+      "related": [
+        {
+          "label": "Key metrics",
+          "path": "IBKR-zbar-2026-09-21/",
+          "kind": "key-metrics"
+        },
+        {
+          "label": "Quarterly metrics dig",
+          "path": "IBKR-quarterly-metrics-2026-09-27/",
+          "kind": "quarterly-metrics"
         }
       ],
       "pdf": false
