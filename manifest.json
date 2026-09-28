@@ -32,22 +32,6 @@
       "pdf": false
     },
     {
-      "ticker": "Z-pilot-2026-09-21-v5",
-      "name": "Zillow key metrics — marketplace mix, take-rate, falsifiers (v5)",
-      "path": "Z-pilot-2026-09-21-v5/",
-      "kind": "key-metrics",
-      "summary": "Pilot v5 — For Sale is the cabinet figure wherever it is filled, including 2022, 2023, and early 2024. First through third quarter 2023 stay Residential plus Mortgages, marked derived, and are not written into the fact column.",
-      "updated": "2026-09-22",
-      "lineage": "z-key-metrics",
-      "supersedes": [
-        "Z",
-        "Z-pilot-2026-09-21",
-        "Z-pilot-2026-09-21-v2",
-        "Z-pilot-2026-09-21-v3"
-      ],
-      "pdf": false
-    },
-    {
       "ticker": "IBKR-intensity",
       "name": "IBKR fee-toll intensity",
       "path": "IBKR-intensity/",
@@ -268,6 +252,47 @@
         {
           "label": "Key metrics",
           "path": "UBER-zbar-2026-09-27/",
+          "kind": "key-metrics"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "Z-zbar-2026-09-28",
+      "name": "Zillow key metrics — income, mix, traffic, PE",
+      "path": "Z-zbar-2026-09-28/",
+      "kind": "key-metrics",
+      "summary": "Zillow key metrics — income, mix, traffic, and trailing PE through the week of 2026-W37 (about 133×). Forward PE stays blank. Preferred attachment, TTV basis points, and relative uplift stay on the unit-econ dig.",
+      "updated": "2026-09-28",
+      "lineage": "z-zbar-2026-09-28",
+      "supersedes": [
+        "Z",
+        "Z-pilot-2026-09-21",
+        "Z-pilot-2026-09-21-v2",
+        "Z-pilot-2026-09-21-v3",
+        "Z-pilot-2026-09-21-v5"
+      ],
+      "related": [
+        {
+          "label": "Unit economics",
+          "path": "Z-unit-econ-2026-09-28/",
+          "kind": "unit-econ"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "Z-unit-econ-2026-09-28",
+      "name": "Zillow unit economics — attachment, TTV bps, uplift",
+      "path": "Z-unit-econ-2026-09-28/",
+      "kind": "unit-econ",
+      "summary": "Operating-scale dig — Preferred attachment, For Sale take intensity, Rentals, ZHL purchase origination, and relative revenue-per-connection uplift. Absolute connection count stays a gap. Income and trailing PE stay on the key-metrics page.",
+      "updated": "2026-09-28",
+      "lineage": "z-unit-econ",
+      "related": [
+        {
+          "label": "Key metrics",
+          "path": "Z-zbar-2026-09-28/",
           "kind": "key-metrics"
         }
       ],
