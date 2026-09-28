@@ -676,9 +676,26 @@
     chart.update("none");
   }
 
+  function houseWindow(chart) {
+    var hw = chart._packPayload && chart._packPayload.houseWindow;
+    if (!hw || typeof hw.min !== "number" || typeof hw.max !== "number") return null;
+    return hw;
+  }
+
   function resetZoom(chart) {
     var scales = chart.options && chart.options.scales;
     if (!scales || !scales.x) return;
+    var hw = houseWindow(chart);
+    if (hw) {
+      rememberFullX(chart);
+      applyXRange(chart, hw.min, hw.max);
+      log(
+        "zoom reset to house window",
+        chart._packPayload && chart._packPayload.id,
+        hw.min + ".." + hw.max
+      );
+      return;
+    }
     delete scales.x.min;
     delete scales.x.max;
     chart.update();
@@ -971,6 +988,19 @@
     canvas._packChart = chart;
     registerChart(chart);
     attachZoom(chart);
+    var hw = houseWindow(chart);
+    if (hw) {
+      rememberFullX(chart);
+      applyXRange(chart, hw.min, hw.max);
+      log(
+        "opened on house window",
+        payload.id,
+        hw.min + ".." + hw.max,
+        "of",
+        labelCount,
+        "— zoom out for the rest of the series"
+      );
+    }
     return chart;
   }
 
