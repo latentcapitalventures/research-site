@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Research",
-  "updated": "2026-09-28",
+  "updated": "2026-09-29",
   "packs": [
     {
       "ticker": "SPOT-conversion",
@@ -258,13 +258,13 @@
       "pdf": false
     },
     {
-      "ticker": "Z-zbar-2026-09-28-v3",
-      "name": "Zillow key metrics — dual margins, shares, EPS, full-history income, mix, traffic, PE",
-      "path": "Z-zbar-2026-09-28-v3/",
+      "ticker": "Z-zbar-2026-09-29-v4",
+      "name": "Zillow key metrics — blanks filled, AE/share, full-history income, mix, traffic, PE",
+      "path": "Z-zbar-2026-09-29-v4/",
       "kind": "key-metrics",
-      "summary": "Zillow key metrics — full income history with operating income and adjusted EBITDA margins, diluted shares, EPS, mix, traffic, and trailing PE through 2026-W38 (about 131×). Forward PE stays blank. Preferred attachment and take intensity stay on the unit-econ dig.",
+      "summary": "Zillow key metrics — filing fills on adjusted EBITDA, share count, and 2017 income, plus adjusted EBITDA per share beside EPS. Full income history, mix, traffic, and all 51 complete weekly PE weeks through 2026-W38 (about 131×). The chart opens on about the last twelve months. Forward PE stays blank. Preferred attachment and take intensity stay on the unit-econ dig.",
       "updated": "2026-09-29",
-      "lineage": "z-zbar-2026-09-28-v3",
+      "lineage": "z-zbar-2026-09-29-v4",
       "supersedes": [
         "Z",
         "Z-pilot-2026-09-21",
@@ -272,7 +272,8 @@
         "Z-pilot-2026-09-21-v3",
         "Z-pilot-2026-09-21-v5",
         "Z-zbar-2026-09-28",
-        "Z-zbar-2026-09-28-v2"
+        "Z-zbar-2026-09-28-v2",
+        "Z-zbar-2026-09-28-v3"
       ],
       "related": [
         {
@@ -289,12 +290,12 @@
       "path": "Z-unit-econ-2026-09-28/",
       "kind": "unit-econ",
       "summary": "Operating-scale dig — Preferred attachment, For Sale take intensity, Rentals, ZHL purchase origination, and relative revenue-per-connection uplift. Absolute connection count stays a gap. Income and trailing PE stay on the key-metrics page.",
-      "updated": "2026-09-28",
+      "updated": "2026-09-29",
       "lineage": "z-unit-econ",
       "related": [
         {
           "label": "Key metrics",
-          "path": "Z-zbar-2026-09-28-v3/",
+          "path": "Z-zbar-2026-09-29-v4/",
           "kind": "key-metrics"
         }
       ],
