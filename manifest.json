@@ -258,19 +258,20 @@
       "pdf": false
     },
     {
-      "ticker": "Z-zbar-2026-09-28",
-      "name": "Zillow key metrics — income, mix, traffic, PE",
-      "path": "Z-zbar-2026-09-28/",
+      "ticker": "Z-zbar-2026-09-28-v2",
+      "name": "Zillow key metrics — full-history income, mix, traffic, PE",
+      "path": "Z-zbar-2026-09-28-v2/",
       "kind": "key-metrics",
-      "summary": "Zillow key metrics — income, mix, traffic, and trailing PE through the week of 2026-W37 (about 133×). Forward PE stays blank. Preferred attachment, TTV basis points, and relative uplift stay on the unit-econ dig.",
+      "summary": "Zillow key metrics — full income history from 2015, mix, traffic, and trailing PE through the week of 2026-W38 (about 131×). Forward PE stays blank. Preferred attachment and take intensity stay on the unit-econ dig.",
       "updated": "2026-09-28",
-      "lineage": "z-zbar-2026-09-28",
+      "lineage": "z-zbar-2026-09-28-v2",
       "supersedes": [
         "Z",
         "Z-pilot-2026-09-21",
         "Z-pilot-2026-09-21-v2",
         "Z-pilot-2026-09-21-v3",
-        "Z-pilot-2026-09-21-v5"
+        "Z-pilot-2026-09-21-v5",
+        "Z-zbar-2026-09-28"
       ],
       "related": [
         {
@@ -292,7 +293,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "Z-zbar-2026-09-28/",
+          "path": "Z-zbar-2026-09-28-v2/",
           "kind": "key-metrics"
         }
       ],
