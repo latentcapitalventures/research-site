@@ -214,13 +214,16 @@
       "pdf": false
     },
     {
-      "ticker": "AMZN-zbar-2026-09-25",
-      "name": "Amazon key metrics — income, free cash flow, trailing PE",
-      "path": "AMZN-zbar-2026-09-25/",
+      "ticker": "AMZN-zbar-2026-09-30",
+      "name": "Amazon key metrics — income, segment OI, issuer FCF, trailing PE",
+      "path": "AMZN-zbar-2026-09-30/",
       "kind": "key-metrics",
-      "summary": "Amazon key metrics — net sales, operating income, net income, free cash flow, and trailing weekly PE through the week of September 14–20, 2026 (about 20.2×). Forward earnings stay open. Segment dollars are not in this cut.",
-      "updated": "2026-09-25",
+      "summary": "Amazon key metrics — net sales, operating income, net income, NA / Intl / AWS segment operating income, issuer free cash flow, and trailing weekly PE through 2026-W39 (about 20.3×). Forward earnings stay open. Segment revenue is not in this cut.",
+      "updated": "2026-09-30",
       "lineage": "amzn-key-metrics",
+      "supersedes": [
+        "AMZN-zbar-2026-09-25"
+      ],
       "pdf": false
     },
     {
