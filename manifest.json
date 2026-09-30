@@ -1,6 +1,5 @@
 {
-  "title": "Latent Capital \u00b7 Research",
-  "updated": "2026-09-30",
+  "version": 1,
   "packs": [
     {
       "ticker": "SPOT-conversion",
@@ -152,26 +151,6 @@
       "pdf": false
     },
     {
-      "ticker": "BKNG-zbar-2026-09-24",
-      "name": "Booking Holdings key metrics \u2014 income, growth, trailing PE",
-      "path": "BKNG-zbar-2026-09-24/",
-      "kind": "key-metrics",
-      "summary": "Booking Holdings key metrics \u2014 revenue, operating income, net income, revenue and net-income growth, and trailing PE through the week of September 14\u201320, 2026 (about 18.3\u00d7). Forward earnings stay open. Room nights and gross bookings stay on the unit-econ dig.",
-      "updated": "2026-09-25",
-      "lineage": "bkng-key-metrics",
-      "supersedes": [
-        "BKNG-zbar-2026-09-21"
-      ],
-      "related": [
-        {
-          "label": "Unit economics",
-          "path": "BKNG-unit-econ-2026-09-24/",
-          "kind": "dig"
-        }
-      ],
-      "pdf": false
-    },
-    {
       "ticker": "BKNG-unit-econ-2026-09-24",
       "name": "Booking Holdings unit economics \u2014 nights, bookings, take rate",
       "path": "BKNG-unit-econ-2026-09-24/",
@@ -225,6 +204,26 @@
         "AMZN-zbar-2026-09-25"
       ],
       "pdf": false
+    },
+    {
+      "ticker": "BKNG-zbar-2026-09-30",
+      "name": "Booking Holdings \u2014 key metrics (income, trailing PE)",
+      "path": "BKNG-zbar-2026-09-30/",
+      "kind": "key-metrics",
+      "lineage": "bkng-key-metrics",
+      "supersedes": [
+        "BKNG-zbar-2026-09-21",
+        "BKNG-zbar-2026-09-24"
+      ],
+      "summary": "Booking Holdings key metrics \u2014 revenue, operating income, net income, and trailing weekly PE through the week of September 14\u201320, 2026 (about 18.3\u00d7). Forward earnings stay open. Room nights, gross bookings, and take rate stay on the unit-econ dig.",
+      "updated": "2026-09-30",
+      "related": [
+        {
+          "label": "Unit economics",
+          "path": "BKNG-unit-econ-2026-09-24/",
+          "kind": "dig"
+        }
+      ]
     },
     {
       "ticker": "UBER-ev-oi-2026-09-27",
