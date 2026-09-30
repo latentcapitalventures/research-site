@@ -1,5 +1,5 @@
 {
-  "title": "Latent Capital · Research",
+  "title": "Latent Capital \u00b7 Research",
   "updated": "2026-09-30",
   "packs": [
     {
@@ -7,7 +7,7 @@
       "name": "Spotify conversion",
       "path": "SPOT-conversion/",
       "kind": "dig",
-      "summary": "Premium conversion dig — lag test, seasonal calendar, growth wedge, and hike overlay.",
+      "summary": "Premium conversion dig \u2014 lag test, seasonal calendar, growth wedge, and hike overlay.",
       "updated": "2026-09-17",
       "related": [
         {
@@ -23,7 +23,7 @@
       "name": "Alphabet Search durability dig",
       "path": "GOOGL-zbar-2026-09-21/",
       "kind": "dig",
-      "summary": "From-scratch dig — Search durability, ads moat, and Cloud upside (2026-09-21).",
+      "summary": "From-scratch dig \u2014 Search durability, ads moat, and Cloud upside (2026-09-21).",
       "updated": "2026-09-22",
       "lineage": "googl-search-durability",
       "supersedes": [
@@ -36,7 +36,7 @@
       "name": "IBKR fee-toll intensity",
       "path": "IBKR-intensity/",
       "kind": "dig",
-      "summary": "Fee-toll intensity dig — per-account / per-order / per-equity take, growth decomposition, and real-vs-nominal reads.",
+      "summary": "Fee-toll intensity dig \u2014 per-account / per-order / per-equity take, growth decomposition, and real-vs-nominal reads.",
       "updated": "2026-09-17",
       "related": [
         {
@@ -54,10 +54,10 @@
     },
     {
       "ticker": "SPOT-zbar-2026-09-21",
-      "name": "Spotify key metrics — marketplace mix, ARPU, cash, multiple",
+      "name": "Spotify key metrics \u2014 marketplace mix, ARPU, cash, multiple",
       "path": "SPOT-zbar-2026-09-21/",
       "kind": "key-metrics",
-      "summary": "From-scratch Spotify key metrics — marketplace mix, ARPU, cash, and the trailing multiple (2026-09-21). Fourth quarters come from the shareholder letter. Street forward sits on the trailing PE chart. Does not replace SPOT.",
+      "summary": "From-scratch Spotify key metrics \u2014 marketplace mix, ARPU, cash, and the trailing multiple (2026-09-21). Fourth quarters come from the shareholder letter. Street forward sits on the trailing PE chart. Does not replace SPOT.",
       "updated": "2026-09-23",
       "lineage": "spot-key-metrics",
       "supersedes": [
@@ -77,7 +77,7 @@
       "name": "IBKR key metrics (zbar)",
       "path": "IBKR-zbar-2026-09-21/",
       "kind": "key-metrics",
-      "summary": "From-scratch key metrics — fee toll, franchise scale, and API moat (letter refresh 2026-09-27; FY2025Q4 on the quarterly spine 2026-09-28).",
+      "summary": "From-scratch key metrics \u2014 fee toll, franchise scale, and API moat (letter refresh 2026-09-27; FY2025Q4 on the quarterly spine 2026-09-28).",
       "updated": "2026-09-28",
       "lineage": "ibkr-key-metrics",
       "supersedes": [
@@ -104,10 +104,10 @@
     },
     {
       "ticker": "IBKR-quarterly-metrics-2026-09-27",
-      "name": "Interactive Brokers — quarterly metrics",
+      "name": "Interactive Brokers \u2014 quarterly metrics",
       "path": "IBKR-quarterly-metrics-2026-09-27/",
       "kind": "quarterly-metrics",
-      "summary": "Quarterly metrics dig — fee toll, accounts and DARTs, pretax, and US versus international net revenues through the second quarter of 2026, with FY2025Q4 on the quarterly spine. Multiples stay on the key-metrics page.",
+      "summary": "Quarterly metrics dig \u2014 fee toll, accounts and DARTs, pretax, and US versus international net revenues through the second quarter of 2026, with FY2025Q4 on the quarterly spine. Multiples stay on the key-metrics page.",
       "updated": "2026-09-28",
       "lineage": "ibkr-quarterly-metrics",
       "related": [
@@ -131,10 +131,10 @@
     },
     {
       "ticker": "IBKR-peer-kpi-2026-09-27",
-      "name": "Interactive Brokers — peer KPIs",
+      "name": "Interactive Brokers \u2014 peer KPIs",
       "path": "IBKR-peer-kpi-2026-09-27/",
       "kind": "peer-kpi",
-      "summary": "Peer KPI dig — pretax margin, client scale, and fee lines for Interactive Brokers, Schwab, and Robinhood through the second quarter of 2026. Mixed: pretax margin favors IBKR; scale favors Schwab; fee intensity and activity lack a fair three-way unit. Not a second key-metrics page.",
+      "summary": "Peer KPI dig \u2014 pretax margin, client scale, and fee lines for Interactive Brokers, Schwab, and Robinhood through the second quarter of 2026. Mixed: pretax margin favors IBKR; scale favors Schwab; fee intensity and activity lack a fair three-way unit. Not a second key-metrics page.",
       "updated": "2026-09-27",
       "lineage": "ibkr-peer-kpi",
       "related": [
@@ -153,10 +153,10 @@
     },
     {
       "ticker": "BKNG-zbar-2026-09-24",
-      "name": "Booking Holdings key metrics — income, growth, trailing PE",
+      "name": "Booking Holdings key metrics \u2014 income, growth, trailing PE",
       "path": "BKNG-zbar-2026-09-24/",
       "kind": "key-metrics",
-      "summary": "Booking Holdings key metrics — revenue, operating income, net income, revenue and net-income growth, and trailing PE through the week of September 14–20, 2026 (about 18.3×). Forward earnings stay open. Room nights and gross bookings stay on the unit-econ dig.",
+      "summary": "Booking Holdings key metrics \u2014 revenue, operating income, net income, revenue and net-income growth, and trailing PE through the week of September 14\u201320, 2026 (about 18.3\u00d7). Forward earnings stay open. Room nights and gross bookings stay on the unit-econ dig.",
       "updated": "2026-09-25",
       "lineage": "bkng-key-metrics",
       "supersedes": [
@@ -173,10 +173,10 @@
     },
     {
       "ticker": "BKNG-unit-econ-2026-09-24",
-      "name": "Booking Holdings unit economics — nights, bookings, take rate",
+      "name": "Booking Holdings unit economics \u2014 nights, bookings, take rate",
       "path": "BKNG-unit-econ-2026-09-24/",
       "kind": "dig",
-      "summary": "Operating scale dig — room nights, gross bookings, merchant mix, take rate, year-over-year growth, and a trailing-twelve-month take rate. Income levels and trailing PE stay on the key-metrics page.",
+      "summary": "Operating scale dig \u2014 room nights, gross bookings, merchant mix, take rate, year-over-year growth, and a trailing-twelve-month take rate. Income levels and trailing PE stay on the key-metrics page.",
       "updated": "2026-09-25",
       "lineage": "bkng-unit-econ",
       "supersedes": [
@@ -193,10 +193,10 @@
     },
     {
       "ticker": "BKNG-ai-disintermediation-2026-09-26",
-      "name": "Booking Holdings — agentic AI and the growth machine",
+      "name": "Booking Holdings \u2014 agentic AI and the growth machine",
       "path": "BKNG-ai-disintermediation-2026-09-26/",
       "kind": "ai-disintermediation",
-      "summary": "Open dig — has agentic AI already broken the growth machine? Cleaned growth, 2015–2019 against 2023–2025, absolute room-night adds, room nights and gross bookings with a calendar of AI launches, and take rate with marketing as a share of revenue. No thesis locked. Income levels and trailing PE stay on the key-metrics page.",
+      "summary": "Open dig \u2014 has agentic AI already broken the growth machine? Cleaned growth, 2015\u20132019 against 2023\u20132025, absolute room-night adds, room nights and gross bookings with a calendar of AI launches, and take rate with marketing as a share of revenue. No thesis locked. Income levels and trailing PE stay on the key-metrics page.",
       "updated": "2026-09-26",
       "lineage": "bkng-ai-disintermediation",
       "related": [
@@ -215,10 +215,10 @@
     },
     {
       "ticker": "AMZN-zbar-2026-09-30",
-      "name": "Amazon key metrics — income, segment OI, issuer FCF, trailing PE",
+      "name": "Amazon key metrics \u2014 income, segment OI, issuer FCF, trailing PE",
       "path": "AMZN-zbar-2026-09-30/",
       "kind": "key-metrics",
-      "summary": "Amazon key metrics — net sales, operating income, net income, NA / Intl / AWS segment operating income, issuer free cash flow, and trailing weekly PE through 2026-W39 (about 20.3×). Forward earnings stay open. Segment revenue is not in this cut.",
+      "summary": "Amazon key metrics \u2014 net sales, operating income, net income, NA / Intl / AWS segment operating income, issuer free cash flow, and trailing weekly PE through 2026-W39 (about 20.3\u00d7). Forward earnings stay open. Segment revenue is not in this cut.",
       "updated": "2026-09-30",
       "lineage": "amzn-key-metrics",
       "supersedes": [
@@ -227,31 +227,11 @@
       "pdf": false
     },
     {
-      "ticker": "UBER-zbar-2026-09-30",
-      "name": "Uber key metrics — income, free cash flow, trailing PE",
-      "path": "UBER-zbar-2026-09-30/",
-      "kind": "key-metrics",
-      "summary": "Uber key metrics — revenue, operating income, net income, free cash flow, and trailing weekly PE through the week ending September 27, 2026 (14.93×). Forward earnings stay open. Gross bookings, trips, and segment cuts are not in this cut.",
-      "updated": "2026-09-30",
-      "lineage": "uber-key-metrics",
-      "supersedes": [
-        "UBER-zbar-2026-09-27"
-      ],
-      "related": [
-        {
-          "label": "EV / operating income dig",
-          "path": "UBER-ev-oi-2026-09-27/",
-          "kind": "valuation"
-        }
-      ],
-      "pdf": false
-    },
-    {
       "ticker": "UBER-ev-oi-2026-09-27",
-      "name": "Uber — EV / operating income",
+      "name": "Uber \u2014 EV / operating income",
       "path": "UBER-ev-oi-2026-09-27/",
       "kind": "valuation",
-      "summary": "Valuation dig — enterprise value over GAAP operating income beside trailing PE. About 23.35× at June 30, 2026, against a trailing PE near 15.3× on the key-metrics letter. Adjusted EBITDA is deferred. Not a second income-and-PE pack.",
+      "summary": "Valuation dig \u2014 enterprise value over GAAP operating income beside trailing PE. About 23.35\u00d7 at June 30, 2026, against a trailing PE near 15.3\u00d7 on the key-metrics letter. Adjusted EBITDA is deferred. Not a second income-and-PE pack.",
       "updated": "2026-09-27",
       "lineage": "uber-ev-oi",
       "related": [
@@ -265,10 +245,10 @@
     },
     {
       "ticker": "Z-zbar-2026-09-30",
-      "name": "Zillow key metrics — Q4 2023 shares filled, AE/share, full-history income, mix, traffic, PE",
+      "name": "Zillow key metrics \u2014 Q4 2023 shares filled, AE/share, full-history income, mix, traffic, PE",
       "path": "Z-zbar-2026-09-30/",
       "kind": "key-metrics",
-      "summary": "Zillow key metrics — fourth-quarter 2023 diluted shares filled, adjusted EBITDA per share on every spine quarter, full income history, mix, traffic, and all 51 complete weekly PE weeks through 2026-W38 (about 131×). The chart opens on about the last twelve months. Forward PE stays blank. Preferred attachment and take intensity stay on the unit-econ dig.",
+      "summary": "Zillow key metrics \u2014 fourth-quarter 2023 diluted shares filled, adjusted EBITDA per share on every spine quarter, full income history, mix, traffic, and all 51 complete weekly PE weeks through 2026-W38 (about 131\u00d7). The chart opens on about the last twelve months. Forward PE stays blank. Preferred attachment and take intensity stay on the unit-econ dig.",
       "updated": "2026-09-30",
       "lineage": "z-zbar-2026-09-30",
       "supersedes": [
@@ -303,10 +283,10 @@
     },
     {
       "ticker": "Z-unit-econ-2026-09-28",
-      "name": "Zillow unit economics — attachment, TTV bps, uplift",
+      "name": "Zillow unit economics \u2014 attachment, TTV bps, uplift",
       "path": "Z-unit-econ-2026-09-28/",
       "kind": "unit-econ",
-      "summary": "Operating-scale dig — Preferred attachment, For Sale take intensity, Rentals, ZHL purchase origination, and relative revenue-per-connection uplift. Absolute connection count stays a gap. Income and trailing PE stay on the key-metrics page.",
+      "summary": "Operating-scale dig \u2014 Preferred attachment, For Sale take intensity, Rentals, ZHL purchase origination, and relative revenue-per-connection uplift. Absolute connection count stays a gap. Income and trailing PE stay on the key-metrics page.",
       "updated": "2026-09-29",
       "lineage": "z-unit-econ",
       "related": [
@@ -330,10 +310,10 @@
     },
     {
       "ticker": "Z-management-quality-2026-09-29",
-      "name": "Zillow management quality — stewardship franchise vs key-person",
+      "name": "Zillow management quality \u2014 stewardship franchise vs key-person",
       "path": "Z-management-quality-2026-09-29/",
       "kind": "management-quality",
-      "summary": "Management-quality dig — August 2024 chief-executive handoff, dual-class founder vote, internal bench, and live buybacks. No numeric management grade. Income, the trailing multiple, and unit economics stay on the companion pages.",
+      "summary": "Management-quality dig \u2014 August 2024 chief-executive handoff, dual-class founder vote, internal bench, and live buybacks. No numeric management grade. Income, the trailing multiple, and unit economics stay on the companion pages.",
       "updated": "2026-09-30",
       "lineage": "z-management-quality",
       "related": [
@@ -352,10 +332,10 @@
     },
     {
       "ticker": "Z-ai-data-access-2026-09-29",
-      "name": "Zillow — AI disintermediation and unique data access",
+      "name": "Zillow \u2014 AI disintermediation and unique data access",
       "path": "Z-ai-data-access-2026-09-29/",
       "kind": "topic-of-interest",
-      "summary": "Open dig — is Zillow addressing AI-assistant disintermediation and unique-data-access risk? Front-door visits and users, direct traffic near 80%, Preferred from 21% to 49%, For Sale intensity with the NAR source change, and Rentals. Language-model share of housing search stays blank. Income and the multiple stay on the key-metrics page.",
+      "summary": "Open dig \u2014 is Zillow addressing AI-assistant disintermediation and unique-data-access risk? Front-door visits and users, direct traffic near 80%, Preferred from 21% to 49%, For Sale intensity with the NAR source change, and Rentals. Language-model share of housing search stays blank. Income and the multiple stay on the key-metrics page.",
       "updated": "2026-09-29",
       "lineage": "z-ai-data-access",
       "related": [
@@ -370,15 +350,6 @@
           "kind": "unit-econ"
         }
       ],
-      "pdf": false
-    },
-    {
-      "ticker": "BKNG-zbar-2026-09-30",
-      "name": "BKNG-zbar-2026-09-30",
-      "path": "BKNG-zbar-2026-09-30/",
-      "kind": "key-metrics",
-      "summary": "Published research pack for BKNG-zbar-2026-09-30.",
-      "updated": "2026-09-30",
       "pdf": false
     },
     {
