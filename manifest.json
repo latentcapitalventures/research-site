@@ -352,13 +352,23 @@
       "pdf": false
     },
     {
-      "ticker": "UBER-zbar-2026-09-27",
-      "name": "UBER-zbar-2026-09-27",
-      "path": "UBER-zbar-2026-09-27/",
+      "ticker": "UBER-zbar-2026-09-30",
+      "name": "Uber key metrics \u2014 income, free cash flow, trailing PE",
+      "path": "UBER-zbar-2026-09-30/",
       "kind": "key-metrics",
-      "summary": "Published research pack for UBER-zbar-2026-09-27.",
+      "lineage": "uber-key-metrics",
+      "supersedes": [
+        "UBER-zbar-2026-09-27"
+      ],
+      "summary": "Uber key metrics \u2014 revenue, operating income, net income, free cash flow, and trailing weekly PE through the week ending September 27, 2026 (14.93\u00d7). Forward earnings stay open. Gross bookings, trips, and segment cuts are not in this cut.",
       "updated": "2026-09-30",
-      "pdf": false
+      "related": [
+        {
+          "label": "EV / operating income dig",
+          "path": "UBER-ev-oi-2026-09-27/",
+          "kind": "valuation"
+        }
+      ]
     }
   ]
 }
