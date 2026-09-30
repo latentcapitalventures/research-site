@@ -16,7 +16,7 @@
           "kind": "key-metrics"
         }
       ],
-      "pdf": true
+      "pdf": false
     },
     {
       "ticker": "GOOGL-zbar-2026-09-21",
@@ -58,7 +58,7 @@
       "path": "SPOT-zbar-2026-09-21/",
       "kind": "key-metrics",
       "summary": "From-scratch Spotify key metrics — marketplace mix, ARPU, cash, and the trailing multiple (2026-09-21). Fourth quarters come from the shareholder letter. Street forward sits on the trailing PE chart. Does not replace SPOT.",
-      "updated": "2026-09-30",
+      "updated": "2026-09-23",
       "lineage": "spot-key-metrics",
       "supersedes": [
         "SPOT"
@@ -258,13 +258,13 @@
       "pdf": false
     },
     {
-      "ticker": "Z-zbar-2026-09-29-v4",
-      "name": "Zillow key metrics — blanks filled, AE/share, full-history income, mix, traffic, PE",
-      "path": "Z-zbar-2026-09-29-v4/",
+      "ticker": "Z-zbar-2026-09-30",
+      "name": "Zillow key metrics — Q4 2023 shares filled, AE/share, full-history income, mix, traffic, PE",
+      "path": "Z-zbar-2026-09-30/",
       "kind": "key-metrics",
-      "summary": "Zillow key metrics — filing fills on adjusted EBITDA, share count, and 2017 income, plus adjusted EBITDA per share beside EPS. Full income history, mix, traffic, and all 51 complete weekly PE weeks through 2026-W38 (about 131×). The chart opens on about the last twelve months. Forward PE stays blank. Preferred attachment and take intensity stay on the unit-econ dig.",
-      "updated": "2026-09-29",
-      "lineage": "z-zbar-2026-09-29-v4",
+      "summary": "Zillow key metrics — fourth-quarter 2023 diluted shares filled, adjusted EBITDA per share on every spine quarter, full income history, mix, traffic, and all 51 complete weekly PE weeks through 2026-W38 (about 131×). The chart opens on about the last twelve months. Forward PE stays blank. Preferred attachment and take intensity stay on the unit-econ dig.",
+      "updated": "2026-09-30",
+      "lineage": "z-zbar-2026-09-30",
       "supersedes": [
         "Z",
         "Z-pilot-2026-09-21",
@@ -273,7 +273,8 @@
         "Z-pilot-2026-09-21-v5",
         "Z-zbar-2026-09-28",
         "Z-zbar-2026-09-28-v2",
-        "Z-zbar-2026-09-28-v3"
+        "Z-zbar-2026-09-28-v3",
+        "Z-zbar-2026-09-29-v4"
       ],
       "related": [
         {
@@ -282,14 +283,14 @@
           "kind": "unit-econ"
         },
         {
-          "label": "Management quality",
-          "path": "Z-management-quality-2026-09-29/",
-          "kind": "management-quality"
-        },
-        {
           "label": "AI and data access",
           "path": "Z-ai-data-access-2026-09-29/",
           "kind": "topic-of-interest"
+        },
+        {
+          "label": "Management quality",
+          "path": "Z-management-quality-2026-09-29/",
+          "kind": "management-quality"
         }
       ],
       "pdf": false
@@ -305,7 +306,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "Z-zbar-2026-09-29-v4/",
+          "path": "Z-zbar-2026-09-30/",
           "kind": "key-metrics"
         },
         {
@@ -332,7 +333,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "Z-zbar-2026-09-29-v4/",
+          "path": "Z-zbar-2026-09-30/",
           "kind": "key-metrics"
         },
         {
@@ -354,7 +355,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "Z-zbar-2026-09-29-v4/",
+          "path": "Z-zbar-2026-09-30/",
           "kind": "key-metrics"
         },
         {
