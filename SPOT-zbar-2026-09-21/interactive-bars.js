@@ -15,6 +15,15 @@
  * e.g. geo already in %): Stacked and 100% stacked draw identically, so
  * Stacked is hidden. 100% uses the printed shares (no re-normalization).
  * Grouped remains available.
+ *
+ * Zoom: wheel / pinch zooms the x (time) domain; drag pans; double-click or
+ * the Reset zoom button restores the house window. DERIVED warning chrome
+ * (hatch, red tint, watermark, tooltip suffix) can be hidden from a page
+ * toggle without changing series statuses.
+ *
+ * House 2026-09-30: Labels chip (default OFF, persisted like DERIVED chrome);
+ * CORE level charts may switch Levels / YoY (YoY is DERIVED from printed FACT
+ * levels); optional quiet trendline when payload.trendline is true.
  */
 (function () {
   "use strict";
@@ -25,10 +34,143 @@
     grouped: "Grouped",
   };
 
+  var DERIVED_CHROME_KEY = "latent-pack-derived-chrome";
+  var DATA_LABELS_KEY = "latent-pack-data-labels";
+  var ZOOM_MIN_CATEGORIES = 4;
+  var mountedCharts = [];
+
   function log() {
     if (typeof console !== "undefined" && console.info) {
       console.info.apply(console, ["[pack-charts]"].concat([].slice.call(arguments)));
     }
+  }
+
+  function derivedChromeOn() {
+    return !document.documentElement.classList.contains("derived-chrome-off");
+  }
+
+  function readDerivedChromePref() {
+    try {
+      var stored = localStorage.getItem(DERIVED_CHROME_KEY);
+      if (stored === "off") return false;
+      if (stored === "on") return true;
+    } catch (err) {
+      log("DERIVED chrome preference unread", err);
+    }
+    return true;
+  }
+
+  function registerChart(chart) {
+    if (chart && mountedCharts.indexOf(chart) < 0) mountedCharts.push(chart);
+  }
+
+  function setDerivedChrome(on, persist) {
+    document.documentElement.classList.toggle("derived-chrome-off", !on);
+    document.documentElement.setAttribute("data-derived-chrome", on ? "on" : "off");
+    var box = document.getElementById("pack-derived-chrome");
+    if (box && box.checked !== !!on) box.checked = !!on;
+    if (persist !== false) {
+      try {
+        localStorage.setItem(DERIVED_CHROME_KEY, on ? "on" : "off");
+        log("DERIVED chrome preference saved", on ? "on" : "off");
+      } catch (err) {
+        log("DERIVED chrome preference not stored", err);
+      }
+    }
+    mountedCharts.forEach(function (chart) {
+      restyleChart(chart);
+    });
+    log("DERIVED chrome", on ? "shown" : "hidden", "charts=", mountedCharts.length);
+  }
+
+  function dataLabelsOn() {
+    return document.documentElement.classList.contains("data-labels-on");
+  }
+
+  function readDataLabelsPref() {
+    try {
+      var stored = localStorage.getItem(DATA_LABELS_KEY);
+      if (stored === "on") return true;
+      if (stored === "off") return false;
+    } catch (err) {
+      log("data labels preference unread", err);
+    }
+    return false;
+  }
+
+  function setDataLabels(on, persist) {
+    document.documentElement.classList.toggle("data-labels-on", !!on);
+    document.documentElement.setAttribute("data-data-labels", on ? "on" : "off");
+    var box = document.getElementById("pack-data-labels");
+    if (box && box.checked !== !!on) box.checked = !!on;
+    document.querySelectorAll("button[data-data-labels]").forEach(function (btn) {
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    if (persist !== false) {
+      try {
+        localStorage.setItem(DATA_LABELS_KEY, on ? "on" : "off");
+        log("data labels preference saved", on ? "on" : "off");
+      } catch (err) {
+        log("data labels preference not stored", err);
+      }
+    }
+    mountedCharts.forEach(function (chart) {
+      if (chart && typeof chart.update === "function") chart.update("none");
+    });
+    log("data labels", on ? "on" : "off", "charts=", mountedCharts.length);
+  }
+
+  function seriesModeOf(chart) {
+    return (chart && chart._packSeriesMode) || "levels";
+  }
+
+  function payloadView(payload, seriesMode) {
+    if (!payload) return payload;
+    if (seriesMode === "yoy" && payload.yoyDatasets && payload.yoyDatasets.length) {
+      var view = Object.assign({}, payload, {
+        datasets: payload.yoyDatasets,
+        ylabel: "YoY %",
+        unit: "%",
+        hasDerived: true,
+        composition: false,
+        trendline: false,
+      });
+      delete view.yDisplayScale;
+      delete view.yDisplayUnit;
+      delete view.y1DisplayScale;
+      log("series mode yoy", payload.id, "datasets=", payload.yoyDatasets.length);
+      return view;
+    }
+    return payload;
+  }
+
+  function restyleChart(chart) {
+    if (!chart || !chart._packPayload) return;
+    var zoom = snapshotZoom(chart);
+    var seriesMode = seriesModeOf(chart);
+    var view = payloadView(chart._packPayload, seriesMode);
+    var mode = chart._packMode || "grouped";
+    chart.data.datasets = asChartDatasets(view, mode);
+    chart.options.scales = scalesFor(view, mode);
+    if (chart.options.plugins) {
+      chart.options.plugins.tooltip = buildTooltip(view);
+    }
+    restoreZoom(chart, zoom);
+    chart.update();
+  }
+
+  function snapshotZoom(chart) {
+    var x = chart.options && chart.options.scales && chart.options.scales.x;
+    if (!x) return null;
+    return { min: x.min, max: x.max };
+  }
+
+  function restoreZoom(chart, zoom) {
+    if (!zoom || !chart.options || !chart.options.scales || !chart.options.scales.x) return;
+    if (zoom.min === undefined) delete chart.options.scales.x.min;
+    else chart.options.scales.x.min = zoom.min;
+    if (zoom.max === undefined) delete chart.options.scales.x.max;
+    else chart.options.scales.x.max = zoom.max;
   }
 
   function fmtMoney(v, unit) {
@@ -46,6 +188,111 @@
   function fmtPct(share) {
     if (share === null || share === undefined || Number.isNaN(share)) return "—";
     return (share * 100).toFixed(1) + "%";
+  }
+
+  function fmtTick(v, scale) {
+    if (v === null || v === undefined || Number.isNaN(Number(v))) return "";
+    var n = Number(v) / (scale || 1);
+    if (!isFinite(n)) return "";
+    if (Math.abs(n) < 1e-12) return "0";
+    var av = Math.abs(n);
+    var s;
+    if (av >= 100) s = String(Math.round(n));
+    else if (av >= 1) s = n.toFixed(1);
+    else s = n.toFixed(2);
+    if (s.indexOf(".") >= 0) {
+      s = s.replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+    }
+    if (s === "-0") return "0";
+    return s;
+  }
+
+  function maxAbsOnAxis(payload, axisId) {
+    var m = 0;
+    (payload.datasets || []).forEach(function (ds) {
+      var axis = ds.yAxisID || "y";
+      if (axisId === "y" && axis === "y1") return;
+      if (axisId === "y1" && axis !== "y1") return;
+      (ds.values || []).forEach(function (v) {
+        if (v === null || v === undefined || Number.isNaN(Number(v))) return;
+        m = Math.max(m, Math.abs(Number(v)));
+      });
+      (ds.points || []).forEach(function (p) {
+        var n = Number(p && p.y);
+        if (!Number.isNaN(n)) m = Math.max(m, Math.abs(n));
+      });
+    });
+    return m;
+  }
+
+  function isRatioAxis(ylabel, unit, payload) {
+    if (payload && (payload.percentShare || payload.stackMode === "percent")) return true;
+    var blob = ((ylabel || "") + " " + (unit || "")).toLowerCase();
+    var raw = (ylabel || "") + (unit || "");
+    if (blob.indexOf("%") >= 0 || blob.indexOf("percent") >= 0 || blob.indexOf("bps") >= 0) {
+      return true;
+    }
+    if (raw.indexOf("×") >= 0 || raw.indexOf("÷") >= 0) return true;
+    var u = String(unit || "").trim().toLowerCase();
+    if (u === "x" || u === "multiple" || u === "ratio" || u === "×") return true;
+    if (/\btake[ -]?rate\b/.test(blob)) return true;
+    if (/\bpe\b/.test(blob) && /(trail|forward|earnings|multiple|\(x\))/.test(blob)) return true;
+    return false;
+  }
+
+  function alreadyScaled(ylabel, unit) {
+    var blob = ((ylabel || "") + " " + (unit || "")).toLowerCase();
+    if (/\b(thousands?|millions?|billions?|trillions?)\b/.test(blob)) return true;
+    if (/[$€£][mbtk]\b/.test(blob)) return true;
+    var u = String(unit || "").trim().toLowerCase();
+    return u === "$m" || u === "$b" || u === "$k" || u === "€m" || u === "millions" || u === "billions";
+  }
+
+  function isUnitRate(ylabel, unit) {
+    var blob = (ylabel || "") + " " + (unit || "");
+    if (/\bper\b/i.test(blob) || /\barpu\b/i.test(blob)) return true;
+    return /\/ *(order|account|night|user|room|share|day|cleared)/i.test(blob);
+  }
+
+  function currencySymbol(ylabel, unit) {
+    var blob = (ylabel || "") + " " + (unit || "");
+    if (blob.indexOf("€") >= 0 || /\beur\b/i.test(blob)) return "€";
+    if (blob.indexOf("£") >= 0 || /\bgbp\b/i.test(blob)) return "£";
+    if (blob.indexOf("$") >= 0 || /\busd\b/i.test(blob)) return "$";
+    return "";
+  }
+
+  function annotateYlabel(ylabel, unitName, symbol) {
+    var base = (ylabel || "").trim();
+    if (!unitName) return base;
+    if (base.toLowerCase().indexOf(unitName) >= 0) return base;
+    var suffix = symbol ? "(" + symbol + " " + unitName + ")" : "(" + unitName + ")";
+    if (!base) return suffix;
+    return base + " " + suffix;
+  }
+
+  function displayAxis(payload, axisId, ylabel) {
+    // House: USD ($ millions) ticks when yDisplayScale is set.
+    var title = ylabel || "";
+    var scaleKey = axisId === "y1" ? "y1DisplayScale" : "yDisplayScale";
+    var titleKey = axisId === "y1" ? "y1Label" : "ylabel";
+    if (payload && payload[scaleKey]) {
+      var scaledTitle = payload[titleKey] || title;
+      log("y-axis display scale", payload.id, axisId, payload[scaleKey], scaledTitle);
+      return { scale: payload[scaleKey], title: scaledTitle };
+    }
+    title = title || (payload && payload[titleKey]) || "";
+    var unit = (payload && payload.unit) || "";
+    if (isRatioAxis(title, unit, payload) || alreadyScaled(title, unit) || isUnitRate(title, unit)) {
+      return { scale: 1, title: title };
+    }
+    var peak = maxAbsOnAxis(payload || {}, axisId);
+    if (peak < 1e6) return { scale: 1, title: title };
+    var scale = peak >= 1e12 ? 1e9 : 1e6;
+    var name = scale === 1e9 ? "billions" : "millions";
+    var inferred = annotateYlabel(title, name, currencySymbol(title, unit));
+    log("inferred y-axis display scale", payload && payload.id, axisId, scale, inferred, "maxAbs=", peak);
+    return { scale: scale, title: inferred };
   }
 
   function isPercentShare(payload) {
@@ -120,7 +367,7 @@
         break;
       }
     }
-    if (!any) return ds.color;
+    if (!any || !derivedChromeOn()) return ds.color;
     log("hatching DERIVED bars", payload.id, payload.derivedLabels);
     return labels.map(function (_lab, i) {
       return isDerivedIndex(payload, i) ? hatchPattern(ds.color) : ds.color;
@@ -193,17 +440,32 @@
         log("dashed dataset", payload.id, ds.key || ds.label);
       }
       var statuses = spec.statuses;
-      if (!isLine && statuses.some(function (s) { return s === "DERIVED"; })) {
-        spec.backgroundColor = values.map(function (_v, i) {
-          return statuses[i] === "DERIVED" ? "rgba(168,72,60,0.42)" : ds.color;
-        });
-        spec.borderColor = values.map(function (_v, i) {
-          return statuses[i] === "DERIVED" ? "#A8483C" : ds.color;
-        });
-        spec.borderWidth = values.map(function (_v, i) {
-          return statuses[i] === "DERIVED" ? 1.5 : (isLine ? 2 : 0);
-        });
-        log("DERIVED bar styling", payload.id, ds.key || ds.label);
+      if (
+        derivedChromeOn() &&
+        !isLine &&
+        statuses.some(function (s) {
+          return s === "DERIVED";
+        })
+      ) {
+        if (payload.preserveSeriesTint) {
+          spec.backgroundColor = values.map(function (_v, i) {
+            return statuses[i] === "DERIVED" ? hatchPattern(ds.color) : ds.color;
+          });
+          spec.borderColor = ds.color;
+          spec.borderWidth = 0;
+          log("DERIVED tint kept (series color + hatch)", payload.id, ds.key || ds.label);
+        } else {
+          spec.backgroundColor = values.map(function (_v, i) {
+            return statuses[i] === "DERIVED" ? "rgba(168,72,60,0.42)" : ds.color;
+          });
+          spec.borderColor = values.map(function (_v, i) {
+            return statuses[i] === "DERIVED" ? "#A8483C" : ds.color;
+          });
+          spec.borderWidth = values.map(function (_v, i) {
+            return statuses[i] === "DERIVED" ? 1.5 : (isLine ? 2 : 0);
+          });
+          log("DERIVED bar styling", payload.id, ds.key || ds.label);
+        }
       }
       if (!isLine && payload.composition && mode !== "grouped") {
         spec.stack = "pack";
@@ -234,15 +496,16 @@
       return scale;
     }
     var isLine = chartType === "line";
+    var axis = displayAxis(payload || {}, "y", ylabel);
     return {
       stacked: !!(composition && mode !== "grouped"),
       beginAtZero: !isLine,
       ticks: {
         callback: function (v) {
-          return v;
+          return fmtTick(v, axis.scale);
         },
       },
-      title: { display: !!ylabel, text: ylabel || "", color: "#5c574f" },
+      title: { display: !!axis.title, text: axis.title || "", color: "#5c574f" },
       grid: { color: "rgba(212,203,184,0.55)" },
     };
   }
@@ -278,7 +541,9 @@
           if (!items.length) return "";
           var raw = items[0].raw;
           var lab = raw && raw.label ? String(raw.label) : items[0].label || "";
-          if (isDerivedIndex(payload, items[0].dataIndex)) return lab + " · DERIVED";
+          if (derivedChromeOn() && isDerivedIndex(payload, items[0].dataIndex)) {
+            return lab + " · DERIVED";
+          }
           return lab;
         },
         label: function (ctx) {
@@ -297,7 +562,9 @@
           var raw = ctx.dataset.rawValues ? ctx.dataset.rawValues[idx] : ctx.raw;
           var unit = ctx.dataset.unit || payload.unit || "";
           var derived =
-            (ctx.dataset.statuses || [])[idx] === "DERIVED" ? " · DERIVED" : "";
+            derivedChromeOn() && (ctx.dataset.statuses || [])[idx] === "DERIVED"
+              ? " · DERIVED"
+              : "";
           if (!composition || isPercentShare(payload)) {
             return " " + ctx.dataset.label + ": " + fmtMoney(raw, unit) + derived;
           }
@@ -365,20 +632,425 @@
       y: yScaleFor(mode, payload.ylabel, payload.composition, payload.chartType, payload),
     };
     if (hasY1) {
+      var y1 = displayAxis(payload, "y1", payload.y1Label);
       scales.y1 = {
         position: "right",
         stacked: false,
         beginAtZero: payload.chartType !== "line",
         grid: { drawOnChartArea: false },
-        ticks: { color: "#5c574f" },
+        ticks: {
+          color: "#5c574f",
+          callback: function (v) {
+            return fmtTick(v, y1.scale);
+          },
+        },
         title: {
-          display: !!payload.y1Label,
-          text: payload.y1Label || "",
+          display: !!y1.title,
+          text: y1.title || "",
           color: "#5c574f",
         },
       };
     }
     return scales;
+  }
+
+  function categoryCount(chart) {
+    return ((chart.data && chart.data.labels) || []).length;
+  }
+
+  function xBounds(chart) {
+    var scale = chart.scales && chart.scales.x;
+    if (!scale) return null;
+    var kind = scale.type === "linear" || scale.type === "time" ? "linear" : "category";
+    if (kind === "category") {
+      var n = categoryCount(chart);
+      if (!n) return null;
+      var opts = chart.options && chart.options.scales && chart.options.scales.x;
+      var min = (opts && opts.min !== undefined) ? opts.min : (scale.options && scale.options.min);
+      var max = (opts && opts.max !== undefined) ? opts.max : (scale.options && scale.options.max);
+      if (min === undefined || min === null) min = 0;
+      if (max === undefined || max === null) max = n - 1;
+      if (typeof min === "string") min = Math.max(0, (chart.data.labels || []).indexOf(min));
+      if (typeof max === "string") {
+        var idx = (chart.data.labels || []).indexOf(max);
+        max = idx >= 0 ? idx : n - 1;
+      }
+      return { kind: kind, min: Number(min), max: Number(max), n: n };
+    }
+    var full = chart._packXFull;
+    return {
+      kind: kind,
+      min: scale.min,
+      max: scale.max,
+      lo: full ? full.min : scale.min,
+      hi: full ? full.max : scale.max,
+    };
+  }
+
+  function applyXRange(chart, min, max) {
+    var scales = chart.options && chart.options.scales;
+    if (!scales || !scales.x) return;
+    var full = chart._packXFull || xBounds(chart);
+    if (!full) return;
+    if (full.kind === "category") {
+      var n = full.n || categoryCount(chart);
+      min = Math.max(0, min);
+      max = Math.min(n - 1, max);
+      if (max < min) {
+        var swap = min;
+        min = max;
+        max = swap;
+      }
+      if (max - min + 1 < ZOOM_MIN_CATEGORIES && n >= ZOOM_MIN_CATEGORIES) {
+        var extra = ZOOM_MIN_CATEGORIES - (max - min + 1);
+        min = Math.max(0, min - Math.ceil(extra / 2));
+        max = Math.min(n - 1, min + ZOOM_MIN_CATEGORIES - 1);
+        min = Math.max(0, max - ZOOM_MIN_CATEGORIES + 1);
+      }
+      if (min <= 0 && max >= n - 1) {
+        delete scales.x.min;
+        delete scales.x.max;
+        log("zoom full range", chart._packPayload && chart._packPayload.id);
+      } else {
+        scales.x.min = Math.round(min);
+        scales.x.max = Math.round(max);
+        log(
+          "zoom range",
+          chart._packPayload && chart._packPayload.id,
+          scales.x.min + ".." + scales.x.max
+        );
+      }
+    } else {
+      var lo = full.min;
+      var hi = full.max;
+      var span = hi - lo;
+      if (!(span > 0)) return;
+      var minSpan = span * 0.05;
+      if (max < min) {
+        var swapped = min;
+        min = max;
+        max = swapped;
+      }
+      if (max - min < minSpan) {
+        var center = (min + max) / 2;
+        min = center - minSpan / 2;
+        max = center + minSpan / 2;
+      }
+      min = Math.max(lo, min);
+      max = Math.min(hi, max);
+      if (min <= lo && max >= hi) {
+        delete scales.x.min;
+        delete scales.x.max;
+      } else {
+        scales.x.min = min;
+        scales.x.max = max;
+      }
+    }
+    chart.update("none");
+  }
+
+  function houseWindow(chart) {
+    var hw = chart._packPayload && chart._packPayload.houseWindow;
+    if (!hw || typeof hw.min !== "number" || typeof hw.max !== "number") return null;
+    return hw;
+  }
+
+  function resetZoom(chart) {
+    var scales = chart.options && chart.options.scales;
+    if (!scales || !scales.x) return;
+    var hw = houseWindow(chart);
+    if (hw) {
+      rememberFullX(chart);
+      applyXRange(chart, hw.min, hw.max);
+      log(
+        "zoom reset to house window",
+        chart._packPayload && chart._packPayload.id,
+        hw.min + ".." + hw.max
+      );
+      return;
+    }
+    delete scales.x.min;
+    delete scales.x.max;
+    chart.update();
+    chart._packXFull = xBounds(chart);
+    log("zoom reset", chart._packPayload && chart._packPayload.id);
+  }
+
+  function panByPixels(chart, dx) {
+    var area = chart.chartArea;
+    var bounds = xBounds(chart);
+    if (!bounds || !area) return;
+    var width = area.right - area.left;
+    if (width <= 0) return;
+    var span = bounds.max - bounds.min;
+    if (!(span > 0)) return;
+    var delta = (-dx / width) * span;
+    applyXRange(chart, bounds.min + delta, bounds.max + delta);
+  }
+
+  function zoomAtClientX(chart, clientX, factor) {
+    var area = chart.chartArea;
+    var bounds = xBounds(chart);
+    if (!bounds || !area) return;
+    var rect = chart.canvas.getBoundingClientRect();
+    var x = clientX - rect.left;
+    var frac = (x - area.left) / Math.max(1, area.right - area.left);
+    frac = Math.max(0, Math.min(1, frac));
+    var span = bounds.max - bounds.min;
+    if (!(span > 0)) return;
+    var newSpan = span * factor;
+    var center = bounds.min + span * frac;
+    applyXRange(chart, center - newSpan * frac, center + newSpan * (1 - frac));
+  }
+
+  function rememberFullX(chart) {
+    if (chart._packXFull) return;
+    var bounds = xBounds(chart);
+    if (!bounds) return;
+    if (bounds.kind === "category") {
+      chart._packXFull = { kind: "category", min: 0, max: bounds.n - 1, n: bounds.n };
+    } else {
+      chart._packXFull = { kind: "linear", min: bounds.min, max: bounds.max };
+    }
+  }
+
+  function attachZoom(chart) {
+    var canvas = chart.canvas;
+    if (!canvas || canvas._packZoomBound) return;
+    canvas._packZoomBound = true;
+    rememberFullX(chart);
+    var drag = { on: false, x: 0, id: null };
+    var pointers = {};
+    var pinch0 = 0;
+
+    canvas.addEventListener(
+      "wheel",
+      function (ev) {
+        rememberFullX(chart);
+        var area = chart.chartArea;
+        if (!area) return;
+        var rect = canvas.getBoundingClientRect();
+        var x = ev.clientX - rect.left;
+        if (x < area.left || x > area.right) return;
+        ev.preventDefault();
+        var factor = ev.deltaY < 0 ? 0.82 : 1.22;
+        zoomAtClientX(chart, ev.clientX, factor);
+      },
+      { passive: false }
+    );
+
+    canvas.addEventListener("pointerdown", function (ev) {
+      pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
+      var ids = Object.keys(pointers);
+      if (ids.length >= 2) {
+        var a = pointers[ids[0]];
+        var b = pointers[ids[1]];
+        var dx = a.x - b.x;
+        var dy = a.y - b.y;
+        pinch0 = Math.sqrt(dx * dx + dy * dy) || 1;
+        drag.on = false;
+        return;
+      }
+      if (ev.button !== undefined && ev.button !== 0) return;
+      drag.on = true;
+      drag.x = ev.clientX;
+      drag.id = ev.pointerId;
+      try {
+        canvas.setPointerCapture(ev.pointerId);
+      } catch (err) {
+        /* older browsers */
+      }
+    });
+
+    canvas.addEventListener("pointermove", function (ev) {
+      if (pointers[ev.pointerId]) {
+        pointers[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
+      }
+      var ids = Object.keys(pointers);
+      if (ids.length >= 2 && pinch0) {
+        ev.preventDefault();
+        var a = pointers[ids[0]];
+        var b = pointers[ids[1]];
+        var dx = a.x - b.x;
+        var dy = a.y - b.y;
+        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        var factor = pinch0 / dist;
+        if (factor > 1.04 || factor < 0.96) {
+          var cx = (a.x + b.x) / 2;
+          zoomAtClientX(chart, cx, factor);
+          pinch0 = dist;
+        }
+        return;
+      }
+      if (!drag.on || (drag.id != null && ev.pointerId !== drag.id)) return;
+      var move = ev.clientX - drag.x;
+      if (Math.abs(move) < 2) return;
+      ev.preventDefault();
+      drag.x = ev.clientX;
+      canvas.style.cursor = "grabbing";
+      panByPixels(chart, move);
+    });
+
+    function endPointer(ev) {
+      delete pointers[ev.pointerId];
+      if (Object.keys(pointers).length < 2) pinch0 = 0;
+      if (!drag.on || (drag.id != null && ev.pointerId !== drag.id)) return;
+      drag.on = false;
+      canvas.style.cursor = "";
+      try {
+        canvas.releasePointerCapture(drag.id);
+      } catch (err) {
+        /* ignore */
+      }
+    }
+    canvas.addEventListener("pointerup", endPointer);
+    canvas.addEventListener("pointercancel", endPointer);
+    canvas.addEventListener("dblclick", function (ev) {
+      ev.preventDefault();
+      resetZoom(chart);
+    });
+    log("zoom attached", chart._packPayload && chart._packPayload.id, "labels=", categoryCount(chart));
+  }
+
+  function drawEventMarkers(chart, payload) {
+    var marks = (payload && payload.vlines) || [];
+    if (!marks.length) return;
+    var xScale = chart.scales && chart.scales.x;
+    var area = chart.chartArea;
+    var labels = (chart.data && chart.data.labels) || payload.labels || [];
+    if (!xScale || !area || !labels.length) return;
+    var ctx = chart.ctx;
+    ctx.save();
+    marks.forEach(function (mark) {
+      var lab = mark && mark.label;
+      if (!lab) return;
+      var idx = labels.indexOf(lab);
+      if (idx < 0) {
+        log("event marker outside axis", payload.id, lab);
+        return;
+      }
+      var x =
+        typeof xScale.getPixelForValue === "function"
+          ? xScale.getPixelForValue(idx)
+          : xScale.getPixelForTick(idx);
+      if (!(x >= area.left && x <= area.right)) return;
+      ctx.beginPath();
+      ctx.strokeStyle = "#C4A04A";
+      ctx.setLineDash([2, 3]);
+      ctx.lineWidth = 1.2;
+      ctx.moveTo(x, area.top);
+      ctx.lineTo(x, area.bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      if (mark.text) {
+        ctx.save();
+        ctx.fillStyle = "#5C564C";
+        ctx.font = "10px sans-serif";
+        ctx.translate(x + 3, area.top + 2);
+        ctx.rotate(Math.PI / 2);
+        ctx.textAlign = "left";
+        ctx.textBaseline = "top";
+        ctx.fillText(String(mark.text), 0, 0);
+        ctx.restore();
+      }
+    });
+    ctx.restore();
+    log("drew event markers", payload.id, "n=" + marks.length);
+  }
+
+  function drawTrendline(chart) {
+    var payload = chart._packPayload;
+    if (!payload || !payload.trendline) return;
+    if (seriesModeOf(chart) === "yoy") return;
+    var area = chart.chartArea;
+    var xScale = chart.scales && chart.scales.x;
+    var yScale = chart.scales && chart.scales.y;
+    if (!area || !xScale || !yScale) return;
+    var ds = (payload.datasets || [])[0];
+    if (!ds) return;
+    var values = ds.values || [];
+    var statuses = ds.statuses || [];
+    var pts = [];
+    for (var i = 0; i < values.length; i++) {
+      var v = values[i];
+      if (v === null || v === undefined || Number.isNaN(Number(v))) continue;
+      if (statuses[i] === "DERIVED") continue;
+      pts.push({ x: i, y: Number(v) });
+    }
+    if (pts.length < 2) {
+      log("trendline skip — need ≥2 FACT points", payload.id, "n=" + pts.length);
+      return;
+    }
+    var n = pts.length;
+    var sumX = 0;
+    var sumY = 0;
+    var sumXY = 0;
+    var sumXX = 0;
+    pts.forEach(function (p) {
+      sumX += p.x;
+      sumY += p.y;
+      sumXY += p.x * p.y;
+      sumXX += p.x * p.x;
+    });
+    var denom = n * sumXX - sumX * sumX;
+    if (!denom) return;
+    var slope = (n * sumXY - sumX * sumY) / denom;
+    var intercept = (sumY - slope * sumX) / n;
+    var x0 = pts[0].x;
+    var x1 = pts[pts.length - 1].x;
+    var y0 = intercept + slope * x0;
+    var y1 = intercept + slope * x1;
+    var ctx = chart.ctx;
+    ctx.save();
+    ctx.beginPath();
+    ctx.strokeStyle = "#5C564C";
+    ctx.globalAlpha = 0.55;
+    ctx.lineWidth = 1.15;
+    ctx.setLineDash([3, 4]);
+    ctx.moveTo(xScale.getPixelForValue(x0), yScale.getPixelForValue(y0));
+    ctx.lineTo(xScale.getPixelForValue(x1), yScale.getPixelForValue(y1));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+    log("trendline", payload.id, "n=" + n, "slope=" + slope);
+  }
+
+  function drawDataLabels(chart) {
+    if (!dataLabelsOn()) return;
+    var payload = chart._packPayload;
+    if (!payload) return;
+    var view = payloadView(payload, seriesModeOf(chart));
+    var area = chart.chartArea;
+    if (!area) return;
+    var ctx = chart.ctx;
+    ctx.save();
+    ctx.fillStyle = "#1B1A17";
+    ctx.font = "600 9px Inter, ui-sans-serif, system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    (chart.data.datasets || []).forEach(function (ds, di) {
+      var meta = chart.getDatasetMeta(di);
+      if (!meta || meta.hidden) return;
+      var axis = displayAxis(view, ds.yAxisID || "y", view.ylabel);
+      (ds.data || []).forEach(function (v, i) {
+        if (v === null || v === undefined || Number.isNaN(Number(v))) return;
+        var el = meta.data && meta.data[i];
+        if (!el) return;
+        var pos = typeof el.tooltipPosition === "function" ? el.tooltipPosition() : el;
+        var x = pos.x;
+        var y = pos.y;
+        if (!(x >= area.left && x <= area.right)) return;
+        var text;
+        if (view.unit === "%" || seriesModeOf(chart) === "yoy") {
+          var num = Number(v);
+          text = (Math.abs(num) >= 10 ? num.toFixed(0) : num.toFixed(1)) + "%";
+        } else {
+          text = fmtTick(v, axis.scale);
+        }
+        ctx.fillText(text, x, y - 2);
+      });
+    });
+    ctx.restore();
   }
 
   function mountChart(canvas, payload) {
@@ -414,10 +1086,21 @@
       : [];
 
     var plugins = [];
-    if (payload.hasDerived) {
+    if (payload.vlines && payload.vlines.length) {
+      plugins.push({
+        id: "packEventMarkers",
+        afterDraw: function (chart) {
+          drawEventMarkers(chart, payload);
+        },
+      });
+      log("event markers on", payload.id, "n=" + payload.vlines.length);
+    }
+    if (payload.hasDerived || (payload.yoyDatasets && payload.yoyDatasets.length)) {
       plugins.push({
         id: "packDerivedWatermark",
         afterDraw: function (chart) {
+          var view = payloadView(chart._packPayload || payload, seriesModeOf(chart));
+          if (!view.hasDerived || !derivedChromeOn()) return;
           var area = chart.chartArea;
           if (!area) return;
           var ctx = chart.ctx;
@@ -434,14 +1117,23 @@
           ctx.restore();
         },
       });
-      log("DERIVED watermark on", payload.id);
+      log("DERIVED watermark plugin on", payload.id, "hasDerived=", !!payload.hasDerived);
     }
+    plugins.push({
+      id: "packHouseChrome",
+      afterDatasetsDraw: function (chart) {
+        drawTrendline(chart);
+        drawDataLabels(chart);
+      },
+    });
+    var seriesMode = payload.defaultSeriesMode || "levels";
+    var view = payloadView(payload, seriesMode);
     var chart = new Chart(canvas.getContext("2d"), {
       type: payload.chartType === "scatter" ? "scatter" : payload.chartType === "line" ? "line" : "bar",
       plugins: plugins,
       data: {
         labels: payload.labels || [],
-        datasets: asChartDatasets(payload, mode),
+        datasets: asChartDatasets(view, mode),
       },
       options: {
         responsive: true,
@@ -455,9 +1147,9 @@
             position: "bottom",
             labels: { boxWidth: 12, color: "#1c1915", font: { size: 11 } },
           },
-          tooltip: buildTooltip(payload),
+          tooltip: buildTooltip(view),
         },
-        scales: scalesFor(payload, mode),
+        scales: scalesFor(view, mode),
       },
     });
     log(
@@ -471,15 +1163,75 @@
     chart._packMode = mode;
     chart._packModes = modes;
     chart._packPayload = payload;
+    chart._packSeriesMode = seriesMode;
+    canvas._packChart = chart;
+    registerChart(chart);
+    attachZoom(chart);
+    var hw = houseWindow(chart);
+    if (hw) {
+      rememberFullX(chart);
+      applyXRange(chart, hw.min, hw.max);
+      log(
+        "opened on house window",
+        payload.id,
+        hw.min + ".." + hw.max,
+        "of",
+        labelCount,
+        "— zoom out for the rest of the series"
+      );
+    }
     return chart;
   }
 
-  function wireToolbar(figure, chart) {
-    if (!chart) return;
+  function wireToolbar(figure, charts) {
+    if (!charts || !charts.length) return;
+    var chart = charts[0];
     var payload = chart._packPayload;
-    if (!payload.composition) return;
     var toolbar = figure.querySelector(".chart-toolbar");
     if (!toolbar) return;
+    toolbar.querySelectorAll("[data-zoom-reset]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        charts.forEach(resetZoom);
+        log("zoom reset click", payload && payload.id);
+      });
+    });
+    toolbar.querySelectorAll("button[data-data-labels]").forEach(function (btn) {
+      btn.setAttribute("aria-pressed", dataLabelsOn() ? "true" : "false");
+      btn.addEventListener("click", function () {
+        setDataLabels(!dataLabelsOn(), true);
+      });
+    });
+    toolbar.querySelectorAll("button[data-series-mode]").forEach(function (btn) {
+      var current = seriesModeOf(chart);
+      btn.setAttribute(
+        "aria-pressed",
+        btn.getAttribute("data-series-mode") === current ? "true" : "false"
+      );
+      btn.addEventListener("click", function () {
+        var next = btn.getAttribute("data-series-mode") || "levels";
+        setSeriesMode(next);
+      });
+    });
+    function setSeriesMode(next) {
+      if (!payload) return;
+      if (next === "yoy" && !(payload.yoyDatasets && payload.yoyDatasets.length)) {
+        log("refusing YoY mode — no house sidecar", payload.id);
+        return;
+      }
+      charts.forEach(function (c) {
+        if (c._packSeriesMode === next) return;
+        c._packSeriesMode = next;
+        restyleChart(c);
+      });
+      toolbar.querySelectorAll("button[data-series-mode]").forEach(function (peer) {
+        peer.setAttribute(
+          "aria-pressed",
+          peer.getAttribute("data-series-mode") === next ? "true" : "false"
+        );
+      });
+      log("series mode", payload.id, next);
+    }
+    if (!payload || !payload.composition) return;
     var mode = chart._packMode;
     toolbar.querySelectorAll("button[data-mode]").forEach(function (btn) {
       var m = btn.getAttribute("data-mode");
@@ -512,12 +1264,15 @@
           return;
         }
       }
+      var zoom = snapshotZoom(chart);
       chart._packMode = next;
       toolbar.querySelectorAll("button[data-mode]").forEach(function (btn) {
         btn.setAttribute("aria-pressed", btn.getAttribute("data-mode") === next ? "true" : "false");
       });
-      chart.data.datasets = asChartDatasets(payload, next);
-      chart.options.scales = scalesFor(payload, next);
+      var view = payloadView(payload, seriesModeOf(chart));
+      chart.data.datasets = asChartDatasets(view, next);
+      chart.options.scales = scalesFor(view, next);
+      restoreZoom(chart, zoom);
       chart.update();
       log("mode change", payload.id, next, MODE_LABELS[next] || next);
     }
@@ -541,30 +1296,209 @@
       return;
     }
     var canvases = figure.querySelectorAll("canvas");
+    if (payload.hasDerived) {
+      figure.setAttribute("data-has-derived", "true");
+    }
     if (payload.panels && payload.panels.length) {
-      var mounted = 0;
+      var mounted = [];
       payload.panels.forEach(function (panel, i) {
         panel.id = panel.id || payload.id + "-" + i;
         panel.composition = false;
         panel.modes = [];
         if (!panel.gapLabels && payload.gapLabels) panel.gapLabels = payload.gapLabels;
-        if (mountChart(canvases[i], panel)) mounted += 1;
+        var panelChart = mountChart(canvases[i], panel);
+        if (panelChart) mounted.push(panelChart);
       });
-      if (!mounted) return;
+      if (!mounted.length) return;
+      wireToolbar(figure, mounted);
       figure.classList.add("js-ready");
-      log("mounted panels", payload.id, "n=" + mounted);
+      log("mounted panels", payload.id, "n=" + mounted.length);
       return;
     }
     var chart = mountChart(canvases[0], payload);
     if (!chart) return;
-    wireToolbar(figure, chart);
+    wireToolbar(figure, [chart]);
     figure.classList.add("js-ready");
   }
 
+  function wireDerivedToggle() {
+    var box = document.getElementById("pack-derived-chrome");
+    if (!box) {
+      log("no DERIVED chrome toggle on page");
+      return;
+    }
+    box.checked = derivedChromeOn();
+    box.addEventListener("change", function () {
+      setDerivedChrome(!!box.checked, true);
+    });
+    log("wired DERIVED chrome toggle", box.checked ? "on" : "off");
+  }
+
+  function wireDataLabelsToggle() {
+    var box = document.getElementById("pack-data-labels");
+    if (!box) {
+      log("no data labels toggle on page");
+      return;
+    }
+    box.checked = dataLabelsOn();
+    box.addEventListener("change", function () {
+      setDataLabels(!!box.checked, true);
+    });
+    log("wired data labels toggle", box.checked ? "on" : "off");
+  }
+
+  function wireWindowToggles() {
+    var node = document.getElementById("win-toggle-data");
+    if (!node) {
+      log("no CAGR window toggles on this page");
+      return;
+    }
+    var spec;
+    try {
+      spec = JSON.parse(node.textContent);
+    } catch (err) {
+      log("window toggle JSON failed", err);
+      return;
+    }
+    var root = document.querySelector("[data-win-toggles]");
+    if (!root) {
+      log("window toggle JSON without controls");
+      return;
+    }
+    var state = {
+      pre: spec.defaults.pre,
+      post: spec.defaults.post,
+      ttm: spec.defaults.ttm,
+    };
+    log(
+      "window toggles ready",
+      "pre=" + state.pre,
+      "post=" + state.post,
+      "ttm=" + state.ttm
+    );
+
+    function cellCopy(metric, windowId, field) {
+      var row = (spec.cells && spec.cells[metric]) || {};
+      var cell = row[windowId];
+      if (!cell || !cell[field]) return "—";
+      return cell[field];
+    }
+
+    function applyCagrChart() {
+      var fig = document.querySelector('figure.chart-interactive[data-chart-id="chart_cagr"]');
+      if (!fig) {
+        log("CAGR chart figure missing");
+        return;
+      }
+      var canvas = fig.querySelector("canvas");
+      var chart = canvas && canvas._packChart;
+      if (!chart || !chart._packPayload) {
+        log("CAGR chart not mounted — bars stay on the default image");
+        return;
+      }
+      var payload = chart._packPayload;
+      var ids = [state.pre, state.post, state.ttm];
+      payload.labels = ids.map(function (id) {
+        return spec.chartLabels[id];
+      });
+      (payload.datasets || []).forEach(function (ds) {
+        var series = spec.bars && spec.bars[ds.key];
+        if (!series) return;
+        ds.values = ids.map(function (id) {
+          return series[id] === undefined ? null : series[id];
+        });
+        log("CAGR series rebound", ds.key, ds.values.join(","));
+      });
+      chart.data.labels = payload.labels.slice();
+      chart.data.datasets = asChartDatasets(payload, chart._packMode || "grouped");
+      chart.update();
+      log("CAGR bars rebound", payload.labels.join(" | "));
+    }
+
+    function applyBoard() {
+      document.querySelectorAll("td[data-win-metric]").forEach(function (td) {
+        var metric = td.getAttribute("data-win-metric");
+        var role = td.getAttribute("data-win-role");
+        var windowId = state[role];
+        if (windowId === spec.defaults[role]) {
+          td.textContent = td.getAttribute("data-win-default");
+          return;
+        }
+        td.textContent = cellCopy(metric, windowId, "text");
+      });
+      document.querySelectorAll("th[data-win-header]").forEach(function (th) {
+        var role = th.getAttribute("data-win-header");
+        var label = spec.headers && spec.headers[state[role]];
+        if (label) th.textContent = label;
+      });
+      document.querySelectorAll("td[data-win-liner]").forEach(function (td) {
+        var metric = td.getAttribute("data-win-liner");
+        if (state.pre === spec.defaults.pre && state.post === spec.defaults.post) {
+          td.textContent = td.getAttribute("data-win-default");
+          return;
+        }
+        var tmpl = (spec.liners && spec.liners[metric]) || "";
+        td.textContent = tmpl
+          .replace("{pre}", cellCopy(metric, state.pre, "pct"))
+          .replace("{post}", cellCopy(metric, state.post, "pct"));
+      });
+      var hint = document.querySelector("[data-win-hint]");
+      if (hint) {
+        if (state.pre === "pre_2017_2019" && spec.hint) {
+          hint.hidden = false;
+          hint.textContent = spec.hint;
+          log("late-pre hint shown");
+        } else {
+          hint.hidden = true;
+          hint.textContent = "";
+        }
+      }
+      applyCagrChart();
+      log(
+        "window board applied",
+        "pre=" + state.pre,
+        "post=" + state.post,
+        "ttm=" + state.ttm
+      );
+    }
+
+    root.querySelectorAll("button[data-win-id]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var role = btn.getAttribute("data-win-role");
+        var id = btn.getAttribute("data-win-id");
+        if (!role || !id || state[role] === id) {
+          log("window toggle unchanged", role, id);
+          return;
+        }
+        state[role] = id;
+        root.querySelectorAll('button[data-win-role="' + role + '"]').forEach(function (peer) {
+          peer.setAttribute(
+            "aria-pressed",
+            peer.getAttribute("data-win-id") === id ? "true" : "false"
+          );
+        });
+        log("window toggle", role, id);
+        applyBoard();
+      });
+    });
+  }
+
   function boot() {
+    setDerivedChrome(readDerivedChromePref(), false);
+    setDataLabels(readDataLabelsPref(), false);
+    wireDerivedToggle();
+    wireDataLabelsToggle();
     var figs = document.querySelectorAll("figure.chart-interactive");
-    log("boot interactive figures=", figs.length);
+    log(
+      "boot interactive figures=",
+      figs.length,
+      "derivedChrome=",
+      derivedChromeOn(),
+      "dataLabels=",
+      dataLabelsOn()
+    );
     figs.forEach(mount);
+    wireWindowToggles();
   }
 
   if (document.readyState === "loading") {

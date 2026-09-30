@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Research",
-  "updated": "2026-09-29",
+  "updated": "2026-09-30",
   "packs": [
     {
       "ticker": "SPOT-conversion",
@@ -58,7 +58,7 @@
       "path": "SPOT-zbar-2026-09-21/",
       "kind": "key-metrics",
       "summary": "From-scratch Spotify key metrics — marketplace mix, ARPU, cash, and the trailing multiple (2026-09-21). Fourth quarters come from the shareholder letter. Street forward sits on the trailing PE chart. Does not replace SPOT.",
-      "updated": "2026-09-23",
+      "updated": "2026-09-30",
       "lineage": "spot-key-metrics",
       "supersedes": [
         "SPOT"
