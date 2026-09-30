@@ -372,15 +372,6 @@
       "pdf": false
     },
     {
-      "ticker": "hub-lattice-draft",
-      "name": "hub-lattice-draft",
-      "path": "hub-lattice-draft/",
-      "kind": "key-metrics",
-      "summary": "Published research pack for hub-lattice-draft.",
-      "updated": "2026-09-30",
-      "pdf": false
-    },
-    {
       "ticker": "UBER-zbar-2026-09-27",
       "name": "Uber key metrics — income, free cash flow, trailing PE",
       "path": "UBER-zbar-2026-09-27/",
@@ -395,15 +386,6 @@
           "kind": "valuation"
         }
       ],
-      "pdf": false
-    },
-    {
-      "ticker": "Z-lattice-draft",
-      "name": "Z-lattice-draft",
-      "path": "Z-lattice-draft/",
-      "kind": "key-metrics",
-      "summary": "Published research pack for Z-lattice-draft.",
-      "updated": "2026-09-30",
       "pdf": false
     }
   ]
