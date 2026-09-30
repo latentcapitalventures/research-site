@@ -16,7 +16,7 @@
           "kind": "key-metrics"
         }
       ],
-      "pdf": false
+      "pdf": true
     },
     {
       "ticker": "GOOGL-zbar-2026-09-21",
@@ -214,34 +214,23 @@
       "pdf": false
     },
     {
-      "ticker": "AMZN-zbar-2026-09-30",
-      "name": "Amazon key metrics — income, segment OI, issuer FCF, trailing PE",
-      "path": "AMZN-zbar-2026-09-30/",
-      "kind": "key-metrics",
-      "summary": "Amazon key metrics — net sales, operating income, net income, NA / Intl / AWS segment operating income, issuer free cash flow, and trailing weekly PE through 2026-W39 (about 20.3×). Forward earnings stay open. Segment revenue is not in this cut.",
-      "updated": "2026-09-30",
-      "lineage": "amzn-key-metrics",
-      "supersedes": [
-        "AMZN-zbar-2026-09-25"
-      ],
-      "pdf": false
-    },
-    {
-      "ticker": "UBER-zbar-2026-09-27",
+      "ticker": "UBER-zbar-2026-09-30",
       "name": "Uber key metrics — income, free cash flow, trailing PE",
-      "path": "UBER-zbar-2026-09-27/",
+      "path": "UBER-zbar-2026-09-30/",
       "kind": "key-metrics",
-      "summary": "Uber key metrics — revenue, operating income, net income, free cash flow, and trailing weekly PE through the week ending September 20, 2026 (15.29×). Forward earnings stay open. Gross bookings, trips, and segment cuts are not in this cut.",
-      "updated": "2026-09-27",
+      "summary": "Uber key metrics — revenue, operating income, net income, free cash flow, and trailing weekly PE through the week ending September 27, 2026 (14.93×). Forward earnings stay open. Gross bookings, trips, and segment cuts are not in this cut.",
+      "updated": "2026-09-30",
       "lineage": "uber-key-metrics",
+      "supersedes": [
+        "UBER-zbar-2026-09-27"
+      ],
       "related": [
         {
           "label": "EV / operating income dig",
           "path": "UBER-ev-oi-2026-09-27/",
           "kind": "valuation"
         }
-      ],
-      "pdf": false
+      ]
     },
     {
       "ticker": "UBER-ev-oi-2026-09-27",
@@ -254,7 +243,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "UBER-zbar-2026-09-27/",
+          "path": "UBER-zbar-2026-09-30/",
           "kind": "key-metrics"
         }
       ],
@@ -367,6 +356,54 @@
           "kind": "unit-econ"
         }
       ],
+      "pdf": false
+    },
+    {
+      "ticker": "AMZN-zbar-2026-09-30",
+      "name": "Amazon key metrics — income, segment OI, issuer FCF, trailing PE",
+      "path": "AMZN-zbar-2026-09-30/",
+      "kind": "key-metrics",
+      "summary": "Amazon key metrics — net sales, operating income, net income, NA / Intl / AWS segment operating income, issuer free cash flow, and trailing weekly PE through 2026-W39 (about 20.3×). Forward earnings stay open. Segment revenue is not in this cut.",
+      "updated": "2026-09-30",
+      "lineage": "amzn-key-metrics",
+      "supersedes": [
+        "AMZN-zbar-2026-09-25"
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "hub-lattice-draft",
+      "name": "hub-lattice-draft",
+      "path": "hub-lattice-draft/",
+      "kind": "key-metrics",
+      "summary": "Published research pack for hub-lattice-draft.",
+      "updated": "2026-09-30",
+      "pdf": false
+    },
+    {
+      "ticker": "UBER-zbar-2026-09-27",
+      "name": "Uber key metrics — income, free cash flow, trailing PE",
+      "path": "UBER-zbar-2026-09-27/",
+      "kind": "key-metrics",
+      "summary": "Uber key metrics — revenue, operating income, net income, free cash flow, and trailing weekly PE through the week ending September 20, 2026 (15.29×). Forward earnings stay open. Gross bookings, trips, and segment cuts are not in this cut.",
+      "updated": "2026-09-27",
+      "lineage": "uber-key-metrics",
+      "related": [
+        {
+          "label": "EV / operating income dig",
+          "path": "UBER-ev-oi-2026-09-27/",
+          "kind": "valuation"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "Z-lattice-draft",
+      "name": "Z-lattice-draft",
+      "path": "Z-lattice-draft/",
+      "kind": "key-metrics",
+      "summary": "Published research pack for Z-lattice-draft.",
+      "updated": "2026-09-30",
       "pdf": false
     }
   ]
