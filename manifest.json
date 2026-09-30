@@ -280,6 +280,11 @@
           "label": "Unit economics",
           "path": "Z-unit-econ-2026-09-28/",
           "kind": "unit-econ"
+        },
+        {
+          "label": "Management quality",
+          "path": "Z-management-quality-2026-09-29/",
+          "kind": "management-quality"
         }
       ],
       "pdf": false
@@ -297,6 +302,33 @@
           "label": "Key metrics",
           "path": "Z-zbar-2026-09-29-v4/",
           "kind": "key-metrics"
+        },
+        {
+          "label": "Management quality",
+          "path": "Z-management-quality-2026-09-29/",
+          "kind": "management-quality"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "Z-management-quality-2026-09-29",
+      "name": "Zillow management quality — stewardship franchise vs key-person",
+      "path": "Z-management-quality-2026-09-29/",
+      "kind": "management-quality",
+      "summary": "Management-quality dig — August 2024 chief-executive handoff, dual-class founder vote, internal bench, and live buybacks. No numeric management grade. Income, the trailing multiple, and unit economics stay on the companion pages.",
+      "updated": "2026-09-29",
+      "lineage": "z-management-quality",
+      "related": [
+        {
+          "label": "Key metrics",
+          "path": "Z-zbar-2026-09-29-v4/",
+          "kind": "key-metrics"
+        },
+        {
+          "label": "Unit economics",
+          "path": "Z-unit-econ-2026-09-28/",
+          "kind": "unit-econ"
         }
       ],
       "pdf": false
