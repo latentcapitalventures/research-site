@@ -38,6 +38,25 @@
         "hold_reason": null,
         "notes": "Latent CLEAR 2026-10-01. Short-sample caveat: non-null weekly trail PE from 2025-W14. W38 lock ~18.30× already in-box (size decision). Forward PE GAPPED — not decision series."
       }
+    },
+    {
+      "ticker": "Z-zbar-2026-09-30",
+      "path": "Z-zbar-2026-09-30/",
+      "buy_box": {
+        "shelf_rank": "very_interested",
+        "series": "forward_pe_fy1",
+        "units": "x",
+        "status": "hold",
+        "add_below": null,
+        "shelved_above": null,
+        "asof_week": "2026-W38",
+        "large_position_gate": true,
+        "hold_reason": "forward_pe_fy1 GAP",
+        "companion_series": [
+          "trailing_pe_ttm"
+        ],
+        "notes": "Latent LOCK 2026-10-01. Trail pe_weekly_ttm ~130.95× @ W38 is FACT printed — not decision series; do not invent PE× gates. Dig B fills add_below/shelved_above when forward_pe_fy1 unlocks."
+      }
     }
   ]
 }

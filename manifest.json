@@ -299,7 +299,7 @@
       "path": "Z-zbar-2026-09-30/",
       "kind": "key-metrics",
       "summary": "Zillow key metrics — fourth-quarter 2023 diluted shares filled, adjusted EBITDA per share on every spine quarter, full income history, mix, traffic, and all 51 complete weekly PE weeks through 2026-W38 (about 131×). The chart opens on about the last twelve months. Forward PE stays blank. Preferred attachment and take intensity stay on the unit-econ dig.",
-      "updated": "2026-09-30",
+      "updated": "2026-10-01",
       "lineage": "z-zbar-2026-09-30",
       "supersedes": [
         "Z",
@@ -329,7 +329,22 @@
           "kind": "management-quality"
         }
       ],
-      "pdf": false
+      "pdf": false,
+      "buy_box": {
+        "shelf_rank": "very_interested",
+        "series": "forward_pe_fy1",
+        "units": "x",
+        "status": "hold",
+        "add_below": null,
+        "shelved_above": null,
+        "asof_week": "2026-W38",
+        "large_position_gate": true,
+        "hold_reason": "forward_pe_fy1 GAP",
+        "companion_series": [
+          "trailing_pe_ttm"
+        ],
+        "notes": "Latent LOCK 2026-10-01. Trail pe_weekly_ttm ~130.95× @ W38 is FACT printed — not decision series; do not invent PE× gates. Dig B fills add_below/shelved_above when forward_pe_fy1 unlocks."
+      }
     },
     {
       "ticker": "Z-unit-econ-2026-09-28",
