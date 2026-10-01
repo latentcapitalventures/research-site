@@ -173,7 +173,7 @@
       "path": "BKNG-zbar-2026-09-30/",
       "kind": "key-metrics",
       "summary": "Booking Holdings key metrics — revenue, operating income, net income, and trailing weekly PE through the week of September 14–20, 2026 (about 18.3×). Forward earnings stay open. Room nights, gross bookings, and take rate stay on the unit-econ dig.",
-      "updated": "2026-09-30",
+      "updated": "2026-10-01",
       "lineage": "bkng-key-metrics",
       "supersedes": [
         "BKNG-zbar-2026-09-21",
@@ -186,7 +186,20 @@
           "kind": "dig"
         }
       ],
-      "pdf": false
+      "pdf": false,
+      "buy_box": {
+        "shelf_rank": "very_interested",
+        "series": "trailing_pe_ttm",
+        "units": "x",
+        "status": "active",
+        "series_field": "pe_weekly",
+        "add_below": 22.0,
+        "shelved_above": 30.0,
+        "asof_week": "2026-W38",
+        "large_position_gate": true,
+        "hold_reason": null,
+        "notes": "Latent CLEAR 2026-10-01. Short-sample caveat: non-null weekly trail PE from 2025-W14. W38 lock ~18.30× already in-box (size decision). Forward PE GAPPED — not decision series."
+      }
     },
     {
       "ticker": "BKNG-unit-econ-2026-09-24",

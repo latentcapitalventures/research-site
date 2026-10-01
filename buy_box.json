@@ -21,6 +21,23 @@
         ],
         "notes": "Latent CLEAR 2026-10-01; W39 pe_weekly 36.60 shelved (≥34). Fwd FY1/FY2 cross-check only — not blended."
       }
+    },
+    {
+      "ticker": "BKNG-zbar-2026-09-30",
+      "path": "BKNG-zbar-2026-09-30/",
+      "buy_box": {
+        "shelf_rank": "very_interested",
+        "series": "trailing_pe_ttm",
+        "units": "x",
+        "status": "active",
+        "series_field": "pe_weekly",
+        "add_below": 22.0,
+        "shelved_above": 30.0,
+        "asof_week": "2026-W38",
+        "large_position_gate": true,
+        "hold_reason": null,
+        "notes": "Latent CLEAR 2026-10-01. Short-sample caveat: non-null weekly trail PE from 2025-W14. W38 lock ~18.30× already in-box (size decision). Forward PE GAPPED — not decision series."
+      }
     }
   ]
 }
