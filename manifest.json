@@ -58,7 +58,7 @@
       "path": "SPOT-zbar-2026-09-21/",
       "kind": "key-metrics",
       "summary": "From-scratch Spotify key metrics — marketplace mix, ARPU, cash, and the trailing multiple (2026-09-21). Fourth quarters come from the shareholder letter. Street forward sits on the trailing PE chart. Does not replace SPOT.",
-      "updated": "2026-09-23",
+      "updated": "2026-10-02",
       "lineage": "spot-key-metrics",
       "supersedes": [
         "SPOT"
@@ -70,7 +70,23 @@
           "kind": "dig"
         }
       ],
-      "pdf": false
+      "pdf": false,
+      "buy_box": {
+        "shelf_rank": "interested",
+        "series": "trailing_pe_ttm",
+        "units": "x",
+        "status": "active",
+        "series_field": "pe",
+        "add_below": 30,
+        "shelved_above": 34,
+        "asof_week": "2026-W39",
+        "large_position_gate": true,
+        "hold_reason": null,
+        "companion_series": [
+          "forward_pe_fy1"
+        ],
+        "notes": "Latent CLEAR 2026-10-01. W39 trail ~31.9x mid-box (not floor ACT). Fwd weekly watch/cross-check only."
+      }
     },
     {
       "ticker": "IBKR-zbar-2026-09-21",
@@ -173,7 +189,7 @@
       "path": "BKNG-zbar-2026-09-30/",
       "kind": "key-metrics",
       "summary": "Booking Holdings key metrics — revenue, operating income, net income, and trailing weekly PE through the week of September 14–20, 2026 (about 18.3×). Forward earnings stay open. Room nights, gross bookings, and take rate stay on the unit-econ dig.",
-      "updated": "2026-10-02",
+      "updated": "2026-10-01",
       "lineage": "bkng-key-metrics",
       "supersedes": [
         "BKNG-zbar-2026-09-21",
