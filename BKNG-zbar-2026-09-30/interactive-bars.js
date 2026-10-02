@@ -24,6 +24,10 @@
  * House 2026-09-30: Labels chip (default OFF, persisted like DERIVED chrome);
  * CORE level charts may switch Levels / YoY (YoY is DERIVED from printed FACT
  * levels); optional quiet trendline when payload.trendline is true.
+ *
+ * Lattice craft (Designer lock): paper canvas, copper hero, indigo+sage
+ * support, latest-only direct labels, one copper callout, faint y-grid,
+ * no chart box. Tokens match pack/palette.py. No teal / navy / white card.
  */
 (function () {
   "use strict";
@@ -34,6 +38,37 @@
     grouped: "Grouped",
   };
 
+  // Lattice identity tokens (locked — not a16z). Keep in sync with pack/palette.py.
+  var LATTICE = {
+    paper: "#F5F0E8",
+    ink: "#1B1A17",
+    line: "#9C958A",
+    soft: "#5C564C",
+    copper: "#B86B3C",
+    alert: "#A8483C",
+    indigo: "#3D4F6F",
+    sage: "#5F7358",
+    ochre: "#C4A04A",
+    plum: "#6E4F62",
+    slate: "#5E6670",
+    clay: "#9A6B55",
+    sea: "#3F6A68",
+  };
+  var STACK_SUPPORT = [
+    LATTICE.indigo,
+    LATTICE.sage,
+    LATTICE.slate,
+    LATTICE.ochre,
+    LATTICE.plum,
+    LATTICE.clay,
+    LATTICE.sea,
+  ];
+  var FONT_SANS = "IBM Plex Sans, Inter, ui-sans-serif, system-ui, sans-serif";
+  var FONT_SERIF = "Libre Baskerville, Georgia, Times New Roman, serif";
+  var COPPER_MUTE = 0.78;
+  var GRID_Y = "rgba(156,149,138,0.28)";
+  var GRID_ZERO = "rgba(156,149,138,0.55)";
+
   var DERIVED_CHROME_KEY = "latent-pack-derived-chrome";
   var DATA_LABELS_KEY = "latent-pack-data-labels";
   var ZOOM_MIN_CATEGORIES = 4;
@@ -43,6 +78,93 @@
     if (typeof console !== "undefined" && console.info) {
       console.info.apply(console, ["[pack-charts]"].concat([].slice.call(arguments)));
     }
+  }
+
+  function hexToRgba(hex, a) {
+    var h = String(hex || "").replace("#", "");
+    if (h.length === 3) {
+      h = h.charAt(0) + h.charAt(0) + h.charAt(1) + h.charAt(1) + h.charAt(2) + h.charAt(2);
+    }
+    var n = parseInt(h, 16);
+    if (!isFinite(n)) return hex;
+    return "rgba(" + ((n >> 16) & 255) + "," + ((n >> 8) & 255) + "," + (n & 255) + "," + a + ")";
+  }
+
+  function isCopper(color) {
+    var s = String(color || "").toUpperCase().replace(/\s/g, "");
+    return s.indexOf("B86B3C") >= 0 || s.indexOf("184,107,60") >= 0;
+  }
+
+  function lastFiniteIndex(values) {
+    if (!values || !values.length) return -1;
+    for (var i = values.length - 1; i >= 0; i--) {
+      var v = values[i];
+      if (v !== null && v !== undefined && !Number.isNaN(Number(v))) return i;
+    }
+    return -1;
+  }
+
+  function firstFiniteIndex(values) {
+    if (!values || !values.length) return -1;
+    for (var i = 0; i < values.length; i++) {
+      var v = values[i];
+      if (v !== null && v !== undefined && !Number.isNaN(Number(v))) return i;
+    }
+    return -1;
+  }
+
+  function houseStackColor(index, n, fallback) {
+    if (n <= 1) return LATTICE.copper;
+    if (index >= n - 1) return LATTICE.copper;
+    return STACK_SUPPORT[index % STACK_SUPPORT.length] || fallback || LATTICE.indigo;
+  }
+
+  function datasetHouseColor(ds, payload, index, n) {
+    if (payload && payload.preserveSeriesColors) return ds.color;
+    if (payload && payload.composition && n >= 2) return houseStackColor(index, n, ds.color);
+    return ds.color;
+  }
+
+  function compactCategoryLabel(lab) {
+    var s = String(lab || "");
+    var m = s.match(/^FY(?:20)?(\d{2})Q([1-4])$/i);
+    if (m) return "Q" + m[2] + "'" + m[1];
+    m = s.match(/^FY(?:20)?(\d{2})$/i);
+    if (m) return "FY" + m[1];
+    return s;
+  }
+
+  function showLineXTick(labels, index) {
+    var n = labels.length;
+    if (index === 0 || index === n - 1) return true;
+    var lab = String(labels[index] || "");
+    if (/Q4/i.test(lab)) return true;
+    if (/W0?1\b/.test(lab) || /W5[0-3]\b/.test(lab)) return true;
+    if (/^FY\d{4}$/i.test(lab) || /^FY\d{2}$/i.test(lab)) return true;
+    return false;
+  }
+
+  function pinHouseDefaults() {
+    if (typeof Chart === "undefined" || Chart._packLatticePinned) return;
+    Chart.defaults.font.family = FONT_SANS;
+    Chart.defaults.font.size = 11;
+    Chart.defaults.color = LATTICE.soft;
+    Chart.defaults.borderColor = "transparent";
+    Chart.defaults.backgroundColor = LATTICE.paper;
+    Chart.defaults.elements.line.borderWidth = 2;
+    Chart.defaults.elements.line.tension = 0;
+    Chart.defaults.elements.bar.borderWidth = 0;
+    Chart.defaults.plugins.legend.position = "bottom";
+    Chart.defaults.plugins.legend.align = "start";
+    Chart.defaults.plugins.legend.labels.color = LATTICE.soft;
+    Chart.defaults.plugins.legend.labels.boxWidth = 10;
+    Chart.defaults.plugins.legend.labels.boxHeight = 10;
+    Chart.defaults.plugins.legend.labels.font = { family: FONT_SANS, size: 11 };
+    Chart.defaults.plugins.title.color = LATTICE.ink;
+    Chart.defaults.plugins.title.font = { family: FONT_SERIF, size: 18, weight: "normal" };
+    Chart.defaults.plugins.title.display = false;
+    Chart._packLatticePinned = true;
+    log("pinned Lattice Chart.js defaults", LATTICE.paper, LATTICE.copper, LATTICE.indigo);
   }
 
   function derivedChromeOn() {
@@ -154,6 +276,7 @@
     chart.options.scales = scalesFor(view, mode);
     if (chart.options.plugins) {
       chart.options.plugins.tooltip = buildTooltip(view);
+      chart.options.plugins.legend = houseLegend(view);
     }
     restoreZoom(chart, zoom);
     chart.update();
@@ -374,16 +497,51 @@
     });
   }
 
+  function muteCopperFill(fill, values, color) {
+    if (!isCopper(color)) return fill;
+    var last = lastFiniteIndex(values);
+    if (last < 0) return fill;
+    function mutedAt(i, current) {
+      if (i === last) return current || color;
+      if (current && typeof current !== "string") return current;
+      return hexToRgba(color, COPPER_MUTE);
+    }
+    if (typeof fill !== "object" || !fill || !fill.length) {
+      return values.map(function (_v, i) {
+        return mutedAt(i, fill);
+      });
+    }
+    return values.map(function (_v, i) {
+      return mutedAt(i, fill[i]);
+    });
+  }
+
+  function isPrimaryLine(payload, ds) {
+    if (ds.dashed || ds.overlay === "forward") return false;
+    var list = payload.datasets || [];
+    for (var i = 0; i < list.length; i++) {
+      var d = list[i];
+      var kind = d.type || (payload.chartType === "line" ? "line" : "bar");
+      if (kind !== "line") continue;
+      if (d.dashed || d.overlay === "forward") continue;
+      return d.key === ds.key || d === ds;
+    }
+    return false;
+  }
+
   function asChartDatasets(payload, mode) {
     var totals = payload._totals || [];
-    return (payload.datasets || []).map(function (ds) {
+    var nSeries = (payload.datasets || []).length;
+    return (payload.datasets || []).map(function (ds, di) {
       var kind = ds.type || (payload.chartType === "line" ? "line" : "bar");
+      var color = datasetHouseColor(ds, payload, di, nSeries);
+      var houseDs = Object.assign({}, ds, { color: color });
       if (payload.chartType === "scatter" || kind === "scatter") {
         return {
           type: "scatter",
           label: ds.label,
-          backgroundColor: ds.color,
-          borderColor: ds.color,
+          backgroundColor: color,
+          borderColor: color,
           pointRadius: 4,
           data: (ds.points || []).map(function (p) {
             return { x: p.x, y: p.y, label: p.label };
@@ -401,6 +559,9 @@
         return Number(v);
       });
       var isLine = kind === "line";
+      var last = lastFiniteIndex(values);
+      var primary = isLine && isPrimaryLine(payload, ds);
+      var stroke = primary && !ds.dashed ? LATTICE.indigo : color;
       var radius =
         ds.pointRadius !== undefined && ds.pointRadius !== null
           ? ds.pointRadius
@@ -414,8 +575,8 @@
       var spec = {
         type: isLine ? "line" : "bar",
         label: ds.label,
-        backgroundColor: isLine ? ds.color : barFill(ds, payload),
-        borderColor: ds.color,
+        backgroundColor: isLine ? stroke : barFill(houseDs, payload),
+        borderColor: isLine ? stroke : color,
         borderWidth: isLine ? 2 : 0,
         pointRadius: radius,
         pointHoverRadius: 5,
@@ -428,6 +589,8 @@
         statuses: (ds.statuses || []).slice(),
         unit: ds.unit || payload.unit || "",
         yAxisID: ds.yAxisID || "y",
+        packHero: !!ds.hero,
+        packColor: color,
       };
       if (ds.borderDash && ds.borderDash.length) {
         spec.borderDash = ds.borderDash.slice();
@@ -449,23 +612,59 @@
       ) {
         if (payload.preserveSeriesTint) {
           spec.backgroundColor = values.map(function (_v, i) {
-            return statuses[i] === "DERIVED" ? hatchPattern(ds.color) : ds.color;
+            return statuses[i] === "DERIVED" ? hatchPattern(color) : color;
           });
-          spec.borderColor = ds.color;
+          spec.borderColor = color;
           spec.borderWidth = 0;
           log("DERIVED tint kept (series color + hatch)", payload.id, ds.key || ds.label);
         } else {
           spec.backgroundColor = values.map(function (_v, i) {
-            return statuses[i] === "DERIVED" ? "rgba(168,72,60,0.42)" : ds.color;
+            return statuses[i] === "DERIVED" ? "rgba(168,72,60,0.42)" : color;
           });
           spec.borderColor = values.map(function (_v, i) {
-            return statuses[i] === "DERIVED" ? "#A8483C" : ds.color;
+            return statuses[i] === "DERIVED" ? LATTICE.alert : color;
           });
           spec.borderWidth = values.map(function (_v, i) {
             return statuses[i] === "DERIVED" ? 1.5 : (isLine ? 2 : 0);
           });
           log("DERIVED bar styling", payload.id, ds.key || ds.label);
         }
+      }
+      if (!isLine) {
+        spec.backgroundColor = muteCopperFill(spec.backgroundColor, values, color);
+      }
+      if (isLine) {
+        spec.pointRadius = values.map(function (_v, i) {
+          if (Array.isArray(radius)) return radius[i] || 0;
+          if (i === last) return primary ? 5 : radius || 3;
+          if (data.length > 48) return 0;
+          return primary ? 2.25 : radius || 3;
+        });
+        spec.pointBackgroundColor = values.map(function (_v, i) {
+          if (i === last && primary) return LATTICE.copper;
+          return hexToRgba(stroke, 0.55);
+        });
+        spec.pointBorderColor = values.map(function (_v, i) {
+          if (i === last && primary) return LATTICE.paper;
+          return stroke;
+        });
+        spec.pointBorderWidth = values.map(function (_v, i) {
+          return i === last && primary ? 2 : 0;
+        });
+        spec.pointHoverRadius = values.map(function (_v, i) {
+          return i === last && primary ? 6 : 5;
+        });
+        log(
+          "line craft",
+          payload.id,
+          ds.key || ds.label,
+          "primary=",
+          primary,
+          "stroke=",
+          stroke,
+          "last=",
+          last
+        );
       }
       if (!isLine && payload.composition && mode !== "grouped") {
         spec.stack = "pack";
@@ -474,13 +673,48 @@
     });
   }
 
+  function yGridColor(ctx) {
+    var v = ctx && ctx.tick ? ctx.tick.value : null;
+    return v === 0 ? GRID_ZERO : GRID_Y;
+  }
+
+  function yGridWidth(ctx) {
+    var v = ctx && ctx.tick ? ctx.tick.value : null;
+    return v === 0 ? 1.15 : 1;
+  }
+
+  function latticeAxisChrome(extra) {
+    var out = {
+      ticks: { color: LATTICE.soft, font: { size: 11, family: FONT_SANS } },
+      title: { color: LATTICE.soft, font: { size: 11, family: FONT_SANS } },
+      border: { display: false },
+      grid: {
+        color: yGridColor,
+        lineWidth: yGridWidth,
+        drawBorder: false,
+      },
+    };
+    if (extra) {
+      Object.keys(extra).forEach(function (k) {
+        if (extra[k] && typeof extra[k] === "object" && !Array.isArray(extra[k]) && out[k]) {
+          out[k] = Object.assign({}, out[k], extra[k]);
+        } else {
+          out[k] = extra[k];
+        }
+      });
+    }
+    return out;
+  }
+
   function yScaleFor(mode, ylabel, composition, chartType, payload) {
     if (mode === "stacked100" && composition) {
       var percentShare = isPercentShare(payload);
-      var scale = {
+      var scale = latticeAxisChrome({
         stacked: true,
         beginAtZero: true,
         ticks: {
+          color: LATTICE.soft,
+          font: { size: 11, family: FONT_SANS },
           callback: function (v) {
             return v + "%";
           },
@@ -488,36 +722,47 @@
         title: {
           display: true,
           text: percentShare ? ylabel || "% share" : "% of period total",
-          color: "#5c574f",
+          color: LATTICE.soft,
+          font: { size: 11, family: FONT_SANS },
         },
-        grid: { color: "rgba(212,203,184,0.55)" },
-      };
+      });
       if (!percentShare) scale.max = 100;
       return scale;
     }
     var isLine = chartType === "line";
     var axis = displayAxis(payload || {}, "y", ylabel);
-    return {
+    var scale = latticeAxisChrome({
       stacked: !!(composition && mode !== "grouped"),
       beginAtZero: !isLine,
       ticks: {
+        color: LATTICE.soft,
+        font: { size: 11, family: FONT_SANS },
         callback: function (v) {
           return fmtTick(v, axis.scale);
         },
       },
-      title: { display: !!axis.title, text: axis.title || "", color: "#5c574f" },
-      grid: { color: "rgba(212,203,184,0.55)" },
-    };
+      title: {
+        display: !!axis.title,
+        text: axis.title || "",
+        color: LATTICE.soft,
+        font: { size: 11, family: FONT_SANS },
+      },
+    });
+    if (composition && mode !== "stacked100") scale.grace = "12%";
+    return scale;
   }
 
   function buildTooltip(payload) {
     var composition = !!payload.composition;
     return {
-      backgroundColor: "#fffcf7",
-      titleColor: "#1c1915",
-      bodyColor: "#1c1915",
-      borderColor: "#d4cbb8",
+      backgroundColor: LATTICE.paper,
+      titleColor: LATTICE.ink,
+      bodyColor: LATTICE.ink,
+      borderColor: LATTICE.line,
       borderWidth: 1,
+      titleFont: { family: FONT_SANS, size: 12 },
+      bodyFont: { family: FONT_SANS, size: 11 },
+      footerFont: { family: FONT_SANS, size: 11 },
       displayColors: true,
       filter: function (item) {
         var sets = payload.datasets || [];
@@ -602,14 +847,19 @@
   }
 
   function scalesFor(payload, mode) {
+    var isLine = payload.chartType === "line";
+    var labels = payload.labels || [];
     if (payload.chartType === "scatter") {
       return {
-        x: {
+        x: latticeAxisChrome({
           type: "linear",
-          ticks: { color: "#5c574f", font: { size: 10 } },
-          grid: { color: "rgba(212,203,184,0.35)" },
-          title: { display: !!payload.xlabel, text: payload.xlabel || "", color: "#5c574f" },
-        },
+          title: {
+            display: !!payload.xlabel,
+            text: payload.xlabel || "",
+            color: LATTICE.soft,
+            font: { size: 11, family: FONT_SANS },
+          },
+        }),
         y: yScaleFor("grouped", payload.ylabel, false, "line", payload),
       };
     }
@@ -620,26 +870,35 @@
       x: {
         stacked: !!(payload.composition && mode !== "grouped"),
         ticks: {
-          maxRotation: 60,
+          maxRotation: 0,
           minRotation: 0,
-          autoSkip: true,
-          maxTicksLimit: 16,
-          color: "#5c574f",
-          font: { size: 10 },
+          autoSkip: !isLine,
+          maxTicksLimit: isLine ? 12 : 16,
+          color: LATTICE.soft,
+          font: { size: 11, family: FONT_SANS },
+          callback: function (val) {
+            var lab = this.getLabelForValue(val);
+            var labels = (payload.labels || []);
+            var idx = typeof val === "number" ? val : labels.indexOf(lab);
+            if (isLine && !showLineXTick(labels, idx)) return "";
+            return compactCategoryLabel(lab);
+          },
         },
-        grid: { display: false },
+        grid: { display: false, drawOnChartArea: false },
+        border: { display: false },
       },
       y: yScaleFor(mode, payload.ylabel, payload.composition, payload.chartType, payload),
     };
     if (hasY1) {
       var y1 = displayAxis(payload, "y1", payload.y1Label);
-      scales.y1 = {
+      scales.y1 = latticeAxisChrome({
         position: "right",
         stacked: false,
         beginAtZero: payload.chartType !== "line",
-        grid: { drawOnChartArea: false },
+        grid: { drawOnChartArea: false, color: "transparent" },
         ticks: {
-          color: "#5c574f",
+          color: LATTICE.soft,
+          font: { size: 11, family: FONT_SANS },
           callback: function (v) {
             return fmtTick(v, y1.scale);
           },
@@ -647,9 +906,10 @@
         title: {
           display: !!y1.title,
           text: y1.title || "",
-          color: "#5c574f",
+          color: LATTICE.soft,
+          font: { size: 11, family: FONT_SANS },
         },
-      };
+      });
     }
     return scales;
   }
@@ -1015,6 +1275,205 @@
     log("trendline", payload.id, "n=" + n, "slope=" + slope);
   }
 
+  function formatCraftValue(view, v, axis, seriesMode) {
+    if (view.unit === "%" || seriesMode === "yoy") {
+      var num = Number(v);
+      return (Math.abs(num) >= 10 ? num.toFixed(0) : num.toFixed(1)) + "%";
+    }
+    if (view.unit === "bps" || /bps/i.test(view.ylabel || "")) {
+      return Number(v).toFixed(1);
+    }
+    return fmtTick(v, axis.scale);
+  }
+
+  function elementPos(el) {
+    if (!el) return null;
+    return typeof el.tooltipPosition === "function" ? el.tooltipPosition() : el;
+  }
+
+  function drawCraftLabels(chart) {
+    var payload = chart._packPayload;
+    if (!payload || payload.craftLabels === false) return;
+    if (dataLabelsOn()) return;
+    var view = payloadView(payload, seriesModeOf(chart));
+    var area = chart.chartArea;
+    if (!area) return;
+    var labels = (chart.data && chart.data.labels) || payload.labels || [];
+    var last = lastFiniteIndex(labels.map(function (_l, i) {
+      var any = null;
+      (payload.datasets || []).forEach(function (ds) {
+        var v = (ds.values || [])[i];
+        if (v !== null && v !== undefined && !Number.isNaN(Number(v))) any = v;
+      });
+      return any;
+    }));
+    if (last < 0) last = labels.length - 1;
+    var ctx = chart.ctx;
+    ctx.save();
+    ctx.font = "500 11px " + FONT_SANS;
+    var isLine = view.chartType === "line" || payload.chartType === "line";
+    if (isLine) {
+      (chart.data.datasets || []).forEach(function (ds, di) {
+        var src = (payload.datasets || [])[di] || {};
+        if (src.dashed || src.overlay === "forward") return;
+        if (!isPrimaryLine(payload, src) && di !== 0) return;
+        var meta = chart.getDatasetMeta(di);
+        if (!meta || meta.hidden) return;
+        var axis = displayAxis(view, ds.yAxisID || "y", view.ylabel);
+        var values = ds.data || [];
+        var first = firstFiniteIndex(values);
+        var end = lastFiniteIndex(values);
+        function paint(i, color, weight, align) {
+          var v = values[i];
+          if (v === null || v === undefined || Number.isNaN(Number(v))) return;
+          var el = meta.data && meta.data[i];
+          var pos = elementPos(el);
+          if (!pos) return;
+          if (!(pos.x >= area.left && pos.x <= area.right)) return;
+          ctx.fillStyle = color;
+          ctx.font = weight + " 11px " + FONT_SANS;
+          ctx.textAlign = align;
+          ctx.textBaseline = "bottom";
+          var text = formatCraftValue(view, v, axis, seriesModeOf(chart));
+          if (align === "left") {
+            if (/bps/i.test(view.unit || view.ylabel || "")) text = text + " bps";
+            var lab = compactCategoryLabel(labels[i]);
+            if (lab) text = text + " · " + lab;
+          }
+          ctx.fillText(text, pos.x + (align === "left" ? 8 : 0), pos.y - 6);
+        }
+        if (first >= 0) paint(first, LATTICE.soft, "500", "center");
+        if (end >= 0 && end !== first) paint(end, LATTICE.copper, "700", "left");
+        log("craft line labels", payload.id, "first=", first, "end=", end);
+      });
+      ctx.restore();
+      return;
+    }
+    var stacked = !!(payload.composition && chart._packMode !== "grouped");
+    var total = 0;
+    var topY = area.bottom;
+    var lastX = null;
+    (chart.data.datasets || []).forEach(function (ds, di) {
+      var meta = chart.getDatasetMeta(di);
+      if (!meta || meta.hidden) return;
+      var axis = displayAxis(view, ds.yAxisID || "y", view.ylabel);
+      var v = (ds.data || [])[last];
+      if (v === null || v === undefined || Number.isNaN(Number(v))) return;
+      var el = meta.data && meta.data[last];
+      var pos = elementPos(el);
+      if (!pos) return;
+      if (!(pos.x >= area.left && pos.x <= area.right)) return;
+      lastX = pos.x;
+      var h = el && typeof el.height === "number" ? Math.abs(el.height) : 18;
+      if (h < 12 && stacked) return;
+      ctx.fillStyle = LATTICE.ink;
+      ctx.font = "600 11px " + FONT_SANS;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      var text = formatCraftValue(view, v, axis, seriesModeOf(chart));
+      ctx.fillText(text, pos.x, pos.y);
+      if (stacked) {
+        total += Number(v);
+        if (pos.y < topY) topY = pos.y;
+      }
+    });
+    if (stacked && lastX != null && total && chart._packMode !== "stacked100" && !view.percentShare) {
+      var axis0 = displayAxis(view, "y", view.ylabel);
+      ctx.fillStyle = LATTICE.ink;
+      ctx.font = "700 12px " + FONT_SANS;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      ctx.fillText(formatCraftValue(view, total, axis0, seriesModeOf(chart)), lastX, topY - 6);
+      log("craft stack labels", payload.id, "last=", last, "total=", total);
+    }
+    ctx.restore();
+  }
+
+  function drawLatestRing(chart) {
+    var payload = chart._packPayload;
+    if (!payload || payload.chartType !== "line") return;
+    var area = chart.chartArea;
+    if (!area) return;
+    var ctx = chart.ctx;
+    (chart.data.datasets || []).forEach(function (ds, di) {
+      var src = (payload.datasets || [])[di] || {};
+      if (!isPrimaryLine(payload, src)) return;
+      var meta = chart.getDatasetMeta(di);
+      if (!meta || meta.hidden) return;
+      var end = lastFiniteIndex(ds.data || []);
+      var el = meta.data && meta.data[end];
+      var pos = elementPos(el);
+      if (!pos) return;
+      if (!(pos.x >= area.left && pos.x <= area.right)) return;
+      ctx.save();
+      ctx.beginPath();
+      ctx.strokeStyle = hexToRgba(LATTICE.copper, 0.38);
+      ctx.lineWidth = 2;
+      ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
+
+  function drawCallout(chart) {
+    var payload = chart._packPayload;
+    if (!payload) return;
+    var call = payload.callout;
+    if (!call || !call.text) return;
+    var area = chart.chartArea;
+    if (!area) return;
+    var labels = (chart.data && chart.data.labels) || payload.labels || [];
+    var idx = call.index;
+    if (idx == null && call.label) idx = labels.indexOf(call.label);
+    if (idx == null || idx < 0) idx = lastFiniteIndex(payload.datasets && payload.datasets[0] && payload.datasets[0].values);
+    if (call.place === "prior" && idx > 0) idx = idx - 1;
+    var heroDi = 0;
+    (payload.datasets || []).forEach(function (ds, i) {
+      if (ds.hero) heroDi = i;
+    });
+    var meta = chart.getDatasetMeta(heroDi);
+    var el = meta && meta.data && meta.data[idx];
+    var pos = elementPos(el);
+    if (!pos) return;
+    var ctx = chart.ctx;
+    ctx.save();
+    ctx.strokeStyle = hexToRgba(LATTICE.copper, 0.85);
+    ctx.fillStyle = LATTICE.copper;
+    ctx.lineWidth = 1;
+    ctx.font = "600 11px " + FONT_SANS;
+    var lines = String(call.text).split(/\n+/);
+    if (lines.length === 1 && lines[0].length > 22) {
+      var bits = lines[0].split(" ");
+      if (bits.length >= 2) lines = [bits.slice(0, 2).join(" "), bits.slice(2).join(" ")];
+    }
+    var textW = 0;
+    lines.forEach(function (line) {
+      textW = Math.max(textW, ctx.measureText(line).width);
+    });
+    var x = pos.x;
+    var align = "center";
+    if (x - textW / 2 < area.left + 4) {
+      x = Math.min(pos.x + 8, area.right - 4);
+      align = "left";
+    }
+    if (x + textW / 2 > area.right - 4 && align === "center") {
+      align = "right";
+    }
+    var y = Math.max(area.top + 14 + (lines.length - 1) * 13, pos.y - 18);
+    ctx.textAlign = align;
+    ctx.textBaseline = "bottom";
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y - 4);
+    ctx.lineTo(pos.x, y);
+    if (align !== "center") ctx.lineTo(x, y);
+    ctx.stroke();
+    lines.forEach(function (line, i) {
+      ctx.fillText(line, x, y - 2 - (lines.length - 1 - i) * 13);
+    });
+    ctx.restore();
+    log("copper callout", payload.id, call.text, "idx=", idx);
+  }
+
   function drawDataLabels(chart) {
     if (!dataLabelsOn()) return;
     var payload = chart._packPayload;
@@ -1024,8 +1483,8 @@
     if (!area) return;
     var ctx = chart.ctx;
     ctx.save();
-    ctx.fillStyle = "#1B1A17";
-    ctx.font = "600 9px Inter, ui-sans-serif, system-ui, sans-serif";
+    ctx.fillStyle = LATTICE.ink;
+    ctx.font = "600 9px " + FONT_SANS;
     ctx.textAlign = "center";
     ctx.textBaseline = "bottom";
     (chart.data.datasets || []).forEach(function (ds, di) {
@@ -1036,7 +1495,7 @@
         if (v === null || v === undefined || Number.isNaN(Number(v))) return;
         var el = meta.data && meta.data[i];
         if (!el) return;
-        var pos = typeof el.tooltipPosition === "function" ? el.tooltipPosition() : el;
+        var pos = elementPos(el);
         var x = pos.x;
         var y = pos.y;
         if (!(x >= area.left && x <= area.right)) return;
@@ -1053,6 +1512,32 @@
     ctx.restore();
   }
 
+  function houseLegend(payload) {
+    return {
+      position: "bottom",
+      align: "start",
+      labels: {
+        boxWidth: 10,
+        boxHeight: 10,
+        padding: 12,
+        color: LATTICE.soft,
+        font: { family: FONT_SANS, size: 11 },
+        generateLabels: function (chart) {
+          var gen = Chart.defaults.plugins.legend.labels.generateLabels;
+          var items = gen ? gen(chart) : [];
+          var sets = (payload && payload.datasets) || [];
+          items.forEach(function (item, i) {
+            var ds = sets[i] || {};
+            if (ds.hero && String(item.text).indexOf("(hero)") < 0) {
+              item.text = item.text + " (hero)";
+            }
+          });
+          return items;
+        },
+      },
+    };
+  }
+
   function mountChart(canvas, payload) {
     if (!canvas) {
       log("skip — missing canvas", payload && payload.id);
@@ -1062,6 +1547,7 @@
       log("Chart.js missing — keeping PNG fallback for", payload.id);
       return null;
     }
+    pinHouseDefaults();
     var composition = !!payload.composition;
     var modes = filterModes(
       payload,
@@ -1073,7 +1559,7 @@
       mode =
         payload.defaultMode && modes.indexOf(payload.defaultMode) >= 0
           ? payload.defaultMode
-          : modes[0] || "stacked100";
+          : modes[0] || "stacked";
       if (isPercentShare(payload) && mode === "stacked") {
         mode = modes.indexOf("stacked100") >= 0 ? "stacked100" : modes[0] || "grouped";
         log("percent_share defaulted off Stacked", payload.id, "mode=", mode);
@@ -1106,8 +1592,8 @@
           var ctx = chart.ctx;
           ctx.save();
           ctx.globalAlpha = 0.28;
-          ctx.fillStyle = "#A8483C";
-          ctx.font = "600 22px sans-serif";
+          ctx.fillStyle = LATTICE.alert;
+          ctx.font = "600 22px " + FONT_SANS;
           ctx.translate(
             area.left + (area.right - area.left) * 0.18,
             area.top + (area.bottom - area.top) * 0.62
@@ -1123,6 +1609,9 @@
       id: "packHouseChrome",
       afterDatasetsDraw: function (chart) {
         drawTrendline(chart);
+        drawLatestRing(chart);
+        drawCraftLabels(chart);
+        drawCallout(chart);
         drawDataLabels(chart);
       },
     });
@@ -1138,15 +1627,13 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: { padding: { top: 16, right: 52, bottom: 2, left: 2 } },
         interaction:
           payload.chartType === "scatter"
             ? { mode: "nearest", intersect: false }
             : { mode: "index", intersect: false },
         plugins: {
-          legend: {
-            position: "bottom",
-            labels: { boxWidth: 12, color: "#1c1915", font: { size: 11 } },
-          },
+          legend: houseLegend(payload),
           tooltip: buildTooltip(view),
         },
         scales: scalesFor(view, mode),
@@ -1158,7 +1645,9 @@
       "type=" + payload.chartType,
       "composition=" + composition,
       "mode=" + (composition ? mode : "hover"),
-      "labels=" + labelCount
+      "labels=" + labelCount,
+      "craftLabels=" + (payload.craftLabels !== false),
+      "hero=" + (((payload.datasets || []).filter(function (d) { return d.hero; })[0] || {}).key || "none")
     );
     chart._packMode = mode;
     chart._packModes = modes;
@@ -1484,6 +1973,7 @@
   }
 
   function boot() {
+    pinHouseDefaults();
     setDerivedChrome(readDerivedChromePref(), false);
     setDataLabels(readDataLabelsPref(), false);
     wireDerivedToggle();
