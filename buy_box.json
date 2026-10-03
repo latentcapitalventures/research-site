@@ -23,8 +23,8 @@
       }
     },
     {
-      "ticker": "IBKR-zbar-2026-10-03",
-      "path": "IBKR-zbar-2026-10-03/",
+      "ticker": "IBKR-zbar-2026-10-04",
+      "path": "IBKR-zbar-2026-10-04/",
       "buy_box": {
         "shelf_rank": "very_interested",
         "series": "trailing_pe_ttm",

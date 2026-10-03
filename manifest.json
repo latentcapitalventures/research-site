@@ -41,7 +41,7 @@
       "related": [
         {
           "label": "IBKR key metrics",
-          "path": "IBKR-zbar-2026-10-03/",
+          "path": "IBKR-zbar-2026-10-04/",
           "kind": "key-metrics"
         },
         {
@@ -90,16 +90,17 @@
       }
     },
     {
-      "ticker": "IBKR-zbar-2026-10-03",
+      "ticker": "IBKR-zbar-2026-10-04",
       "name": "Interactive Brokers key metrics — income, franchise, geography, trailing PE",
-      "path": "IBKR-zbar-2026-10-03/",
+      "path": "IBKR-zbar-2026-10-04/",
       "kind": "key-metrics",
-      "summary": "Interactive Brokers key metrics — annual income from FY2008, pretax as the profit line, commissions, net interest, accounts, and every weekly trailing PE week from 2018-W41 through 2026-W39. Forward FY1 and FY2 sit on that chart. International share is grouped. Buy box is unchanged: trailing PE, add below 30, shelved above 34, week 2026-W39.",
+      "summary": "Filing-face rebuild of Interactive Brokers key metrics, superseding IBKR-zbar-2026-10-03. Annual income from FY2008, pretax as the profit line, quarterly capex on first quarters only, geography pretax side by side, annual contract-revenue mix for FY2023–FY2025, and every weekly trailing PE week from 2018-W41 through 2026-W39. Forward FY1 and FY2 sit on that chart. Buy box is unchanged: trailing PE, add below 30, shelved above 34, week 2026-W39.",
       "updated": "2026-10-03",
       "lineage": "ibkr-key-metrics",
       "supersedes": [
         "IBKR",
-        "IBKR-zbar-2026-09-21"
+        "IBKR-zbar-2026-09-21",
+        "IBKR-zbar-2026-10-03"
       ],
       "related": [
         {
@@ -142,7 +143,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "IBKR-zbar-2026-10-03/",
+          "path": "IBKR-zbar-2026-10-04/",
           "kind": "key-metrics"
         },
         {
@@ -169,7 +170,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "IBKR-zbar-2026-10-03/",
+          "path": "IBKR-zbar-2026-10-04/",
           "kind": "key-metrics"
         },
         {
