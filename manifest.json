@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Research",
-  "updated": "2026-10-02",
+  "updated": "2026-10-03",
   "packs": [
     {
       "ticker": "SPOT-conversion",
@@ -12,7 +12,7 @@
       "related": [
         {
           "label": "SPOT key metrics",
-          "path": "SPOT-zbar-2026-09-21/",
+          "path": "SPOT-zbar-2026-10-03/",
           "kind": "key-metrics"
         }
       ],
@@ -53,15 +53,16 @@
       "pdf": false
     },
     {
-      "ticker": "SPOT-zbar-2026-09-21",
-      "name": "Spotify key metrics — marketplace mix, ARPU, cash, multiple",
-      "path": "SPOT-zbar-2026-09-21/",
+      "ticker": "SPOT-zbar-2026-10-03",
+      "name": "Spotify key metrics — income, cash, users, and the trailing multiple",
+      "path": "SPOT-zbar-2026-10-03/",
       "kind": "key-metrics",
-      "summary": "From-scratch Spotify key metrics — marketplace mix, ARPU, cash, and the trailing multiple (2026-09-21). Fourth quarters come from the shareholder letter. Street forward sits on the trailing PE chart. Does not replace SPOT.",
-      "updated": "2026-10-01",
+      "summary": "Spotify key metrics — annual and quarterly income from FY2018, Premium and advertising, users, free cash flow, capital expenditure, and every weekly trailing PE week from 2022-W13 through 2026-W39. Forward FY1 and FY2 sit on that chart. The blended forward year stays blank. Buy box is unchanged: trailing PE, add below 30, shelved above 34, week 2026-W39.",
+      "updated": "2026-10-03",
       "lineage": "spot-key-metrics",
       "supersedes": [
-        "SPOT"
+        "SPOT",
+        "SPOT-zbar-2026-09-21"
       ],
       "related": [
         {
@@ -315,7 +316,7 @@
       "path": "Z-zbar-2026-10-02/",
       "kind": "key-metrics",
       "summary": "Zillow key metrics — annual income from FY2013, segments, For Sale versus Rentals, purchases of equipment and capitalized software, operating cash flow, and all 321 weekly trailing PE weeks from 2020-W31 through 2026-W38. Blanks stay blank. Forward PE stays off the chart. Buy box is HOLD on forward_pe_fy1.",
-      "updated": "2026-10-02",
+      "updated": "2026-10-03",
       "lineage": "z-zbar-2026-10-02",
       "supersedes": [
         "Z",

@@ -1,10 +1,10 @@
 {
   "title": "Latent Capital · Buy box",
-  "updated": "2026-10-02",
+  "updated": "2026-10-03",
   "items": [
     {
-      "ticker": "SPOT-zbar-2026-09-21",
-      "path": "SPOT-zbar-2026-09-21/",
+      "ticker": "SPOT-zbar-2026-10-03",
+      "path": "SPOT-zbar-2026-10-03/",
       "buy_box": {
         "shelf_rank": "interested",
         "series": "trailing_pe_ttm",
