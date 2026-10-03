@@ -41,7 +41,7 @@
       "related": [
         {
           "label": "IBKR key metrics",
-          "path": "IBKR-zbar-2026-09-21/",
+          "path": "IBKR-zbar-2026-10-03/",
           "kind": "key-metrics"
         },
         {
@@ -90,22 +90,18 @@
       }
     },
     {
-      "ticker": "IBKR-zbar-2026-09-21",
-      "name": "IBKR key metrics (zbar)",
-      "path": "IBKR-zbar-2026-09-21/",
+      "ticker": "IBKR-zbar-2026-10-03",
+      "name": "Interactive Brokers key metrics — income, franchise, geography, trailing PE",
+      "path": "IBKR-zbar-2026-10-03/",
       "kind": "key-metrics",
-      "summary": "From-scratch key metrics — fee toll, franchise scale, and API moat (letter refresh 2026-09-27; FY2025Q4 on the quarterly spine 2026-09-28).",
-      "updated": "2026-10-01",
+      "summary": "Interactive Brokers key metrics — annual income from FY2008, pretax as the profit line, commissions, net interest, accounts, and every weekly trailing PE week from 2018-W41 through 2026-W39. Forward FY1 and FY2 sit on that chart. International share is grouped. Buy box is unchanged: trailing PE, add below 30, shelved above 34, week 2026-W39.",
+      "updated": "2026-10-03",
       "lineage": "ibkr-key-metrics",
       "supersedes": [
-        "IBKR"
+        "IBKR",
+        "IBKR-zbar-2026-09-21"
       ],
       "related": [
-        {
-          "label": "Fee-toll intensity dig",
-          "path": "IBKR-intensity/",
-          "kind": "dig"
-        },
         {
           "label": "Quarterly metrics dig",
           "path": "IBKR-quarterly-metrics-2026-09-27/",
@@ -123,16 +119,16 @@
         "series": "trailing_pe_ttm",
         "units": "x",
         "status": "active",
-        "series_field": "pe_weekly",
-        "add_below": 30.0,
-        "shelved_above": 34.0,
+        "series_field": "pe",
+        "add_below": 30,
+        "shelved_above": 34,
         "asof_week": "2026-W39",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent CLEAR 2026-10-01; W39 pe_weekly 36.60 shelved (≥34). Fwd FY1/FY2 cross-check only — not blended."
+        "notes": "Latent LOCK. Decision series trailing_pe_ttm. W39 week VWAP 91.566 trail 36.60× is shelved at ≥34. Forward FY1 is the companion, not blended. W40 is incomplete until after Sunday 2026-10-04. Gates were not reset."
       }
     },
     {
@@ -146,7 +142,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "IBKR-zbar-2026-09-21/",
+          "path": "IBKR-zbar-2026-10-03/",
           "kind": "key-metrics"
         },
         {
@@ -173,7 +169,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "IBKR-zbar-2026-09-21/",
+          "path": "IBKR-zbar-2026-10-03/",
           "kind": "key-metrics"
         },
         {

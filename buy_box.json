@@ -23,23 +23,23 @@
       }
     },
     {
-      "ticker": "IBKR-zbar-2026-09-21",
-      "path": "IBKR-zbar-2026-09-21/",
+      "ticker": "IBKR-zbar-2026-10-03",
+      "path": "IBKR-zbar-2026-10-03/",
       "buy_box": {
         "shelf_rank": "very_interested",
         "series": "trailing_pe_ttm",
         "units": "x",
         "status": "active",
-        "series_field": "pe_weekly",
-        "add_below": 30.0,
-        "shelved_above": 34.0,
+        "series_field": "pe",
+        "add_below": 30,
+        "shelved_above": 34,
         "asof_week": "2026-W39",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent CLEAR 2026-10-01; W39 pe_weekly 36.60 shelved (≥34). Fwd FY1/FY2 cross-check only — not blended."
+        "notes": "Latent LOCK. Decision series trailing_pe_ttm. W39 week VWAP 91.566 trail 36.60× is shelved at ≥34. Forward FY1 is the companion, not blended. W40 is incomplete until after Sunday 2026-10-04. Gates were not reset."
       }
     },
     {
