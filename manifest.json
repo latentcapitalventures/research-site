@@ -41,7 +41,7 @@
       "related": [
         {
           "label": "IBKR key metrics",
-          "path": "IBKR-zbar-2026-10-06/",
+          "path": "IBKR-zbar-2026-10-07/",
           "kind": "key-metrics"
         },
         {
@@ -90,11 +90,11 @@
       }
     },
     {
-      "ticker": "IBKR-zbar-2026-10-06",
+      "ticker": "IBKR-zbar-2026-10-07",
       "name": "Interactive Brokers key metrics — income, franchise, geography, trailing PE",
-      "path": "IBKR-zbar-2026-10-06/",
+      "path": "IBKR-zbar-2026-10-07/",
       "kind": "key-metrics",
-      "summary": "Filing-face rebuild of Interactive Brokers key metrics, superseding IBKR-zbar-2026-10-05. Annual income from FY2008, pretax as the profit line, including January-letter income for the fourth quarters of 2011 through 2014. Annual total customer DARTs from FY2009, and annual commission per DART on its own chart from FY2009 through FY2018. First-quarter geography from 2016 and full-year 2025 geography. Weekly trailing PE runs from 2018-W41 through 2026-W39. Forward FY1 and FY2 sit on that chart. Buy box is unchanged: trailing PE, add below 30, shelved above 34, week 2026-W39.",
+      "summary": "Interactive Brokers key metrics, superseding IBKR-zbar-2026-10-06. Annual income from FY2008, pretax as the profit line, and fourth-quarter United States and international net revenue and pretax for 2016 through 2025. The fourth quarter of 2015 stays blank. The six-way fee split stays blank for the fourth quarters of 2024 and 2025. Weekly trailing PE runs from 2018-W41 through 2026-W39. Forward FY1 and FY2 sit on that chart. Buy box is unchanged: trailing PE, add below 30, shelved above 34, week 2026-W39.",
       "updated": "2026-10-04",
       "lineage": "ibkr-key-metrics",
       "supersedes": [
@@ -102,7 +102,8 @@
         "IBKR-zbar-2026-09-21",
         "IBKR-zbar-2026-10-03",
         "IBKR-zbar-2026-10-04",
-        "IBKR-zbar-2026-10-05"
+        "IBKR-zbar-2026-10-05",
+        "IBKR-zbar-2026-10-06"
       ],
       "related": [
         {
@@ -145,7 +146,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "IBKR-zbar-2026-10-06/",
+          "path": "IBKR-zbar-2026-10-07/",
           "kind": "key-metrics"
         },
         {
@@ -172,7 +173,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "IBKR-zbar-2026-10-06/",
+          "path": "IBKR-zbar-2026-10-07/",
           "kind": "key-metrics"
         },
         {
