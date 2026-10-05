@@ -144,6 +144,37 @@
     return false;
   }
 
+  /** Keep first+last category ticks when thinning crowded axes (autoSkip can drop FY2025 / FY2026Q2). */
+  function pinCategoryEndTicks(axis, budget) {
+    var labels = (axis.chart && axis.chart.data && axis.chart.data.labels) || [];
+    var n = labels.length;
+    if (!n || !axis.ticks) return;
+    var limit = typeof budget === "number" && budget > 2 ? budget : 16;
+    if (n <= limit) {
+      // Still guarantee ends exist even when Chart.js thinned already.
+      var have = {};
+      for (var i = 0; i < axis.ticks.length; i++) have[axis.ticks[i].value] = true;
+      if (!have[0]) axis.ticks.unshift({ value: 0 });
+      if (n > 1 && !have[n - 1]) axis.ticks.push({ value: n - 1 });
+      axis.ticks.sort(function (a, b) {
+        return a.value - b.value;
+      });
+      return;
+    }
+    var keep = {};
+    keep[0] = true;
+    keep[n - 1] = true;
+    var inner = limit - 2;
+    for (var k = 1; k <= inner; k++) {
+      keep[Math.round((k * (n - 1)) / (inner + 1))] = true;
+    }
+    var next = [];
+    for (var j = 0; j < n; j++) {
+      if (keep[j]) next.push({ value: j });
+    }
+    axis.ticks = next;
+  }
+
   function pinHouseDefaults() {
     if (typeof Chart === "undefined" || Chart._packLatticePinned) return;
     Chart.defaults.font.family = FONT_SANS;
@@ -874,11 +905,22 @@
     var scales = {
       x: {
         stacked: !!(payload.composition && mode !== "grouped"),
+        afterBuildTicks: function (axis) {
+          if (isLine) {
+            // Line charts keep dense ticks; showLineXTick blanks middle labels.
+            // Only re-attach first+last if a prior pass dropped them.
+            pinCategoryEndTicks(axis, Number.POSITIVE_INFINITY);
+          } else {
+            // Bar axes: thin ourselves with ends pinned (Chart autoSkip can drop FY2025).
+            pinCategoryEndTicks(axis, 16);
+          }
+        },
         ticks: {
           maxRotation: 0,
           minRotation: 0,
-          autoSkip: !isLine,
-          maxTicksLimit: isLine ? 12 : 16,
+          // House autoSkip can drop the final category (FY2025 / FY2026Q2). Off —
+          // pinCategoryEndTicks keeps first+last and samples the middle.
+          autoSkip: false,
           color: LATTICE.soft,
           font: { size: 11, family: FONT_SANS },
           callback: function (val) {
