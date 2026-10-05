@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Research",
-  "updated": "2026-10-04",
+  "updated": "2026-10-05",
   "packs": [
     {
       "ticker": "SPOT-conversion",
@@ -95,7 +95,7 @@
       "path": "IBKR-zbar-2026-10-07/",
       "kind": "key-metrics",
       "summary": "Interactive Brokers key metrics, superseding IBKR-zbar-2026-10-06. Annual income from FY2008, pretax as the profit line, and fourth-quarter United States and international net revenue and pretax for 2016 through 2025. The fourth quarter of 2015 stays blank. The six-way fee split stays blank for the fourth quarters of 2024 and 2025. Weekly trailing PE runs from 2018-W41 through 2026-W39. Forward FY1 and FY2 sit on that chart. Buy box is unchanged: trailing PE, add below 30, shelved above 34, week 2026-W39.",
-      "updated": "2026-10-04",
+      "updated": "2026-10-05",
       "lineage": "ibkr-key-metrics",
       "supersedes": [
         "IBKR",
@@ -112,9 +112,9 @@
           "kind": "quarterly-metrics"
         },
         {
-          "label": "Peer KPI dig",
-          "path": "IBKR-peer-kpi-2026-09-27/",
-          "kind": "peer-kpi"
+          "label": "Peer benchmark",
+          "path": "IBKR-peer-benchmark-2026-10-05/",
+          "kind": "peer-benchmark"
         }
       ],
       "pdf": false,
@@ -141,7 +141,7 @@
       "path": "IBKR-quarterly-metrics-2026-09-27/",
       "kind": "quarterly-metrics",
       "summary": "Quarterly metrics dig — fee toll, accounts and DARTs, pretax, and US versus international net revenues through the second quarter of 2026, with FY2025Q4 on the quarterly spine. Multiples stay on the key-metrics page.",
-      "updated": "2026-09-28",
+      "updated": "2026-10-05",
       "lineage": "ibkr-quarterly-metrics",
       "related": [
         {
@@ -155,21 +155,24 @@
           "kind": "dig"
         },
         {
-          "label": "Peer KPI dig",
-          "path": "IBKR-peer-kpi-2026-09-27/",
-          "kind": "peer-kpi"
+          "label": "Peer benchmark",
+          "path": "IBKR-peer-benchmark-2026-10-05/",
+          "kind": "peer-benchmark"
         }
       ],
       "pdf": false
     },
     {
-      "ticker": "IBKR-peer-kpi-2026-09-27",
-      "name": "Interactive Brokers — peer KPIs",
-      "path": "IBKR-peer-kpi-2026-09-27/",
-      "kind": "peer-kpi",
-      "summary": "Peer KPI dig — pretax margin, client scale, and fee lines for Interactive Brokers, Schwab, and Robinhood through the second quarter of 2026. Mixed: pretax margin favors IBKR; scale favors Schwab; fee intensity and activity lack a fair three-way unit. Not a second key-metrics page.",
-      "updated": "2026-09-27",
-      "lineage": "ibkr-peer-kpi",
+      "ticker": "IBKR-peer-benchmark-2026-10-05",
+      "name": "Interactive Brokers — peer benchmark",
+      "path": "IBKR-peer-benchmark-2026-10-05/",
+      "kind": "peer-benchmark",
+      "summary": "Interactive Brokers against Schwab, Fidelity, and Robinhood — net revenues, pretax, pretax margin, and trailing weekly PE.",
+      "updated": "2026-10-05",
+      "lineage": "ibkr-peer-benchmark",
+      "supersedes": [
+        "IBKR-peer-kpi-2026-09-27"
+      ],
       "related": [
         {
           "label": "Key metrics",
