@@ -906,14 +906,10 @@
       x: {
         stacked: !!(payload.composition && mode !== "grouped"),
         afterBuildTicks: function (axis) {
-          if (isLine) {
-            // Line charts keep dense ticks; showLineXTick blanks middle labels.
-            // Only re-attach first+last if a prior pass dropped them.
-            pinCategoryEndTicks(axis, Number.POSITIVE_INFINITY);
-          } else {
-            // Bar axes: thin ourselves with ends pinned (Chart autoSkip can drop FY2025).
-            pinCategoryEndTicks(axis, 16);
-          }
+          // Bars and long weekly lines: thin to ~16 with ends pinned.
+          // (Line used to keep every category — weekly PE became unreadable.)
+          // showLineXTick still blanks non-W01/end labels among the kept ticks.
+          pinCategoryEndTicks(axis, 16);
         },
         ticks: {
           maxRotation: 0,
