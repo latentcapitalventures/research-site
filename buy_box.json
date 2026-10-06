@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Buy box",
-  "updated": "2026-10-05",
+  "updated": "2026-10-06",
   "items": [
     {
       "ticker": "SPOT-zbar-2026-10-03",
@@ -33,13 +33,13 @@
         "series_field": "pe",
         "add_below": 30,
         "shelved_above": 34,
-        "asof_week": "2026-W39",
+        "asof_week": "2026-W40",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent LOCK. Decision series trailing_pe_ttm. W39 week VWAP 91.566 trail 36.60× is shelved at ≥34. Forward FY1 is the companion, not blended. W40 is incomplete until after Sunday 2026-10-04. Gates were not reset."
+        "notes": "Latent LOCK. Decision series trailing_pe_ttm. W40 week VWAP 86.563 trail 34.60× is shelved at ≥34. Forward FY1 is the companion, not blended. Gates were not reset. Weekly PE folded from Tylor 5bed257 (#138) after Yahoo backfill of the Alpaca hole."
       }
     },
     {

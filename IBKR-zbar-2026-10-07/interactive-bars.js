@@ -16,10 +16,12 @@
  * Stacked is hidden. 100% uses the printed shares (no re-normalization).
  * Grouped remains available.
  *
- * Zoom: wheel / pinch zooms the x (time) domain; drag pans; double-click or
- * the Reset zoom button restores the house window. DERIVED warning chrome
- * (hatch, red tint, watermark, tooltip suffix) can be hidden from a page
- * toggle without changing series statuses.
+ * Zoom: wheel / pinch zooms both X (time) and Y around the cursor; scroll on
+ * an axis to zoom that axis only; drag pans both; Shift-drag a box to set
+ * X and Y together (crop an outlier without dropping it from the series).
+ * Double-click or Reset zoom restores the house X window and full auto Y.
+ * DERIVED warning chrome (hatch, red tint, watermark, tooltip suffix) can
+ * be hidden from a page toggle without changing series statuses.
  *
  * House 2026-09-30: Labels chip (default OFF, persisted like DERIVED chrome);
  * CORE level charts may switch Levels / YoY (YoY is DERIVED from printed FACT
@@ -28,6 +30,12 @@
  * Lattice craft (Designer lock): paper canvas, copper hero, indigo+sage
  * support, latest-only direct labels, one copper callout, faint y-grid,
  * no chart box. Tokens match pack/palette.py. No teal / navy / white card.
+ * Latest-value bar labels measure with canvas measureText (same discipline
+ * as category ticks), then stagger vertically on overlap; drop is last
+ * resort (stack total > hero > leftmost dataset index > higher |value|).
+ * Labels may sit in the canvas right padding (layout 52/72px); do not drop
+ * solely for crossing chartArea.right. Dual primary lines stay indigo unless
+ * the pack set key_colors / preserveSeriesColors.
  */
 (function () {
   "use strict";
@@ -134,6 +142,22 @@
     return s;
   }
 
+  /** Monday of an ISO week, as a real date ("31 Mar 2025"). Null for other labels. */
+  function isoWeekDateLabel(lab) {
+    var m = String(lab || "").match(/^(\d{4})-W(\d{2})$/);
+    if (!m) return null;
+    var year = Number(m[1]);
+    var week = Number(m[2]);
+    if (!isFinite(year) || !isFinite(week) || week < 1 || week > 53) return null;
+    var jan4 = new Date(Date.UTC(year, 0, 4));
+    var dow = jan4.getUTCDay() || 7;
+    var monday = new Date(jan4.getTime());
+    monday.setUTCDate(jan4.getUTCDate() - dow + 1 + (week - 1) * 7);
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return monday.getUTCDate() + " " + months[monday.getUTCMonth()] + " " + monday.getUTCFullYear();
+  }
+
+
   function showLineXTick(labels, index) {
     var n = labels.length;
     if (index === 0 || index === n - 1) return true;
@@ -142,6 +166,463 @@
     if (/W0?1\b/.test(lab) || /W5[0-3]\b/.test(lab)) return true;
     if (/^FY\d{4}$/i.test(lab) || /^FY\d{2}$/i.test(lab)) return true;
     return false;
+  }
+
+  function visibleCategorySpan(axis) {
+    var labels = (axis.chart && axis.chart.data && axis.chart.data.labels) || [];
+    var n = labels.length;
+    if (!n) return { min: 0, max: 0, n: 0 };
+    var min = axis.min;
+    var max = axis.max;
+    if (min == null || !isFinite(Number(min))) min = 0;
+    if (max == null || !isFinite(Number(max))) max = n - 1;
+    min = Math.max(0, Math.floor(Number(min)));
+    max = Math.min(n - 1, Math.ceil(Number(max)));
+    if (max < min) max = min;
+    return { min: min, max: max, n: n };
+  }
+
+  function visibleWindowIsWeekly(labels, min, max) {
+    var hi = Math.min(max, min + 7);
+    for (var p = min; p <= hi; p++) {
+      if (/^\d{4}-W\d{2}$/.test(String(labels[p] || ""))) return true;
+    }
+    return false;
+  }
+
+  function displayCategoryLabel(lab) {
+    var dated = isoWeekDateLabel(lab);
+    if (dated) return dated;
+    return compactCategoryLabel(lab);
+  }
+
+  function plotAreaWidth(chart) {
+    var area = chart && chart.chartArea;
+    if (area && isFinite(area.left) && isFinite(area.right) && area.right > area.left) {
+      return area.right - area.left;
+    }
+    return 0;
+  }
+
+  function measureTickText(chart, text) {
+    var ctx = chart && chart.ctx;
+    var s = String(text || "");
+    if (!ctx || !s) return 0;
+    ctx.save();
+    ctx.font = "11px " + FONT_SANS;
+    var w = ctx.measureText(s).width;
+    ctx.restore();
+    return w;
+  }
+
+  /**
+   * Same canvas measureText discipline as ticks, plus height.
+   * Prefer actualBoundingBoxAscent+Descent; 13px fallback for an 11px face.
+   */
+  function measureCraftLabel(chart, text, fontSpec) {
+    var ctx = chart && chart.ctx;
+    var s = String(text || "");
+    if (!ctx || !s) return { w: 0, h: 0 };
+    ctx.save();
+    ctx.font = fontSpec || ("600 11px " + FONT_SANS);
+    var m = ctx.measureText(s);
+    var w = m.width;
+    var ascent = m.actualBoundingBoxAscent;
+    var descent = m.actualBoundingBoxDescent;
+    var h =
+      typeof ascent === "number" &&
+      isFinite(ascent) &&
+      typeof descent === "number" &&
+      isFinite(descent)
+        ? ascent + descent
+        : 13;
+    ctx.restore();
+    if (!(w > 0)) w = 0;
+    if (!(h > 0)) h = 13;
+    return { w: w, h: h };
+  }
+
+  // ~4px: 18 FY labels (~24px) fit on ~32px pitch at ~575px plot width.
+  // 8px left ~6–7px leftover and budgeted 17/18 (blank FY16).
+  var TICK_LABEL_GAP = 4;
+  var WEEKLY_TICK_CAP = 8;
+  // Latest-value bar labels: same 4px gap as ticks. Drop only after stagger.
+  var CRAFT_LABEL_GAP = 4;
+  var CRAFT_LABEL_MAX_STAGGER = 4;
+
+  function craftLabelBox(x, y, w, h, align, baseline) {
+    var left = x;
+    if (align === "center") left = x - w / 2;
+    else if (align === "right") left = x - w;
+    var top = y;
+    if (baseline === "middle") top = y - h / 2;
+    else if (baseline === "bottom") top = y - h;
+    return { left: left, right: left + w, top: top, bottom: top + h, w: w, h: h };
+  }
+
+  function craftBoxesOverlap(a, b, gap) {
+    var g = gap == null ? CRAFT_LABEL_GAP : gap;
+    return !(
+      a.right + g <= b.left ||
+      b.right + g <= a.left ||
+      a.bottom + g <= b.top ||
+      b.bottom + g <= a.top
+    );
+  }
+
+  /**
+   * Keep order (lower rank number wins — drop is last resort after stagger):
+   *   0. kind === "total" (composition stack sum above the last category)
+   *   1. hero series
+   *   2. lower dataset index (leftmost; pack ticker is typically keys[0])
+   *   3. higher |value|
+   *   4. original collect order
+   */
+  function craftLabelRank(item) {
+    var kindRank = item && item.kind === "total" ? 0 : 1;
+    var heroRank = item && item.hero ? 0 : 1;
+    var di = item && typeof item.di === "number" ? item.di : 99;
+    var abs =
+      item && isFinite(Number(item.value)) ? -Math.abs(Number(item.value)) : 0;
+    var orig = item && typeof item._i === "number" ? item._i : 0;
+    return [kindRank, heroRank, di, abs, orig];
+  }
+
+  function compareCraftLabelRank(a, b) {
+    var pa = craftLabelRank(a);
+    var pb = craftLabelRank(b);
+    var k;
+    for (k = 0; k < pa.length; k++) {
+      if (pa[k] !== pb[k]) return pa[k] < pb[k] ? -1 : 1;
+    }
+    return 0;
+  }
+
+  function craftLabelRightLimit(area) {
+    if (!area) return null;
+    if (typeof area.canvasRight === "number" && isFinite(area.canvasRight)) {
+      return area.canvasRight;
+    }
+    // No canvas bound: do not treat chartArea.right as a clip. Latest bars
+    // sit on the plot edge; labels belong in the layout right padding.
+    return null;
+  }
+
+  function craftLabelInArea(box, area) {
+    if (!area) return true;
+    if (box.top < area.top - 2 || box.bottom > area.bottom + 2) return false;
+    if (box.left < area.left - 4) return false;
+    var rightLimit = craftLabelRightLimit(area);
+    if (rightLimit != null && box.right > rightLimit) return false;
+    return true;
+  }
+
+  function craftLabelHitsOccupied(box, placed, occupied) {
+    var i;
+    for (i = 0; i < (placed || []).length; i++) {
+      if (craftBoxesOverlap(box, placed[i].box)) return true;
+    }
+    for (i = 0; i < (occupied || []).length; i++) {
+      if (craftBoxesOverlap(box, occupied[i])) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Place latest-value labels without overlap. High-priority labels keep their
+   * anchor; others stagger vertically (up, then down) by height+gap. Labels
+   * may use the canvas right padding (area.canvasRight, typically
+   * chart.width-4). A small left nudge keeps a box on-canvas when it would
+   * otherwise clip. Drop only on a real overlap after stagger — never solely
+   * because the box crossed chartArea.right. Rank-0 stack totals that still
+   * miss a slot (right-edge overrun, callout graze) stay put.
+   */
+  function resolveCraftLabelCollisions(items, area, occupied) {
+    var ranked = (items || []).map(function (it, i) {
+      var copy = {};
+      var key;
+      for (key in it) {
+        if (Object.prototype.hasOwnProperty.call(it, key)) copy[key] = it[key];
+      }
+      copy._i = i;
+      return copy;
+    });
+    ranked.sort(compareCraftLabelRank);
+    var placed = [];
+    var dropped = [];
+    var obstacles = occupied || [];
+    ranked.forEach(function (it) {
+      var step = (it.h || 13) + CRAFT_LABEL_GAP;
+      var offsets = [0];
+      var n;
+      for (n = 1; n <= CRAFT_LABEL_MAX_STAGGER; n++) {
+        offsets.push(-n * step);
+        offsets.push(n * step);
+      }
+      var found = null;
+      var o;
+      var align = it.align || "center";
+      var baseline = it.baseline || "middle";
+      var rightLimit = craftLabelRightLimit(area);
+      for (o = 0; o < offsets.length; o++) {
+        var y = it.y + offsets[o];
+        var x = it.x;
+        var box = craftLabelBox(x, y, it.w, it.h, align, baseline);
+        if (rightLimit != null && box.right > rightLimit) {
+          x = x - (box.right - rightLimit);
+          box = craftLabelBox(x, y, it.w, it.h, align, baseline);
+        }
+        if (!craftLabelInArea(box, area)) continue;
+        if (craftLabelHitsOccupied(box, placed, obstacles)) continue;
+        found = {
+          item: it,
+          x: x,
+          y: y,
+          box: box,
+          staggered: offsets[o] !== 0,
+          nudged: x !== it.x,
+        };
+        if (area && box.right > area.right + 4) {
+          log(
+            "craft keep in right padding",
+            it.key || it.text,
+            it.text,
+            "over=" + Math.round(box.right - area.right)
+          );
+        }
+        if (found.nudged) {
+          log("craft nudge left into padding", it.key || it.text, it.text, "dx=" + Math.round(x - it.x));
+        }
+        break;
+      }
+      if (found) {
+        placed.push(found);
+      } else if (it.kind === "total") {
+        var tx = it.x;
+        var ty = it.y;
+        var tbox = craftLabelBox(tx, ty, it.w, it.h, align, baseline);
+        if (rightLimit != null && tbox.right > rightLimit) {
+          tx = tx - (tbox.right - rightLimit);
+          tbox = craftLabelBox(tx, ty, it.w, it.h, align, baseline);
+        }
+        placed.push({
+          item: it,
+          x: tx,
+          y: ty,
+          box: tbox,
+          staggered: false,
+          nudged: tx !== it.x,
+          keptOverflow: true,
+        });
+        log("craft keep rank-0 total", it.text, "right-edge/callout did not drop it");
+      } else {
+        dropped.push(it);
+        log("craft drop after stagger", it.key || it.text, it.text);
+      }
+    });
+    return { placed: placed, dropped: dropped };
+  }
+
+  function measureMaxTickWidth(axis) {
+    var chart = axis && axis.chart;
+    var labels = (chart && chart.data && chart.data.labels) || [];
+    var span = visibleCategorySpan(axis);
+    var firstText = displayCategoryLabel(labels[span.min]);
+    var lastText = displayCategoryLabel(labels[span.max]);
+    var firstW = measureTickText(chart, firstText);
+    var lastW = measureTickText(chart, lastText);
+    var maxW = Math.max(firstW, lastW);
+    for (var p = span.min; p <= span.max; p++) {
+      var dated = isoWeekDateLabel(labels[p]);
+      if (dated) {
+        maxW = Math.max(maxW, measureTickText(chart, dated));
+        break;
+      }
+    }
+    if (!(maxW > 0)) maxW = 28;
+    if (!(firstW > 0)) firstW = maxW;
+    if (!(lastW > 0)) lastW = maxW;
+    return { firstW: firstW, lastW: lastW, maxW: maxW };
+  }
+
+  /**
+   * Keep min, min+step, min+2*step, … and always the last index.
+   * If the second-to-last falls within one step of last, drop it.
+   * Never drop min — first and last stay pinned.
+   */
+  function keepStepped(min, max, step) {
+    var k = Math.floor(Number(step));
+    if (!(k >= 1)) k = 1;
+    var out = [];
+    var i;
+    for (i = min; i < max; i += k) out.push(i);
+    if (!out.length) out.push(min);
+    if (out[out.length - 1] !== max) {
+      if (out.length >= 2 && max - out[out.length - 1] < k) out.pop();
+      out.push(max);
+    }
+    return out;
+  }
+
+  function keptTicksFit(axis, kept, pitch) {
+    var chart = axis && axis.chart;
+    var labels = (chart && chart.data && chart.data.labels) || [];
+    var measured = measureMaxTickWidth(axis);
+    var a;
+    for (a = 1; a < kept.length; a++) {
+      var prevW = measureTickText(chart, displayCategoryLabel(labels[kept[a - 1]]));
+      var nextW = measureTickText(chart, displayCategoryLabel(labels[kept[a]]));
+      if (!(prevW > 0)) prevW = measured.maxW;
+      if (!(nextW > 0)) nextW = measured.maxW;
+      var dx = (kept[a] - kept[a - 1]) * pitch;
+      if (dx < prevW / 2 + nextW / 2 + TICK_LABEL_GAP) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Smallest whole-category step k ≥ 1 whose keepStepped labels fit.
+   * pitch = plotWidth / visN (half-category inset at each end is the
+   * center-align end reserve). Weekly windows also require keep-count
+   * ≤ WEEKLY_TICK_CAP. Do not guess 640px — return 0 until chartArea exists.
+   */
+  function categoryTickStep(axis) {
+    var chart = axis && axis.chart;
+    var width = plotAreaWidth(chart);
+    if (!(width > 0)) return 0;
+    var span = visibleCategorySpan(axis);
+    var visN = span.max - span.min + 1;
+    if (visN <= 1) return 1;
+    var pitch = width / visN;
+    if (!(pitch > 0)) return 0;
+    var labels = (chart.data && chart.data.labels) || [];
+    var weekly = visibleWindowIsWeekly(labels, span.min, span.max);
+    var measured = measureMaxTickWidth(axis);
+    var kMin = Math.ceil((measured.maxW + TICK_LABEL_GAP) / pitch);
+    if (!(kMin >= 1)) kMin = 1;
+    var k;
+    for (k = 1; k < visN; k++) {
+      var kept = keepStepped(span.min, span.max, k);
+      if (weekly && kept.length > WEEKLY_TICK_CAP) continue;
+      if (k < kMin && !weekly) continue;
+      if (keptTicksFit(axis, kept, pitch)) return k;
+    }
+    log(
+      "category tick step fallback first+last",
+      (chart._packPayload && chart._packPayload.id) || "",
+      "visN=" + visN,
+      "pitch=" + Math.round(pitch * 10) / 10
+    );
+    return visN - 1;
+  }
+
+  /** How many displayed category labels fit in the current plot width. */
+  function categoryTickBudget(axis) {
+    var step = categoryTickStep(axis);
+    if (!(step > 0)) return 0;
+    var span = visibleCategorySpan(axis);
+    var visN = span.max - span.min + 1;
+    if (visN <= 1) return visN;
+    return keepStepped(span.min, span.max, step).length;
+  }
+
+  /**
+   * Thin visible category ticks in whole-category steps (keepStepped).
+   * Even Math.round spacing can land kept ticks one category apart;
+   * a whole-category k never places neighbours side-by-side when they
+   * don't fit. afterBuildTicks often runs before chartArea exists;
+   * afterLayout recounts once the width is real.
+   */
+  function pinCategoryEndTicks(axis) {
+    var labels = (axis.chart && axis.chart.data && axis.chart.data.labels) || [];
+    var n = labels.length;
+    if (!n || !axis.ticks) return;
+    var span = visibleCategorySpan(axis);
+    var visN = span.max - span.min + 1;
+    var weekly = visibleWindowIsWeekly(labels, span.min, span.max);
+    var step = categoryTickStep(axis);
+    if (!(step > 0)) {
+      log(
+        "category ticks wait for layout",
+        (axis.chart && axis.chart._packPayload && axis.chart._packPayload.id) || "",
+        "visN=" + visN
+      );
+      return;
+    }
+    var kept = keepStepped(span.min, span.max, step);
+    var next = [];
+    var t;
+    for (t = 0; t < kept.length; t++) next.push({ value: kept[t] });
+    axis.ticks = next;
+    log(
+      "category ticks",
+      (axis.chart && axis.chart._packPayload && axis.chart._packPayload.id) || "",
+      span.min + ".." + span.max,
+      "of",
+      n,
+      "kept=" + next.length,
+      "step=" + step,
+      weekly ? "weekly-dates" : "labels",
+      "width=" + Math.round(plotAreaWidth(axis.chart))
+    );
+  }
+
+  function recountCategoryTicksIfNeeded(chart) {
+    if (!chart || chart._packTickRecounting) return;
+    var x = chart.scales && chart.scales.x;
+    if (!x || x.type === "linear" || x.type === "time") return;
+    var w = plotAreaWidth(chart);
+    if (!(w > 0)) return;
+    var step = categoryTickStep(x);
+    if (!(step > 0)) return;
+    var span = visibleCategorySpan(x);
+    var visN = span.max - span.min + 1;
+    var rounded = Math.round(w);
+    if (
+      chart._packTickStep === step &&
+      chart._packTickAreaW === rounded &&
+      chart._packTickVisN === visN
+    ) {
+      return;
+    }
+    if ((chart._packTickRecounts || 0) >= 3) {
+      log(
+        "category tick recount capped",
+        chart._packPayload && chart._packPayload.id,
+        "width=" + rounded,
+        "step=" + step,
+        "visN=" + visN
+      );
+      return;
+    }
+    chart._packTickRecounts = (chart._packTickRecounts || 0) + 1;
+    chart._packTickStep = step;
+    chart._packTickBudget = keepStepped(span.min, span.max, step).length;
+    chart._packTickAreaW = rounded;
+    chart._packTickVisN = visN;
+    chart._packTickRecounting = true;
+    log(
+      "category tick recount",
+      chart._packPayload && chart._packPayload.id,
+      "width=" + rounded,
+      "step=" + step,
+      "kept=" + chart._packTickBudget,
+      "visN=" + visN
+    );
+    try {
+      chart.update("none");
+    } finally {
+      chart._packTickRecounting = false;
+    }
+  }
+
+  function resetTickBudget(chart) {
+    if (!chart) return;
+    chart._packTickBudget = null;
+    chart._packTickStep = null;
+    chart._packTickAreaW = null;
+    chart._packTickVisN = null;
+    chart._packTickRecounts = 0;
   }
 
   function pinHouseDefaults() {
@@ -279,6 +760,8 @@
       chart.options.plugins.legend = houseLegend(view);
     }
     restoreZoom(chart, zoom);
+    chart._packYFull = null;
+    resetTickBudget(chart);
     chart.update();
   }
 
@@ -296,13 +779,26 @@
     else chart.options.scales.x.max = zoom.max;
   }
 
-  function fmtMoney(v, unit) {
+  function fmtFixed(n, digits) {
+    var s = Number(n).toFixed(digits);
+    if (s.indexOf(".") >= 0) {
+      s = s.replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+    }
+    if (s === "-0") return "0";
+    return s;
+  }
+
+  function fmtMoney(v, unit, digits) {
     if (v === null || v === undefined || Number.isNaN(Number(v))) return "—";
     var n = Number(v);
     var abs = Math.abs(n);
     // Dollars stay whole. Multiples and rates (PE 16.86, TAC 19.8) keep two decimals.
-    var digits = abs >= 1000 ? 0 : 2;
-    var body = n.toLocaleString(undefined, { maximumFractionDigits: digits });
+    // A chart may ask for more places (DPS 0.025 + 0.25 = 0.275, not 0.28).
+    var places = digits != null && digits !== "" ? Number(digits) : abs >= 1000 ? 0 : 2;
+    var body =
+      digits != null && digits !== ""
+        ? fmtFixed(n, places)
+        : n.toLocaleString(undefined, { maximumFractionDigits: places });
     if (!unit) return body;
     if (unit.charAt(0) === "$") return unit.charAt(0) + body + unit.slice(1);
     return body + " " + unit;
@@ -456,6 +952,25 @@
     return totals;
   }
 
+  /** Sum every finite segment at one category — unlabeled / thin / collision-dropped still count. */
+  function stackCategoryTotal(datasets, index) {
+    var t = 0;
+    var any = false;
+    if (!datasets || !(index >= 0)) return 0;
+    var d;
+    for (d = 0; d < datasets.length; d++) {
+      var ds = datasets[d];
+      if (!ds) continue;
+      var vals = ds.values || ds.data || [];
+      var v = vals[index];
+      if (v !== null && v !== undefined && !Number.isNaN(Number(v))) {
+        t += Number(v);
+        any = true;
+      }
+    }
+    return any ? t : 0;
+  }
+
   function isDerivedIndex(payload, idx) {
     var labs = payload.derivedLabels || [];
     if (!labs.length) return false;
@@ -561,7 +1076,25 @@
       var isLine = kind === "line";
       var last = lastFiniteIndex(values);
       var primary = isLine && isPrimaryLine(payload, ds);
-      var stroke = primary && !ds.dashed ? LATTICE.indigo : color;
+      // key_colors / preserveSeriesColors keeps ds.color (weekly yield copper).
+      // Dual payloads default the line to P.ALERT (#A8483C); without the indigo
+      // override those charts paint DERIVED-warning red. House default for an
+      // ordinary primary line is Lattice indigo, matching main.
+      var stroke =
+        primary && !ds.dashed && !(payload && payload.preserveSeriesColors)
+          ? LATTICE.indigo
+          : color || LATTICE.indigo;
+      if (isLine) {
+        log(
+          "line stroke",
+          payload.id,
+          ds.key || ds.label,
+          stroke,
+          primary ? "primary" : "support",
+          payload && payload.preserveSeriesColors ? "preserve" : "house",
+          color
+        );
+      }
       var radius =
         ds.pointRadius !== undefined && ds.pointRadius !== null
           ? ds.pointRadius
@@ -600,7 +1133,14 @@
       if (spec.borderDash) {
         spec.borderWidth = isLine ? 2 : spec.borderWidth;
         spec.pointRadius = isLine ? 4 : spec.pointRadius;
-        log("dashed dataset", payload.id, ds.key || ds.label);
+        log("dashed dataset", payload.id, ds.key || ds.label, stroke);
+      }
+      if (ds.hollow) {
+        spec.pointBackgroundColor = "transparent";
+        spec.pointBorderColor = stroke;
+        spec.pointBorderWidth = 1.6;
+        spec.backgroundColor = "transparent";
+        log("hollow marker", payload.id, ds.key || ds.label, stroke);
       }
       var statuses = spec.statuses;
       if (
@@ -715,6 +1255,9 @@
         ticks: {
           color: LATTICE.soft,
           font: { size: 11, family: FONT_SANS },
+          autoSkip: false,
+          includeBounds: true,
+          maxTicksLimit: 11,
           callback: function (v) {
             return v + "%";
           },
@@ -737,6 +1280,9 @@
       ticks: {
         color: LATTICE.soft,
         font: { size: 11, family: FONT_SANS },
+        autoSkip: false,
+        includeBounds: true,
+        maxTicksLimit: 11,
         callback: function (v) {
           return fmtTick(v, axis.scale);
         },
@@ -789,6 +1335,14 @@
           if (derivedChromeOn() && isDerivedIndex(payload, items[0].dataIndex)) {
             return lab + " · DERIVED";
           }
+          var sets = payload.datasets || [];
+          var ds0 = sets[items[0].datasetIndex] || {};
+          if (
+            (ds0.statuses || [])[items[0].dataIndex] === "CALCULATED" &&
+            String(ds0.label || "").toLowerCase().indexOf("calculated") < 0
+          ) {
+            return lab + " · calculated";
+          }
           return lab;
         },
         label: function (ctx) {
@@ -806,12 +1360,18 @@
           var idx = ctx.dataIndex;
           var raw = ctx.dataset.rawValues ? ctx.dataset.rawValues[idx] : ctx.raw;
           var unit = ctx.dataset.unit || payload.unit || "";
+          var st = (ctx.dataset.statuses || [])[idx];
+          var labelAlreadyCalculated =
+            String(ctx.dataset.label || "").toLowerCase().indexOf("calculated") >= 0;
           var derived =
-            derivedChromeOn() && (ctx.dataset.statuses || [])[idx] === "DERIVED"
+            derivedChromeOn() && st === "DERIVED"
               ? " · DERIVED"
-              : "";
+              : st === "CALCULATED" && !labelAlreadyCalculated
+                ? " · calculated"
+                : "";
+          var moneyDigits = payload.valueDecimals;
           if (!composition || isPercentShare(payload)) {
-            return " " + ctx.dataset.label + ": " + fmtMoney(raw, unit) + derived;
+            return " " + ctx.dataset.label + ": " + fmtMoney(raw, unit, moneyDigits) + derived;
           }
           var totals = payload._totals || [];
           var tot = totals[idx];
@@ -823,7 +1383,7 @@
             " " +
             ctx.dataset.label +
             ": " +
-            fmtMoney(raw, unit) +
+            fmtMoney(raw, unit, payload.valueDecimals) +
             derived +
             " (" +
             fmtPct(share) +
@@ -845,7 +1405,7 @@
           if (!composition) return "";
           var idx = items[0].dataIndex;
           var tot = (payload._totals || [])[idx];
-          return "Total: " + fmtMoney(tot, payload.unit || "");
+          return "Total: " + fmtMoney(tot, payload.unit || "", payload.valueDecimals);
         },
       },
     };
@@ -874,18 +1434,32 @@
     var scales = {
       x: {
         stacked: !!(payload.composition && mode !== "grouped"),
+        afterBuildTicks: function (axis) {
+          // Whole-category step thinning on the visible window. k=1 keeps
+          // every label; otherwise pin ends. Weekly ISO weeks cap at 8.
+          pinCategoryEndTicks(axis);
+        },
         ticks: {
           maxRotation: 0,
           minRotation: 0,
-          autoSkip: !isLine,
-          maxTicksLimit: isLine ? 12 : 16,
+          align: "center",
+          // House autoSkip can drop the final category (FY2025 / FY2026Q2). Off —
+          // pinCategoryEndTicks keeps first+last of the visible window.
+          autoSkip: false,
           color: LATTICE.soft,
           font: { size: 11, family: FONT_SANS },
           callback: function (val) {
             var lab = this.getLabelForValue(val);
-            var labels = (payload.labels || []);
+            var dated = isoWeekDateLabel(lab);
+            if (dated) return dated;
+            var labels = payload.labels || [];
             var idx = typeof val === "number" ? val : labels.indexOf(lab);
-            if (isLine && !showLineXTick(labels, idx)) return "";
+            var weekly = labels.some(function (item) {
+              return /^\d{4}-W\d{2}$/.test(String(item || ""));
+            });
+            // Week axes label every kept tick (FY1/FY2 included). Other lines
+            // still drop the crowded middle.
+            if (isLine && !weekly && !showLineXTick(labels, idx)) return "";
             return compactCategoryLabel(lab);
           },
         },
@@ -904,6 +1478,9 @@
         ticks: {
           color: LATTICE.soft,
           font: { size: 11, family: FONT_SANS },
+          autoSkip: false,
+          includeBounds: true,
+          maxTicksLimit: 11,
           callback: function (v) {
             return fmtTick(v, y1.scale);
           },
@@ -952,7 +1529,7 @@
     };
   }
 
-  function applyXRange(chart, min, max) {
+  function applyXRange(chart, min, max, opts) {
     var scales = chart.options && chart.options.scales;
     if (!scales || !scales.x) return;
     var full = chart._packXFull || xBounds(chart);
@@ -1011,6 +1588,77 @@
         scales.x.max = max;
       }
     }
+    if (!(opts && opts.silent)) chart.update("none");
+  }
+
+  function yBounds(chart) {
+    var scale = chart.scales && chart.scales.y;
+    if (!scale) return null;
+    var opts = chart.options && chart.options.scales && chart.options.scales.y;
+    var full = chart._packYFull;
+    var min = opts && opts.min !== undefined ? opts.min : scale.min;
+    var max = opts && opts.max !== undefined ? opts.max : scale.max;
+    return {
+      min: Number(min),
+      max: Number(max),
+      lo: full ? full.min : scale.min,
+      hi: full ? full.max : scale.max,
+    };
+  }
+
+  function rememberFullY(chart) {
+    if (chart._packYFull) return;
+    var scale = chart.scales && chart.scales.y;
+    if (!scale || !isFinite(scale.min) || !isFinite(scale.max)) return;
+    if (!(scale.max > scale.min)) return;
+    chart._packYFull = { min: scale.min, max: scale.max };
+    log(
+      "y full range",
+      chart._packPayload && chart._packPayload.id,
+      scale.min + ".." + scale.max
+    );
+  }
+
+  function applyYRange(chart, min, max, opts) {
+    var scales = chart.options && chart.options.scales;
+    if (!scales || !scales.y) return;
+    rememberFullY(chart);
+    var full = chart._packYFull;
+    if (!full) return;
+    var lo = full.min;
+    var hi = full.max;
+    var span = hi - lo;
+    if (!(span > 0)) return;
+    var minSpan = span * 0.05;
+    if (max < min) {
+      var swapped = min;
+      min = max;
+      max = swapped;
+    }
+    if (max - min < minSpan) {
+      var center = (min + max) / 2;
+      min = center - minSpan / 2;
+      max = center + minSpan / 2;
+    }
+    min = Math.max(lo, min);
+    max = Math.min(hi, max);
+    if (min <= lo && max >= hi) {
+      delete scales.y.min;
+      delete scales.y.max;
+      log("y zoom full range", chart._packPayload && chart._packPayload.id);
+    } else {
+      scales.y.min = min;
+      scales.y.max = max;
+      log(
+        "y zoom range",
+        chart._packPayload && chart._packPayload.id,
+        Number(min).toFixed(2) + ".." + Number(max).toFixed(2)
+      );
+    }
+    if (!(opts && opts.silent)) chart.update("none");
+  }
+
+  function flushZoom(chart) {
     chart.update("none");
   }
 
@@ -1020,17 +1668,30 @@
     return hw;
   }
 
+  function clearYZoom(chart) {
+    var scales = chart.options && chart.options.scales;
+    if (scales && scales.y) {
+      delete scales.y.min;
+      delete scales.y.max;
+    }
+    chart._packYFull = null;
+  }
+
   function resetZoom(chart) {
     var scales = chart.options && chart.options.scales;
     if (!scales || !scales.x) return;
+    clearYZoom(chart);
     var hw = houseWindow(chart);
     if (hw) {
       rememberFullX(chart);
-      applyXRange(chart, hw.min, hw.max);
+      applyXRange(chart, hw.min, hw.max, { silent: true });
+      chart.update();
+      rememberFullY(chart);
       log(
         "zoom reset to house window",
         chart._packPayload && chart._packPayload.id,
-        hw.min + ".." + hw.max
+        hw.min + ".." + hw.max,
+        "y auto"
       );
       return;
     }
@@ -1038,34 +1699,86 @@
     delete scales.x.max;
     chart.update();
     chart._packXFull = xBounds(chart);
-    log("zoom reset", chart._packPayload && chart._packPayload.id);
+    rememberFullY(chart);
+    log("zoom reset", chart._packPayload && chart._packPayload.id, "xy auto");
   }
 
-  function panByPixels(chart, dx) {
+  function panByPixels(chart, dx, dy) {
     var area = chart.chartArea;
-    var bounds = xBounds(chart);
-    if (!bounds || !area) return;
+    if (!area) return;
     var width = area.right - area.left;
-    if (width <= 0) return;
-    var span = bounds.max - bounds.min;
-    if (!(span > 0)) return;
-    var delta = (-dx / width) * span;
-    applyXRange(chart, bounds.min + delta, bounds.max + delta);
+    var height = area.bottom - area.top;
+    var silent = { silent: true };
+    var moved = false;
+    if (dx && width > 0) {
+      var xBoundsNow = xBounds(chart);
+      if (xBoundsNow) {
+        var xSpan = xBoundsNow.max - xBoundsNow.min;
+        if (xSpan > 0) {
+          var xDelta = (-dx / width) * xSpan;
+          applyXRange(chart, xBoundsNow.min + xDelta, xBoundsNow.max + xDelta, silent);
+          moved = true;
+        }
+      }
+    }
+    if (dy && height > 0) {
+      rememberFullY(chart);
+      var yb = yBounds(chart);
+      if (yb) {
+        var ySpan = yb.max - yb.min;
+        if (ySpan > 0) {
+          var yDelta = (dy / height) * ySpan;
+          applyYRange(chart, yb.min + yDelta, yb.max + yDelta, silent);
+          moved = true;
+        }
+      }
+    }
+    if (moved) flushZoom(chart);
+  }
+
+  function zoomAtClient(chart, clientX, clientY, factor, mode) {
+    var area = chart.chartArea;
+    if (!area) return;
+    mode = mode || "xy";
+    var rect = chart.canvas.getBoundingClientRect();
+    var silent = { silent: true };
+    var changed = false;
+    if (mode.indexOf("x") >= 0) {
+      var bounds = xBounds(chart);
+      if (bounds) {
+        var x = clientX - rect.left;
+        var fracX = (x - area.left) / Math.max(1, area.right - area.left);
+        fracX = Math.max(0, Math.min(1, fracX));
+        var spanX = bounds.max - bounds.min;
+        if (spanX > 0) {
+          var newSpanX = spanX * factor;
+          var centerX = bounds.min + spanX * fracX;
+          applyXRange(chart, centerX - newSpanX * fracX, centerX + newSpanX * (1 - fracX), silent);
+          changed = true;
+        }
+      }
+    }
+    if (mode.indexOf("y") >= 0) {
+      rememberFullY(chart);
+      var yb = yBounds(chart);
+      if (yb) {
+        var y = clientY - rect.top;
+        var fracY = (area.bottom - y) / Math.max(1, area.bottom - area.top);
+        fracY = Math.max(0, Math.min(1, fracY));
+        var spanY = yb.max - yb.min;
+        if (spanY > 0) {
+          var newSpanY = spanY * factor;
+          var centerY = yb.min + spanY * fracY;
+          applyYRange(chart, centerY - newSpanY * fracY, centerY + newSpanY * (1 - fracY), silent);
+          changed = true;
+        }
+      }
+    }
+    if (changed) flushZoom(chart);
   }
 
   function zoomAtClientX(chart, clientX, factor) {
-    var area = chart.chartArea;
-    var bounds = xBounds(chart);
-    if (!bounds || !area) return;
-    var rect = chart.canvas.getBoundingClientRect();
-    var x = clientX - rect.left;
-    var frac = (x - area.left) / Math.max(1, area.right - area.left);
-    frac = Math.max(0, Math.min(1, frac));
-    var span = bounds.max - bounds.min;
-    if (!(span > 0)) return;
-    var newSpan = span * factor;
-    var center = bounds.min + span * frac;
-    applyXRange(chart, center - newSpan * frac, center + newSpan * (1 - frac));
+    zoomAtClient(chart, clientX, 0, factor, "x");
   }
 
   function rememberFullX(chart) {
@@ -1079,27 +1792,108 @@
     }
   }
 
+  function wheelZoomMode(area, x, y) {
+    if (!area) return "";
+    var inX = x >= area.left && x <= area.right;
+    var inY = y >= area.top && y <= area.bottom;
+    if (inX && inY) return "xy";
+    if (!inX && inY) return "y";
+    if (inX && !inY) return "x";
+    return "";
+  }
+
+  function ensureZoomRect(canvas) {
+    var wrap = canvas.parentNode;
+    if (!wrap) return null;
+    var el = wrap.querySelector(".chart-zoom-rect");
+    if (!el) {
+      el = document.createElement("div");
+      el.className = "chart-zoom-rect";
+      el.setAttribute("aria-hidden", "true");
+      wrap.appendChild(el);
+    }
+    return el;
+  }
+
+  function hideZoomRect(el) {
+    if (!el) return;
+    el.style.display = "none";
+  }
+
+  function placeZoomRect(el, wrap, x0, y0, x1, y1) {
+    if (!el || !wrap) return;
+    var rect = wrap.getBoundingClientRect();
+    var left = Math.min(x0, x1) - rect.left;
+    var top = Math.min(y0, y1) - rect.top;
+    var w = Math.abs(x1 - x0);
+    var h = Math.abs(y1 - y0);
+    el.style.display = "block";
+    el.style.left = left + "px";
+    el.style.top = top + "px";
+    el.style.width = w + "px";
+    el.style.height = h + "px";
+  }
+
+  function applyBoxZoom(chart, x0, y0, x1, y1) {
+    var area = chart.chartArea;
+    var xScale = chart.scales && chart.scales.x;
+    var yScale = chart.scales && chart.scales.y;
+    if (!area || !xScale || !yScale) return;
+    var rect = chart.canvas.getBoundingClientRect();
+    var px0 = Math.min(x0, x1) - rect.left;
+    var px1 = Math.max(x0, x1) - rect.left;
+    var py0 = Math.min(y0, y1) - rect.top;
+    var py1 = Math.max(y0, y1) - rect.top;
+    if (px1 - px0 < 8 && py1 - py0 < 8) return;
+    px0 = Math.max(area.left, Math.min(area.right, px0));
+    px1 = Math.max(area.left, Math.min(area.right, px1));
+    py0 = Math.max(area.top, Math.min(area.bottom, py0));
+    py1 = Math.max(area.top, Math.min(area.bottom, py1));
+    if (!(px1 > px0) || !(py1 > py0)) return;
+    var xv0 = xScale.getValueForPixel(px0);
+    var xv1 = xScale.getValueForPixel(px1);
+    var yv0 = yScale.getValueForPixel(py1);
+    var yv1 = yScale.getValueForPixel(py0);
+    rememberFullX(chart);
+    rememberFullY(chart);
+    applyXRange(chart, xv0, xv1, { silent: true });
+    applyYRange(chart, yv0, yv1, { silent: true });
+    flushZoom(chart);
+    log(
+      "box zoom",
+      chart._packPayload && chart._packPayload.id,
+      xv0 + ".." + xv1,
+      yv0 + ".." + yv1
+    );
+  }
+
   function attachZoom(chart) {
     var canvas = chart.canvas;
     if (!canvas || canvas._packZoomBound) return;
     canvas._packZoomBound = true;
     rememberFullX(chart);
-    var drag = { on: false, x: 0, id: null };
+    rememberFullY(chart);
+    var drag = { on: false, x: 0, y: 0, id: null, box: false };
     var pointers = {};
     var pinch0 = 0;
+    var zoomRect = ensureZoomRect(canvas);
 
     canvas.addEventListener(
       "wheel",
       function (ev) {
         rememberFullX(chart);
+        rememberFullY(chart);
         var area = chart.chartArea;
         if (!area) return;
         var rect = canvas.getBoundingClientRect();
         var x = ev.clientX - rect.left;
-        if (x < area.left || x > area.right) return;
+        var y = ev.clientY - rect.top;
+        var mode = wheelZoomMode(area, x, y);
+        if (!mode) return;
         ev.preventDefault();
         var factor = ev.deltaY < 0 ? 0.82 : 1.22;
-        zoomAtClientX(chart, ev.clientX, factor);
+        log("wheel zoom", chart._packPayload && chart._packPayload.id, mode, factor);
+        zoomAtClient(chart, ev.clientX, ev.clientY, factor, mode);
       },
       { passive: false }
     );
@@ -1114,12 +1908,15 @@
         var dy = a.y - b.y;
         pinch0 = Math.sqrt(dx * dx + dy * dy) || 1;
         drag.on = false;
+        hideZoomRect(zoomRect);
         return;
       }
       if (ev.button !== undefined && ev.button !== 0) return;
       drag.on = true;
       drag.x = ev.clientX;
+      drag.y = ev.clientY;
       drag.id = ev.pointerId;
+      drag.box = !!(ev.shiftKey || ev.metaKey);
       try {
         canvas.setPointerCapture(ev.pointerId);
       } catch (err) {
@@ -1142,25 +1939,38 @@
         var factor = pinch0 / dist;
         if (factor > 1.04 || factor < 0.96) {
           var cx = (a.x + b.x) / 2;
-          zoomAtClientX(chart, cx, factor);
+          var cy = (a.y + b.y) / 2;
+          zoomAtClient(chart, cx, cy, factor, "xy");
           pinch0 = dist;
         }
         return;
       }
       if (!drag.on || (drag.id != null && ev.pointerId !== drag.id)) return;
-      var move = ev.clientX - drag.x;
-      if (Math.abs(move) < 2) return;
+      if (drag.box) {
+        ev.preventDefault();
+        placeZoomRect(zoomRect, canvas.parentNode, drag.x, drag.y, ev.clientX, ev.clientY);
+        return;
+      }
+      var moveX = ev.clientX - drag.x;
+      var moveY = ev.clientY - drag.y;
+      if (Math.abs(moveX) < 2 && Math.abs(moveY) < 2) return;
       ev.preventDefault();
       drag.x = ev.clientX;
+      drag.y = ev.clientY;
       canvas.style.cursor = "grabbing";
-      panByPixels(chart, move);
+      panByPixels(chart, moveX, moveY);
     });
 
     function endPointer(ev) {
       delete pointers[ev.pointerId];
       if (Object.keys(pointers).length < 2) pinch0 = 0;
       if (!drag.on || (drag.id != null && ev.pointerId !== drag.id)) return;
+      if (drag.box) {
+        applyBoxZoom(chart, drag.x, drag.y, ev.clientX, ev.clientY);
+        hideZoomRect(zoomRect);
+      }
       drag.on = false;
+      drag.box = false;
       canvas.style.cursor = "";
       try {
         canvas.releasePointerCapture(drag.id);
@@ -1174,7 +1984,7 @@
       ev.preventDefault();
       resetZoom(chart);
     });
-    log("zoom attached", chart._packPayload && chart._packPayload.id, "labels=", categoryCount(chart));
+    log("zoom attached", chart._packPayload && chart._packPayload.id, "labels=", categoryCount(chart), "xy");
   }
 
   function drawEventMarkers(chart, payload) {
@@ -1288,6 +2098,9 @@
     if (view.unit === "bps" || /bps/i.test(view.ylabel || "")) {
       return Number(v).toFixed(1);
     }
+    if (view.valueDecimals != null && view.valueDecimals !== "") {
+      return fmtFixed(v, Number(view.valueDecimals));
+    }
     return fmtTick(v, axis.scale);
   }
 
@@ -1342,10 +2155,24 @@
           var text = formatCraftValue(view, v, axis, seriesModeOf(chart));
           if (align === "left") {
             if (/bps/i.test(view.unit || view.ylabel || "")) text = text + " bps";
-            var lab = compactCategoryLabel(labels[i]);
-            if (lab) text = text + " · " + lab;
+            // Week axes already show the date. Appending "2026-W40" clips as "34.6 · 20…".
+            if (!isoWeekDateLabel(labels[i])) {
+              var lab = compactCategoryLabel(labels[i]);
+              if (lab) text = text + " · " + lab;
+            }
           }
-          ctx.fillText(text, pos.x + (align === "left" ? 8 : 0), pos.y - 6);
+          var textW = ctx.measureText(text).width;
+          var x = pos.x + (align === "left" ? 8 : 0);
+          var drawAlign = align;
+          if (align === "left" && x + textW > chart.width - 6) {
+            drawAlign = "right";
+            x = Math.max(area.left + 4, pos.x - 10);
+            log("craft tip inside", payload.id, text);
+          }
+          ctx.textAlign = drawAlign;
+          var y = pos.y - 6;
+          if (y < area.top + 12) y = area.top + 12;
+          ctx.fillText(text, x, y);
         }
         if (first >= 0) paint(first, LATTICE.soft, "500", "center");
         if (end >= 0 && end !== first) paint(end, LATTICE.copper, "700", "left");
@@ -1358,39 +2185,135 @@
     var total = 0;
     var topY = area.bottom;
     var lastX = null;
+    var candidates = [];
+    var visibleStack = [];
     (chart.data.datasets || []).forEach(function (ds, di) {
       var meta = chart.getDatasetMeta(di);
       if (!meta || meta.hidden) return;
+      var src = (payload.datasets || [])[di] || {};
       var axis = displayAxis(view, ds.yAxisID || "y", view.ylabel);
       var v = (ds.data || [])[last];
       if (v === null || v === undefined || Number.isNaN(Number(v))) return;
+      if (stacked) visibleStack.push(ds);
       var el = meta.data && meta.data[last];
       var pos = elementPos(el);
       if (!pos) return;
       if (!(pos.x >= area.left && pos.x <= area.right)) return;
       lastX = pos.x;
-      var h = el && typeof el.height === "number" ? Math.abs(el.height) : 18;
-      if (h < 12 && stacked) return;
-      ctx.fillStyle = LATTICE.ink;
-      ctx.font = "600 11px " + FONT_SANS;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      var text = formatCraftValue(view, v, axis, seriesModeOf(chart));
-      ctx.fillText(text, pos.x, pos.y);
-      if (stacked) {
-        total += Number(v);
-        if (pos.y < topY) topY = pos.y;
+      if (stacked && pos.y < topY) topY = pos.y;
+      var barH = el && typeof el.height === "number" ? Math.abs(el.height) : 18;
+      if (barH < 12 && stacked) {
+        log(
+          "craft skip thin segment label",
+          payload.id,
+          src.key || ds.label,
+          "h=" + Math.round(barH),
+          "value=" + v
+        );
+        return;
       }
+      var font = "600 11px " + FONT_SANS;
+      var text = formatCraftValue(view, v, axis, seriesModeOf(chart));
+      var meas = measureCraftLabel(chart, text, font);
+      if (!(meas.w > 0)) return;
+      candidates.push({
+        x: pos.x,
+        y: pos.y,
+        w: meas.w,
+        h: meas.h,
+        align: "center",
+        baseline: "middle",
+        text: text,
+        font: font,
+        fill: LATTICE.ink,
+        di: di,
+        key: src.key || ds.label,
+        hero: !!(src.hero || ds.packHero),
+        value: Number(v),
+        kind: "series",
+      });
     });
+    if (stacked) {
+      total = stackCategoryTotal(visibleStack, last);
+      log(
+        "craft stack total",
+        payload.id,
+        "last=" + last,
+        "total=" + total,
+        "labeled=" + candidates.length,
+        "segments=" + visibleStack.length
+      );
+    }
     if (stacked && lastX != null && total && chart._packMode !== "stacked100" && !view.percentShare) {
       var axis0 = displayAxis(view, "y", view.ylabel);
-      ctx.fillStyle = LATTICE.ink;
-      ctx.font = "700 12px " + FONT_SANS;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "bottom";
-      ctx.fillText(formatCraftValue(view, total, axis0, seriesModeOf(chart)), lastX, topY - 6);
-      log("craft stack labels", payload.id, "last=", last, "total=", total);
+      var totalText = formatCraftValue(view, total, axis0, seriesModeOf(chart));
+      var totalFont = "700 12px " + FONT_SANS;
+      var totalMeas = measureCraftLabel(chart, totalText, totalFont);
+      candidates.push({
+        x: lastX,
+        y: topY - 6,
+        w: totalMeas.w,
+        h: totalMeas.h,
+        align: "center",
+        baseline: "bottom",
+        text: totalText,
+        font: totalFont,
+        fill: LATTICE.ink,
+        di: -1,
+        key: "_total",
+        hero: true,
+        value: total,
+        kind: "total",
+      });
     }
+    var clip = {
+      left: area.left,
+      right: area.right,
+      top: area.top,
+      bottom: area.bottom,
+      canvasRight: (typeof chart.width === "number" ? chart.width : area.right) - 4,
+    };
+    var occupied = [];
+    var callLayout = calloutLayout(chart);
+    if (callLayout && callLayout.boxes && callLayout.boxes.length) {
+      occupied = callLayout.boxes;
+    }
+    log(
+      "craft clip",
+      payload.id,
+      "area.right=" + Math.round(area.right),
+      "canvasRight=" + Math.round(clip.canvasRight),
+      "occupied=" + occupied.length
+    );
+    var resolved = resolveCraftLabelCollisions(candidates, clip, occupied);
+    resolved.placed.forEach(function (p) {
+      var it = p.item;
+      ctx.fillStyle = it.fill;
+      ctx.font = it.font;
+      ctx.textAlign = it.align;
+      ctx.textBaseline = it.baseline;
+      ctx.fillText(it.text, p.x, p.y);
+    });
+    log(
+      "craft bar labels",
+      payload.id,
+      "last=" + last,
+      "kept=" + resolved.placed.length,
+      "staggered=" +
+        resolved.placed.filter(function (p) {
+          return p.staggered;
+        }).length,
+      "nudged=" +
+        resolved.placed.filter(function (p) {
+          return p.nudged;
+        }).length,
+      "dropped=" +
+        resolved.dropped
+          .map(function (d) {
+            return d.key;
+          })
+          .join(",")
+    );
     ctx.restore();
   }
 
@@ -1420,18 +2343,20 @@
     });
   }
 
-  function drawCallout(chart) {
+  function calloutLayout(chart) {
     var payload = chart._packPayload;
-    if (!payload) return;
+    if (!payload) return null;
     var call = payload.callout;
-    if (!call || !call.text) return;
+    if (!call || !call.text) return null;
     var area = chart.chartArea;
-    if (!area) return;
+    if (!area) return null;
     var labels = (chart.data && chart.data.labels) || payload.labels || [];
     var idx = call.index;
     if (idx == null && call.label) idx = labels.indexOf(call.label);
     if (idx == null || idx < 0) idx = lastFiniteIndex(payload.datasets && payload.datasets[0] && payload.datasets[0].values);
-    if (call.place === "prior" && idx > 0) idx = idx - 1;
+    var place = call.place || "";
+    // "pad" parks the tip in the right padding, off the series. "prior" stays one point left.
+    if (place !== "pad" && place !== "end" && place === "prior" && idx > 0) idx = idx - 1;
     var heroDi = 0;
     (payload.datasets || []).forEach(function (ds, i) {
       if (ds.hero) heroDi = i;
@@ -1439,13 +2364,11 @@
     var meta = chart.getDatasetMeta(heroDi);
     var el = meta && meta.data && meta.data[idx];
     var pos = elementPos(el);
-    if (!pos) return;
+    if (!pos) return null;
+    var font = "600 11px " + FONT_SANS;
     var ctx = chart.ctx;
     ctx.save();
-    ctx.strokeStyle = hexToRgba(LATTICE.copper, 0.85);
-    ctx.fillStyle = LATTICE.copper;
-    ctx.lineWidth = 1;
-    ctx.font = "600 11px " + FONT_SANS;
+    ctx.font = font;
     var lines = String(call.text).split(/\n+/);
     if (lines.length === 1 && lines[0].length > 22) {
       var bits = lines[0].split(" ");
@@ -1457,26 +2380,91 @@
     });
     var x = pos.x;
     var align = "center";
-    if (x - textW / 2 < area.left + 4) {
-      x = Math.min(pos.x + 8, area.right - 4);
-      align = "left";
-    }
-    if (x + textW / 2 > area.right - 4 && align === "center") {
-      align = "right";
-    }
+    var baseline = "bottom";
     var y = Math.max(area.top + 14 + (lines.length - 1) * 13, pos.y - 18);
-    ctx.textAlign = align;
-    ctx.textBaseline = "bottom";
-    ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y - 4);
-    ctx.lineTo(pos.x, y);
-    if (align !== "center") ctx.lineTo(x, y);
-    ctx.stroke();
+    if (place === "pad" || place === "end") {
+      // Right of the tip, in the line-chart padding, so the stroke cannot cut the glyphs.
+      align = "left";
+      baseline = "middle";
+      x = area.right + 10;
+      y = pos.y;
+      var canvasRight = (typeof chart.width === "number" ? chart.width : area.right + 72) - 6;
+      if (x + textW > canvasRight) x = Math.max(pos.x + 14, canvasRight - textW);
+      log("callout pad", payload.id, call.text, "x=" + Math.round(x), "y=" + Math.round(y));
+    } else {
+      if (x - textW / 2 < area.left + 4) {
+        x = Math.min(pos.x + 8, area.right - 4);
+        align = "left";
+      }
+      if (x + textW / 2 > area.right - 4 && align === "center") {
+        align = "right";
+      }
+    }
+    var boxes = [];
     lines.forEach(function (line, i) {
-      ctx.fillText(line, x, y - 2 - (lines.length - 1 - i) * 13);
+      var ly = baseline === "middle" ? y : y - 2 - (lines.length - 1 - i) * 13;
+      var meas = measureCraftLabel(chart, line, font);
+      boxes.push(craftLabelBox(x, ly, meas.w, meas.h || 13, align, baseline));
     });
     ctx.restore();
-    log("copper callout", payload.id, call.text, "idx=", idx);
+    return {
+      lines: lines,
+      x: x,
+      y: y,
+      align: align,
+      baseline: baseline,
+      pos: pos,
+      idx: idx,
+      boxes: boxes,
+      text: call.text,
+      place: place,
+      color: call.color || "",
+    };
+  }
+
+  function drawCallout(chart) {
+    var layout = calloutLayout(chart);
+    if (!layout) return;
+    var payload = chart._packPayload;
+    var ctx = chart.ctx;
+    var ink = layout.color === "ink";
+    var padded = layout.place === "pad" || layout.place === "end";
+    ctx.save();
+    ctx.strokeStyle = ink ? LATTICE.ink : hexToRgba(LATTICE.copper, 0.85);
+    ctx.fillStyle = ink ? LATTICE.ink : LATTICE.copper;
+    ctx.lineWidth = 1;
+    ctx.font = "600 11px " + FONT_SANS;
+    ctx.textAlign = layout.align;
+    ctx.textBaseline = layout.baseline || "bottom";
+    if (!padded) {
+      ctx.beginPath();
+      ctx.moveTo(layout.pos.x, layout.pos.y - 4);
+      ctx.lineTo(layout.pos.x, layout.y);
+      if (layout.align !== "center") ctx.lineTo(layout.x, layout.y);
+      ctx.stroke();
+    }
+    layout.lines.forEach(function (line, i) {
+      var ly =
+        layout.baseline === "middle"
+          ? layout.y
+          : layout.y - 2 - (layout.lines.length - 1 - i) * 13;
+      ctx.fillText(line, layout.x, ly);
+    });
+    ctx.restore();
+    log(
+      ink ? "ink callout" : "copper callout",
+      payload && payload.id,
+      layout.text,
+      "place=" + (layout.place || "point"),
+      "idx=",
+      layout.idx
+    );
+  }
+
+  function calloutUnclipped(chart) {
+    var call = chart && chart._packPayload && chart._packPayload.callout;
+    if (!call) return false;
+    return call.place === "pad" || call.place === "end" || call.color === "ink";
   }
 
   function drawDataLabels(chart) {
@@ -1518,6 +2506,9 @@
   }
 
   function houseLegend(payload) {
+    var hasHollow = ((payload && payload.datasets) || []).some(function (ds) {
+      return ds && ds.hollow;
+    });
     return {
       position: "bottom",
       align: "start",
@@ -1527,6 +2518,7 @@
         padding: 12,
         color: LATTICE.soft,
         font: { family: FONT_SANS, size: 11 },
+        usePointStyle: hasHollow,
         generateLabels: function (chart) {
           var gen = Chart.defaults.plugins.legend.labels.generateLabels;
           var items = gen ? gen(chart) : [];
@@ -1535,6 +2527,19 @@
             var ds = sets[i] || {};
             if (ds.hero && String(item.text).indexOf("(hero)") < 0) {
               item.text = item.text + " (hero)";
+            }
+            if (
+              payload &&
+              (payload.preserveSeriesTint || payload.preserveSeriesColors) &&
+              ds.color
+            ) {
+              item.strokeStyle = ds.color;
+              item.fillStyle = ds.hollow ? "transparent" : ds.color;
+              if (ds.hollow) {
+                item.pointStyle = "circle";
+                item.lineWidth = 1.6;
+                log("hollow legend swatch", payload.id, ds.key || ds.label);
+              }
             }
           });
           return items;
@@ -1611,17 +2616,46 @@
       log("DERIVED watermark plugin on", payload.id, "hasDerived=", !!payload.hasDerived);
     }
     plugins.push({
+      id: "packCategoryTicks",
+      afterLayout: function (chart) {
+        recountCategoryTicksIfNeeded(chart);
+      },
+      resize: function (chart) {
+        resetTickBudget(chart);
+        log("category tick resize", chart._packPayload && chart._packPayload.id);
+      },
+    });
+    plugins.push({
       id: "packHouseChrome",
       afterDatasetsDraw: function (chart) {
         drawTrendline(chart);
-        drawLatestRing(chart);
+        if (!(chart._packPayload && chart._packPayload.tipInset)) drawLatestRing(chart);
         drawCraftLabels(chart);
-        drawCallout(chart);
+        if (!calloutUnclipped(chart)) drawCallout(chart);
         drawDataLabels(chart);
+      },
+    });
+    plugins.push({
+      id: "packUnclippedChrome",
+      afterDraw: function (chart) {
+        // afterDraw is outside the chart-area clip, so a tip ring and a
+        // right-padding callout are not cut by the plot edge.
+        if (chart._packPayload && chart._packPayload.tipInset) {
+          drawLatestRing(chart);
+          log("tip inset ring", chart._packPayload.id);
+        }
+        if (calloutUnclipped(chart)) drawCallout(chart);
       },
     });
     var seriesMode = payload.defaultSeriesMode || "levels";
     var view = payloadView(payload, seriesMode);
+    var scales = scalesFor(view, mode);
+    var hw0 = payload.houseWindow;
+    if (hw0 && typeof hw0.min === "number" && typeof hw0.max === "number") {
+      scales.x.min = hw0.min;
+      scales.x.max = hw0.max;
+      log("category axis default", payload.id, hw0.min + ".." + hw0.max, "of", labelCount);
+    }
     var chart = new Chart(canvas.getContext("2d"), {
       type: payload.chartType === "scatter" ? "scatter" : payload.chartType === "line" ? "line" : "bar",
       plugins: plugins,
@@ -1632,7 +2666,14 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        layout: { padding: { top: 16, right: 52, bottom: 2, left: 2 } },
+        layout: {
+          padding: {
+            top: 16,
+            right: payload.chartType === "line" ? 72 : 52,
+            bottom: 2,
+            left: 2,
+          },
+        },
         interaction:
           payload.chartType === "scatter"
             ? { mode: "nearest", intersect: false }
@@ -1641,7 +2682,7 @@
           legend: houseLegend(payload),
           tooltip: buildTooltip(view),
         },
-        scales: scalesFor(view, mode),
+        scales: scales,
       },
     });
     log(
@@ -1767,6 +2808,8 @@
       chart.data.datasets = asChartDatasets(view, next);
       chart.options.scales = scalesFor(view, next);
       restoreZoom(chart, zoom);
+      chart._packYFull = null;
+      resetTickBudget(chart);
       chart.update();
       log("mode change", payload.id, next, MODE_LABELS[next] || next);
     }
