@@ -16,10 +16,12 @@
  * Stacked is hidden. 100% uses the printed shares (no re-normalization).
  * Grouped remains available.
  *
- * Zoom: wheel / pinch zooms the x (time) domain; drag pans; double-click or
- * the Reset zoom button restores the house window. DERIVED warning chrome
- * (hatch, red tint, watermark, tooltip suffix) can be hidden from a page
- * toggle without changing series statuses.
+ * Zoom: wheel / pinch zooms both X (time) and Y around the cursor; scroll on
+ * an axis to zoom that axis only; drag pans both; Shift-drag a box to set
+ * X and Y together (crop an outlier without dropping it from the series).
+ * Double-click or Reset zoom restores the house X window and full auto Y.
+ * DERIVED warning chrome (hatch, red tint, watermark, tooltip suffix) can
+ * be hidden from a page toggle without changing series statuses.
  *
  * House 2026-09-30: Labels chip (default OFF, persisted like DERIVED chrome);
  * CORE level charts may switch Levels / YoY (YoY is DERIVED from printed FACT
@@ -134,6 +136,22 @@
     return s;
   }
 
+  /** Monday of an ISO week, as a real date ("31 Mar 2025"). Null for other labels. */
+  function isoWeekDateLabel(lab) {
+    var m = String(lab || "").match(/^(\d{4})-W(\d{2})$/);
+    if (!m) return null;
+    var year = Number(m[1]);
+    var week = Number(m[2]);
+    if (!isFinite(year) || !isFinite(week) || week < 1 || week > 53) return null;
+    var jan4 = new Date(Date.UTC(year, 0, 4));
+    var dow = jan4.getUTCDay() || 7;
+    var monday = new Date(jan4.getTime());
+    monday.setUTCDate(jan4.getUTCDate() - dow + 1 + (week - 1) * 7);
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return monday.getUTCDate() + " " + months[monday.getUTCMonth()] + " " + monday.getUTCFullYear();
+  }
+
+
   function showLineXTick(labels, index) {
     var n = labels.length;
     if (index === 0 || index === n - 1) return true;
@@ -144,35 +162,258 @@
     return false;
   }
 
-  /** Keep first+last category ticks when thinning crowded axes (autoSkip can drop FY2025 / FY2026Q2). */
-  function pinCategoryEndTicks(axis, budget) {
+  function visibleCategorySpan(axis) {
+    var labels = (axis.chart && axis.chart.data && axis.chart.data.labels) || [];
+    var n = labels.length;
+    if (!n) return { min: 0, max: 0, n: 0 };
+    var min = axis.min;
+    var max = axis.max;
+    if (min == null || !isFinite(Number(min))) min = 0;
+    if (max == null || !isFinite(Number(max))) max = n - 1;
+    min = Math.max(0, Math.floor(Number(min)));
+    max = Math.min(n - 1, Math.ceil(Number(max)));
+    if (max < min) max = min;
+    return { min: min, max: max, n: n };
+  }
+
+  function visibleWindowIsWeekly(labels, min, max) {
+    var hi = Math.min(max, min + 7);
+    for (var p = min; p <= hi; p++) {
+      if (/^\d{4}-W\d{2}$/.test(String(labels[p] || ""))) return true;
+    }
+    return false;
+  }
+
+  function displayCategoryLabel(lab) {
+    var dated = isoWeekDateLabel(lab);
+    if (dated) return dated;
+    return compactCategoryLabel(lab);
+  }
+
+  function plotAreaWidth(chart) {
+    var area = chart && chart.chartArea;
+    if (area && isFinite(area.left) && isFinite(area.right) && area.right > area.left) {
+      return area.right - area.left;
+    }
+    return 0;
+  }
+
+  function measureTickText(chart, text) {
+    var ctx = chart && chart.ctx;
+    var s = String(text || "");
+    if (!ctx || !s) return 0;
+    ctx.save();
+    ctx.font = "11px " + FONT_SANS;
+    var w = ctx.measureText(s).width;
+    ctx.restore();
+    return w;
+  }
+
+  // ~4px: 18 FY labels (~24px) fit on ~32px pitch at ~575px plot width.
+  // 8px left ~6–7px leftover and budgeted 17/18 (blank FY16).
+  var TICK_LABEL_GAP = 4;
+  var WEEKLY_TICK_CAP = 8;
+
+  function measureMaxTickWidth(axis) {
+    var chart = axis && axis.chart;
+    var labels = (chart && chart.data && chart.data.labels) || [];
+    var span = visibleCategorySpan(axis);
+    var firstText = displayCategoryLabel(labels[span.min]);
+    var lastText = displayCategoryLabel(labels[span.max]);
+    var firstW = measureTickText(chart, firstText);
+    var lastW = measureTickText(chart, lastText);
+    var maxW = Math.max(firstW, lastW);
+    for (var p = span.min; p <= span.max; p++) {
+      var dated = isoWeekDateLabel(labels[p]);
+      if (dated) {
+        maxW = Math.max(maxW, measureTickText(chart, dated));
+        break;
+      }
+    }
+    if (!(maxW > 0)) maxW = 28;
+    if (!(firstW > 0)) firstW = maxW;
+    if (!(lastW > 0)) lastW = maxW;
+    return { firstW: firstW, lastW: lastW, maxW: maxW };
+  }
+
+  /**
+   * Keep min, min+step, min+2*step, … and always the last index.
+   * If the second-to-last falls within one step of last, drop it.
+   * Never drop min — first and last stay pinned.
+   */
+  function keepStepped(min, max, step) {
+    var k = Math.floor(Number(step));
+    if (!(k >= 1)) k = 1;
+    var out = [];
+    var i;
+    for (i = min; i < max; i += k) out.push(i);
+    if (!out.length) out.push(min);
+    if (out[out.length - 1] !== max) {
+      if (out.length >= 2 && max - out[out.length - 1] < k) out.pop();
+      out.push(max);
+    }
+    return out;
+  }
+
+  function keptTicksFit(axis, kept, pitch) {
+    var chart = axis && axis.chart;
+    var labels = (chart && chart.data && chart.data.labels) || [];
+    var measured = measureMaxTickWidth(axis);
+    var a;
+    for (a = 1; a < kept.length; a++) {
+      var prevW = measureTickText(chart, displayCategoryLabel(labels[kept[a - 1]]));
+      var nextW = measureTickText(chart, displayCategoryLabel(labels[kept[a]]));
+      if (!(prevW > 0)) prevW = measured.maxW;
+      if (!(nextW > 0)) nextW = measured.maxW;
+      var dx = (kept[a] - kept[a - 1]) * pitch;
+      if (dx < prevW / 2 + nextW / 2 + TICK_LABEL_GAP) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Smallest whole-category step k ≥ 1 whose keepStepped labels fit.
+   * pitch = plotWidth / visN (half-category inset at each end is the
+   * center-align end reserve). Weekly windows also require keep-count
+   * ≤ WEEKLY_TICK_CAP. Do not guess 640px — return 0 until chartArea exists.
+   */
+  function categoryTickStep(axis) {
+    var chart = axis && axis.chart;
+    var width = plotAreaWidth(chart);
+    if (!(width > 0)) return 0;
+    var span = visibleCategorySpan(axis);
+    var visN = span.max - span.min + 1;
+    if (visN <= 1) return 1;
+    var pitch = width / visN;
+    if (!(pitch > 0)) return 0;
+    var labels = (chart.data && chart.data.labels) || [];
+    var weekly = visibleWindowIsWeekly(labels, span.min, span.max);
+    var measured = measureMaxTickWidth(axis);
+    var kMin = Math.ceil((measured.maxW + TICK_LABEL_GAP) / pitch);
+    if (!(kMin >= 1)) kMin = 1;
+    var k;
+    for (k = 1; k < visN; k++) {
+      var kept = keepStepped(span.min, span.max, k);
+      if (weekly && kept.length > WEEKLY_TICK_CAP) continue;
+      if (k < kMin && !weekly) continue;
+      if (keptTicksFit(axis, kept, pitch)) return k;
+    }
+    log(
+      "category tick step fallback first+last",
+      (chart._packPayload && chart._packPayload.id) || "",
+      "visN=" + visN,
+      "pitch=" + Math.round(pitch * 10) / 10
+    );
+    return visN - 1;
+  }
+
+  /** How many displayed category labels fit in the current plot width. */
+  function categoryTickBudget(axis) {
+    var step = categoryTickStep(axis);
+    if (!(step > 0)) return 0;
+    var span = visibleCategorySpan(axis);
+    var visN = span.max - span.min + 1;
+    if (visN <= 1) return visN;
+    return keepStepped(span.min, span.max, step).length;
+  }
+
+  /**
+   * Thin visible category ticks in whole-category steps (keepStepped).
+   * Even Math.round spacing can land kept ticks one category apart;
+   * a whole-category k never places neighbours side-by-side when they
+   * don't fit. afterBuildTicks often runs before chartArea exists;
+   * afterLayout recounts once the width is real.
+   */
+  function pinCategoryEndTicks(axis) {
     var labels = (axis.chart && axis.chart.data && axis.chart.data.labels) || [];
     var n = labels.length;
     if (!n || !axis.ticks) return;
-    var limit = typeof budget === "number" && budget > 2 ? budget : 16;
-    if (n <= limit) {
-      // Still guarantee ends exist even when Chart.js thinned already.
-      var have = {};
-      for (var i = 0; i < axis.ticks.length; i++) have[axis.ticks[i].value] = true;
-      if (!have[0]) axis.ticks.unshift({ value: 0 });
-      if (n > 1 && !have[n - 1]) axis.ticks.push({ value: n - 1 });
-      axis.ticks.sort(function (a, b) {
-        return a.value - b.value;
-      });
+    var span = visibleCategorySpan(axis);
+    var visN = span.max - span.min + 1;
+    var weekly = visibleWindowIsWeekly(labels, span.min, span.max);
+    var step = categoryTickStep(axis);
+    if (!(step > 0)) {
+      log(
+        "category ticks wait for layout",
+        (axis.chart && axis.chart._packPayload && axis.chart._packPayload.id) || "",
+        "visN=" + visN
+      );
       return;
     }
-    var keep = {};
-    keep[0] = true;
-    keep[n - 1] = true;
-    var inner = limit - 2;
-    for (var k = 1; k <= inner; k++) {
-      keep[Math.round((k * (n - 1)) / (inner + 1))] = true;
-    }
+    var kept = keepStepped(span.min, span.max, step);
     var next = [];
-    for (var j = 0; j < n; j++) {
-      if (keep[j]) next.push({ value: j });
-    }
+    var t;
+    for (t = 0; t < kept.length; t++) next.push({ value: kept[t] });
     axis.ticks = next;
+    log(
+      "category ticks",
+      (axis.chart && axis.chart._packPayload && axis.chart._packPayload.id) || "",
+      span.min + ".." + span.max,
+      "of",
+      n,
+      "kept=" + next.length,
+      "step=" + step,
+      weekly ? "weekly-dates" : "labels",
+      "width=" + Math.round(plotAreaWidth(axis.chart))
+    );
+  }
+
+  function recountCategoryTicksIfNeeded(chart) {
+    if (!chart || chart._packTickRecounting) return;
+    var x = chart.scales && chart.scales.x;
+    if (!x || x.type === "linear" || x.type === "time") return;
+    var w = plotAreaWidth(chart);
+    if (!(w > 0)) return;
+    var step = categoryTickStep(x);
+    if (!(step > 0)) return;
+    var span = visibleCategorySpan(x);
+    var visN = span.max - span.min + 1;
+    var rounded = Math.round(w);
+    if (
+      chart._packTickStep === step &&
+      chart._packTickAreaW === rounded &&
+      chart._packTickVisN === visN
+    ) {
+      return;
+    }
+    if ((chart._packTickRecounts || 0) >= 3) {
+      log(
+        "category tick recount capped",
+        chart._packPayload && chart._packPayload.id,
+        "width=" + rounded,
+        "step=" + step,
+        "visN=" + visN
+      );
+      return;
+    }
+    chart._packTickRecounts = (chart._packTickRecounts || 0) + 1;
+    chart._packTickStep = step;
+    chart._packTickBudget = keepStepped(span.min, span.max, step).length;
+    chart._packTickAreaW = rounded;
+    chart._packTickVisN = visN;
+    chart._packTickRecounting = true;
+    log(
+      "category tick recount",
+      chart._packPayload && chart._packPayload.id,
+      "width=" + rounded,
+      "step=" + step,
+      "kept=" + chart._packTickBudget,
+      "visN=" + visN
+    );
+    try {
+      chart.update("none");
+    } finally {
+      chart._packTickRecounting = false;
+    }
+  }
+
+  function resetTickBudget(chart) {
+    if (!chart) return;
+    chart._packTickBudget = null;
+    chart._packTickStep = null;
+    chart._packTickAreaW = null;
+    chart._packTickVisN = null;
+    chart._packTickRecounts = 0;
   }
 
   function pinHouseDefaults() {
@@ -310,6 +551,8 @@
       chart.options.plugins.legend = houseLegend(view);
     }
     restoreZoom(chart, zoom);
+    chart._packYFull = null;
+    resetTickBudget(chart);
     chart.update();
   }
 
@@ -592,7 +835,11 @@
       var isLine = kind === "line";
       var last = lastFiniteIndex(values);
       var primary = isLine && isPrimaryLine(payload, ds);
-      var stroke = primary && !ds.dashed ? LATTICE.indigo : color;
+      // Explicit series colors stay put. Otherwise the first line is indigo.
+      var stroke =
+        primary && !ds.dashed && !(payload && payload.preserveSeriesColors)
+          ? LATTICE.indigo
+          : color;
       var radius =
         ds.pointRadius !== undefined && ds.pointRadius !== null
           ? ds.pointRadius
@@ -631,7 +878,14 @@
       if (spec.borderDash) {
         spec.borderWidth = isLine ? 2 : spec.borderWidth;
         spec.pointRadius = isLine ? 4 : spec.pointRadius;
-        log("dashed dataset", payload.id, ds.key || ds.label);
+        log("dashed dataset", payload.id, ds.key || ds.label, stroke);
+      }
+      if (ds.hollow) {
+        spec.pointBackgroundColor = "transparent";
+        spec.pointBorderColor = stroke;
+        spec.pointBorderWidth = 1.6;
+        spec.backgroundColor = "transparent";
+        log("hollow marker", payload.id, ds.key || ds.label, stroke);
       }
       var statuses = spec.statuses;
       if (
@@ -746,6 +1000,9 @@
         ticks: {
           color: LATTICE.soft,
           font: { size: 11, family: FONT_SANS },
+          autoSkip: false,
+          includeBounds: true,
+          maxTicksLimit: 11,
           callback: function (v) {
             return v + "%";
           },
@@ -768,6 +1025,9 @@
       ticks: {
         color: LATTICE.soft,
         font: { size: 11, family: FONT_SANS },
+        autoSkip: false,
+        includeBounds: true,
+        maxTicksLimit: 11,
         callback: function (v) {
           return fmtTick(v, axis.scale);
         },
@@ -906,24 +1166,31 @@
       x: {
         stacked: !!(payload.composition && mode !== "grouped"),
         afterBuildTicks: function (axis) {
-          // Bars and long weekly lines: thin to ~16 with ends pinned.
-          // (Line used to keep every category — weekly PE became unreadable.)
-          // showLineXTick still blanks non-W01/end labels among the kept ticks.
-          pinCategoryEndTicks(axis, 16);
+          // Whole-category step thinning on the visible window. k=1 keeps
+          // every label; otherwise pin ends. Weekly ISO weeks cap at 8.
+          pinCategoryEndTicks(axis);
         },
         ticks: {
           maxRotation: 0,
           minRotation: 0,
+          align: "center",
           // House autoSkip can drop the final category (FY2025 / FY2026Q2). Off —
-          // pinCategoryEndTicks keeps first+last and samples the middle.
+          // pinCategoryEndTicks keeps first+last of the visible window.
           autoSkip: false,
           color: LATTICE.soft,
           font: { size: 11, family: FONT_SANS },
           callback: function (val) {
             var lab = this.getLabelForValue(val);
-            var labels = (payload.labels || []);
+            var dated = isoWeekDateLabel(lab);
+            if (dated) return dated;
+            var labels = payload.labels || [];
             var idx = typeof val === "number" ? val : labels.indexOf(lab);
-            if (isLine && !showLineXTick(labels, idx)) return "";
+            var weekly = labels.some(function (item) {
+              return /^\d{4}-W\d{2}$/.test(String(item || ""));
+            });
+            // Week axes label every kept tick (FY1/FY2 included). Other lines
+            // still drop the crowded middle.
+            if (isLine && !weekly && !showLineXTick(labels, idx)) return "";
             return compactCategoryLabel(lab);
           },
         },
@@ -942,6 +1209,9 @@
         ticks: {
           color: LATTICE.soft,
           font: { size: 11, family: FONT_SANS },
+          autoSkip: false,
+          includeBounds: true,
+          maxTicksLimit: 11,
           callback: function (v) {
             return fmtTick(v, y1.scale);
           },
@@ -990,7 +1260,7 @@
     };
   }
 
-  function applyXRange(chart, min, max) {
+  function applyXRange(chart, min, max, opts) {
     var scales = chart.options && chart.options.scales;
     if (!scales || !scales.x) return;
     var full = chart._packXFull || xBounds(chart);
@@ -1049,6 +1319,77 @@
         scales.x.max = max;
       }
     }
+    if (!(opts && opts.silent)) chart.update("none");
+  }
+
+  function yBounds(chart) {
+    var scale = chart.scales && chart.scales.y;
+    if (!scale) return null;
+    var opts = chart.options && chart.options.scales && chart.options.scales.y;
+    var full = chart._packYFull;
+    var min = opts && opts.min !== undefined ? opts.min : scale.min;
+    var max = opts && opts.max !== undefined ? opts.max : scale.max;
+    return {
+      min: Number(min),
+      max: Number(max),
+      lo: full ? full.min : scale.min,
+      hi: full ? full.max : scale.max,
+    };
+  }
+
+  function rememberFullY(chart) {
+    if (chart._packYFull) return;
+    var scale = chart.scales && chart.scales.y;
+    if (!scale || !isFinite(scale.min) || !isFinite(scale.max)) return;
+    if (!(scale.max > scale.min)) return;
+    chart._packYFull = { min: scale.min, max: scale.max };
+    log(
+      "y full range",
+      chart._packPayload && chart._packPayload.id,
+      scale.min + ".." + scale.max
+    );
+  }
+
+  function applyYRange(chart, min, max, opts) {
+    var scales = chart.options && chart.options.scales;
+    if (!scales || !scales.y) return;
+    rememberFullY(chart);
+    var full = chart._packYFull;
+    if (!full) return;
+    var lo = full.min;
+    var hi = full.max;
+    var span = hi - lo;
+    if (!(span > 0)) return;
+    var minSpan = span * 0.05;
+    if (max < min) {
+      var swapped = min;
+      min = max;
+      max = swapped;
+    }
+    if (max - min < minSpan) {
+      var center = (min + max) / 2;
+      min = center - minSpan / 2;
+      max = center + minSpan / 2;
+    }
+    min = Math.max(lo, min);
+    max = Math.min(hi, max);
+    if (min <= lo && max >= hi) {
+      delete scales.y.min;
+      delete scales.y.max;
+      log("y zoom full range", chart._packPayload && chart._packPayload.id);
+    } else {
+      scales.y.min = min;
+      scales.y.max = max;
+      log(
+        "y zoom range",
+        chart._packPayload && chart._packPayload.id,
+        Number(min).toFixed(2) + ".." + Number(max).toFixed(2)
+      );
+    }
+    if (!(opts && opts.silent)) chart.update("none");
+  }
+
+  function flushZoom(chart) {
     chart.update("none");
   }
 
@@ -1058,17 +1399,30 @@
     return hw;
   }
 
+  function clearYZoom(chart) {
+    var scales = chart.options && chart.options.scales;
+    if (scales && scales.y) {
+      delete scales.y.min;
+      delete scales.y.max;
+    }
+    chart._packYFull = null;
+  }
+
   function resetZoom(chart) {
     var scales = chart.options && chart.options.scales;
     if (!scales || !scales.x) return;
+    clearYZoom(chart);
     var hw = houseWindow(chart);
     if (hw) {
       rememberFullX(chart);
-      applyXRange(chart, hw.min, hw.max);
+      applyXRange(chart, hw.min, hw.max, { silent: true });
+      chart.update();
+      rememberFullY(chart);
       log(
         "zoom reset to house window",
         chart._packPayload && chart._packPayload.id,
-        hw.min + ".." + hw.max
+        hw.min + ".." + hw.max,
+        "y auto"
       );
       return;
     }
@@ -1076,34 +1430,86 @@
     delete scales.x.max;
     chart.update();
     chart._packXFull = xBounds(chart);
-    log("zoom reset", chart._packPayload && chart._packPayload.id);
+    rememberFullY(chart);
+    log("zoom reset", chart._packPayload && chart._packPayload.id, "xy auto");
   }
 
-  function panByPixels(chart, dx) {
+  function panByPixels(chart, dx, dy) {
     var area = chart.chartArea;
-    var bounds = xBounds(chart);
-    if (!bounds || !area) return;
+    if (!area) return;
     var width = area.right - area.left;
-    if (width <= 0) return;
-    var span = bounds.max - bounds.min;
-    if (!(span > 0)) return;
-    var delta = (-dx / width) * span;
-    applyXRange(chart, bounds.min + delta, bounds.max + delta);
+    var height = area.bottom - area.top;
+    var silent = { silent: true };
+    var moved = false;
+    if (dx && width > 0) {
+      var xBoundsNow = xBounds(chart);
+      if (xBoundsNow) {
+        var xSpan = xBoundsNow.max - xBoundsNow.min;
+        if (xSpan > 0) {
+          var xDelta = (-dx / width) * xSpan;
+          applyXRange(chart, xBoundsNow.min + xDelta, xBoundsNow.max + xDelta, silent);
+          moved = true;
+        }
+      }
+    }
+    if (dy && height > 0) {
+      rememberFullY(chart);
+      var yb = yBounds(chart);
+      if (yb) {
+        var ySpan = yb.max - yb.min;
+        if (ySpan > 0) {
+          var yDelta = (dy / height) * ySpan;
+          applyYRange(chart, yb.min + yDelta, yb.max + yDelta, silent);
+          moved = true;
+        }
+      }
+    }
+    if (moved) flushZoom(chart);
+  }
+
+  function zoomAtClient(chart, clientX, clientY, factor, mode) {
+    var area = chart.chartArea;
+    if (!area) return;
+    mode = mode || "xy";
+    var rect = chart.canvas.getBoundingClientRect();
+    var silent = { silent: true };
+    var changed = false;
+    if (mode.indexOf("x") >= 0) {
+      var bounds = xBounds(chart);
+      if (bounds) {
+        var x = clientX - rect.left;
+        var fracX = (x - area.left) / Math.max(1, area.right - area.left);
+        fracX = Math.max(0, Math.min(1, fracX));
+        var spanX = bounds.max - bounds.min;
+        if (spanX > 0) {
+          var newSpanX = spanX * factor;
+          var centerX = bounds.min + spanX * fracX;
+          applyXRange(chart, centerX - newSpanX * fracX, centerX + newSpanX * (1 - fracX), silent);
+          changed = true;
+        }
+      }
+    }
+    if (mode.indexOf("y") >= 0) {
+      rememberFullY(chart);
+      var yb = yBounds(chart);
+      if (yb) {
+        var y = clientY - rect.top;
+        var fracY = (area.bottom - y) / Math.max(1, area.bottom - area.top);
+        fracY = Math.max(0, Math.min(1, fracY));
+        var spanY = yb.max - yb.min;
+        if (spanY > 0) {
+          var newSpanY = spanY * factor;
+          var centerY = yb.min + spanY * fracY;
+          applyYRange(chart, centerY - newSpanY * fracY, centerY + newSpanY * (1 - fracY), silent);
+          changed = true;
+        }
+      }
+    }
+    if (changed) flushZoom(chart);
   }
 
   function zoomAtClientX(chart, clientX, factor) {
-    var area = chart.chartArea;
-    var bounds = xBounds(chart);
-    if (!bounds || !area) return;
-    var rect = chart.canvas.getBoundingClientRect();
-    var x = clientX - rect.left;
-    var frac = (x - area.left) / Math.max(1, area.right - area.left);
-    frac = Math.max(0, Math.min(1, frac));
-    var span = bounds.max - bounds.min;
-    if (!(span > 0)) return;
-    var newSpan = span * factor;
-    var center = bounds.min + span * frac;
-    applyXRange(chart, center - newSpan * frac, center + newSpan * (1 - frac));
+    zoomAtClient(chart, clientX, 0, factor, "x");
   }
 
   function rememberFullX(chart) {
@@ -1117,27 +1523,108 @@
     }
   }
 
+  function wheelZoomMode(area, x, y) {
+    if (!area) return "";
+    var inX = x >= area.left && x <= area.right;
+    var inY = y >= area.top && y <= area.bottom;
+    if (inX && inY) return "xy";
+    if (!inX && inY) return "y";
+    if (inX && !inY) return "x";
+    return "";
+  }
+
+  function ensureZoomRect(canvas) {
+    var wrap = canvas.parentNode;
+    if (!wrap) return null;
+    var el = wrap.querySelector(".chart-zoom-rect");
+    if (!el) {
+      el = document.createElement("div");
+      el.className = "chart-zoom-rect";
+      el.setAttribute("aria-hidden", "true");
+      wrap.appendChild(el);
+    }
+    return el;
+  }
+
+  function hideZoomRect(el) {
+    if (!el) return;
+    el.style.display = "none";
+  }
+
+  function placeZoomRect(el, wrap, x0, y0, x1, y1) {
+    if (!el || !wrap) return;
+    var rect = wrap.getBoundingClientRect();
+    var left = Math.min(x0, x1) - rect.left;
+    var top = Math.min(y0, y1) - rect.top;
+    var w = Math.abs(x1 - x0);
+    var h = Math.abs(y1 - y0);
+    el.style.display = "block";
+    el.style.left = left + "px";
+    el.style.top = top + "px";
+    el.style.width = w + "px";
+    el.style.height = h + "px";
+  }
+
+  function applyBoxZoom(chart, x0, y0, x1, y1) {
+    var area = chart.chartArea;
+    var xScale = chart.scales && chart.scales.x;
+    var yScale = chart.scales && chart.scales.y;
+    if (!area || !xScale || !yScale) return;
+    var rect = chart.canvas.getBoundingClientRect();
+    var px0 = Math.min(x0, x1) - rect.left;
+    var px1 = Math.max(x0, x1) - rect.left;
+    var py0 = Math.min(y0, y1) - rect.top;
+    var py1 = Math.max(y0, y1) - rect.top;
+    if (px1 - px0 < 8 && py1 - py0 < 8) return;
+    px0 = Math.max(area.left, Math.min(area.right, px0));
+    px1 = Math.max(area.left, Math.min(area.right, px1));
+    py0 = Math.max(area.top, Math.min(area.bottom, py0));
+    py1 = Math.max(area.top, Math.min(area.bottom, py1));
+    if (!(px1 > px0) || !(py1 > py0)) return;
+    var xv0 = xScale.getValueForPixel(px0);
+    var xv1 = xScale.getValueForPixel(px1);
+    var yv0 = yScale.getValueForPixel(py1);
+    var yv1 = yScale.getValueForPixel(py0);
+    rememberFullX(chart);
+    rememberFullY(chart);
+    applyXRange(chart, xv0, xv1, { silent: true });
+    applyYRange(chart, yv0, yv1, { silent: true });
+    flushZoom(chart);
+    log(
+      "box zoom",
+      chart._packPayload && chart._packPayload.id,
+      xv0 + ".." + xv1,
+      yv0 + ".." + yv1
+    );
+  }
+
   function attachZoom(chart) {
     var canvas = chart.canvas;
     if (!canvas || canvas._packZoomBound) return;
     canvas._packZoomBound = true;
     rememberFullX(chart);
-    var drag = { on: false, x: 0, id: null };
+    rememberFullY(chart);
+    var drag = { on: false, x: 0, y: 0, id: null, box: false };
     var pointers = {};
     var pinch0 = 0;
+    var zoomRect = ensureZoomRect(canvas);
 
     canvas.addEventListener(
       "wheel",
       function (ev) {
         rememberFullX(chart);
+        rememberFullY(chart);
         var area = chart.chartArea;
         if (!area) return;
         var rect = canvas.getBoundingClientRect();
         var x = ev.clientX - rect.left;
-        if (x < area.left || x > area.right) return;
+        var y = ev.clientY - rect.top;
+        var mode = wheelZoomMode(area, x, y);
+        if (!mode) return;
         ev.preventDefault();
         var factor = ev.deltaY < 0 ? 0.82 : 1.22;
-        zoomAtClientX(chart, ev.clientX, factor);
+        log("wheel zoom", chart._packPayload && chart._packPayload.id, mode, factor);
+        zoomAtClient(chart, ev.clientX, ev.clientY, factor, mode);
       },
       { passive: false }
     );
@@ -1152,12 +1639,15 @@
         var dy = a.y - b.y;
         pinch0 = Math.sqrt(dx * dx + dy * dy) || 1;
         drag.on = false;
+        hideZoomRect(zoomRect);
         return;
       }
       if (ev.button !== undefined && ev.button !== 0) return;
       drag.on = true;
       drag.x = ev.clientX;
+      drag.y = ev.clientY;
       drag.id = ev.pointerId;
+      drag.box = !!(ev.shiftKey || ev.metaKey);
       try {
         canvas.setPointerCapture(ev.pointerId);
       } catch (err) {
@@ -1180,25 +1670,38 @@
         var factor = pinch0 / dist;
         if (factor > 1.04 || factor < 0.96) {
           var cx = (a.x + b.x) / 2;
-          zoomAtClientX(chart, cx, factor);
+          var cy = (a.y + b.y) / 2;
+          zoomAtClient(chart, cx, cy, factor, "xy");
           pinch0 = dist;
         }
         return;
       }
       if (!drag.on || (drag.id != null && ev.pointerId !== drag.id)) return;
-      var move = ev.clientX - drag.x;
-      if (Math.abs(move) < 2) return;
+      if (drag.box) {
+        ev.preventDefault();
+        placeZoomRect(zoomRect, canvas.parentNode, drag.x, drag.y, ev.clientX, ev.clientY);
+        return;
+      }
+      var moveX = ev.clientX - drag.x;
+      var moveY = ev.clientY - drag.y;
+      if (Math.abs(moveX) < 2 && Math.abs(moveY) < 2) return;
       ev.preventDefault();
       drag.x = ev.clientX;
+      drag.y = ev.clientY;
       canvas.style.cursor = "grabbing";
-      panByPixels(chart, move);
+      panByPixels(chart, moveX, moveY);
     });
 
     function endPointer(ev) {
       delete pointers[ev.pointerId];
       if (Object.keys(pointers).length < 2) pinch0 = 0;
       if (!drag.on || (drag.id != null && ev.pointerId !== drag.id)) return;
+      if (drag.box) {
+        applyBoxZoom(chart, drag.x, drag.y, ev.clientX, ev.clientY);
+        hideZoomRect(zoomRect);
+      }
       drag.on = false;
+      drag.box = false;
       canvas.style.cursor = "";
       try {
         canvas.releasePointerCapture(drag.id);
@@ -1212,7 +1715,7 @@
       ev.preventDefault();
       resetZoom(chart);
     });
-    log("zoom attached", chart._packPayload && chart._packPayload.id, "labels=", categoryCount(chart));
+    log("zoom attached", chart._packPayload && chart._packPayload.id, "labels=", categoryCount(chart), "xy");
   }
 
   function drawEventMarkers(chart, payload) {
@@ -1380,10 +1883,24 @@
           var text = formatCraftValue(view, v, axis, seriesModeOf(chart));
           if (align === "left") {
             if (/bps/i.test(view.unit || view.ylabel || "")) text = text + " bps";
-            var lab = compactCategoryLabel(labels[i]);
-            if (lab) text = text + " · " + lab;
+            // Week axes already show the date. Appending "2026-W40" clips as "34.6 · 20…".
+            if (!isoWeekDateLabel(labels[i])) {
+              var lab = compactCategoryLabel(labels[i]);
+              if (lab) text = text + " · " + lab;
+            }
           }
-          ctx.fillText(text, pos.x + (align === "left" ? 8 : 0), pos.y - 6);
+          var textW = ctx.measureText(text).width;
+          var x = pos.x + (align === "left" ? 8 : 0);
+          var drawAlign = align;
+          if (align === "left" && x + textW > chart.width - 6) {
+            drawAlign = "right";
+            x = Math.max(area.left + 4, pos.x - 10);
+            log("craft tip inside", payload.id, text);
+          }
+          ctx.textAlign = drawAlign;
+          var y = pos.y - 6;
+          if (y < area.top + 12) y = area.top + 12;
+          ctx.fillText(text, x, y);
         }
         if (first >= 0) paint(first, LATTICE.soft, "500", "center");
         if (end >= 0 && end !== first) paint(end, LATTICE.copper, "700", "left");
@@ -1556,6 +2073,9 @@
   }
 
   function houseLegend(payload) {
+    var hasHollow = ((payload && payload.datasets) || []).some(function (ds) {
+      return ds && ds.hollow;
+    });
     return {
       position: "bottom",
       align: "start",
@@ -1565,6 +2085,7 @@
         padding: 12,
         color: LATTICE.soft,
         font: { family: FONT_SANS, size: 11 },
+        usePointStyle: hasHollow,
         generateLabels: function (chart) {
           var gen = Chart.defaults.plugins.legend.labels.generateLabels;
           var items = gen ? gen(chart) : [];
@@ -1573,6 +2094,19 @@
             var ds = sets[i] || {};
             if (ds.hero && String(item.text).indexOf("(hero)") < 0) {
               item.text = item.text + " (hero)";
+            }
+            if (
+              payload &&
+              (payload.preserveSeriesTint || payload.preserveSeriesColors) &&
+              ds.color
+            ) {
+              item.strokeStyle = ds.color;
+              item.fillStyle = ds.hollow ? "transparent" : ds.color;
+              if (ds.hollow) {
+                item.pointStyle = "circle";
+                item.lineWidth = 1.6;
+                log("hollow legend swatch", payload.id, ds.key || ds.label);
+              }
             }
           });
           return items;
@@ -1649,6 +2183,16 @@
       log("DERIVED watermark plugin on", payload.id, "hasDerived=", !!payload.hasDerived);
     }
     plugins.push({
+      id: "packCategoryTicks",
+      afterLayout: function (chart) {
+        recountCategoryTicksIfNeeded(chart);
+      },
+      resize: function (chart) {
+        resetTickBudget(chart);
+        log("category tick resize", chart._packPayload && chart._packPayload.id);
+      },
+    });
+    plugins.push({
       id: "packHouseChrome",
       afterDatasetsDraw: function (chart) {
         drawTrendline(chart);
@@ -1660,6 +2204,13 @@
     });
     var seriesMode = payload.defaultSeriesMode || "levels";
     var view = payloadView(payload, seriesMode);
+    var scales = scalesFor(view, mode);
+    var hw0 = payload.houseWindow;
+    if (hw0 && typeof hw0.min === "number" && typeof hw0.max === "number") {
+      scales.x.min = hw0.min;
+      scales.x.max = hw0.max;
+      log("category axis default", payload.id, hw0.min + ".." + hw0.max, "of", labelCount);
+    }
     var chart = new Chart(canvas.getContext("2d"), {
       type: payload.chartType === "scatter" ? "scatter" : payload.chartType === "line" ? "line" : "bar",
       plugins: plugins,
@@ -1670,7 +2221,14 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        layout: { padding: { top: 16, right: 52, bottom: 2, left: 2 } },
+        layout: {
+          padding: {
+            top: 16,
+            right: payload.chartType === "line" ? 72 : 52,
+            bottom: 2,
+            left: 2,
+          },
+        },
         interaction:
           payload.chartType === "scatter"
             ? { mode: "nearest", intersect: false }
@@ -1679,7 +2237,7 @@
           legend: houseLegend(payload),
           tooltip: buildTooltip(view),
         },
-        scales: scalesFor(view, mode),
+        scales: scales,
       },
     });
     log(
@@ -1805,6 +2363,8 @@
       chart.data.datasets = asChartDatasets(view, next);
       chart.options.scales = scalesFor(view, next);
       restoreZoom(chart, zoom);
+      chart._packYFull = null;
+      resetTickBudget(chart);
       chart.update();
       log("mode change", payload.id, next, MODE_LABELS[next] || next);
     }
