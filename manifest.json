@@ -188,22 +188,28 @@
       "pdf": false
     },
     {
-      "ticker": "BKNG-zbar-2026-09-30",
-      "name": "Booking Holdings — key metrics (income, trailing PE)",
-      "path": "BKNG-zbar-2026-09-30/",
+      "ticker": "BKNG-zbar-2026-10-06",
+      "name": "Booking Holdings — key metrics (income, shares, TTM EPS, trailing PE)",
+      "path": "BKNG-zbar-2026-10-06/",
       "kind": "key-metrics",
-      "summary": "Booking Holdings key metrics — revenue, operating income, net income, and trailing weekly PE through the week of September 14–20, 2026 (about 18.3×). Forward earnings stay open. Room nights, gross bookings, and take rate stay on the unit-econ dig.",
-      "updated": "2026-10-01",
+      "summary": "Booking Holdings key metrics — annual and quarterly income, diluted weighted-average shares, trailing diluted EPS, and trailing weekly PE through 2026-W40 (about 17.9×). Forward earnings stay blank on that chart. Buy box is unchanged: trailing PE, add below 22, shelved above 30, week 2026-W40. Room nights, gross bookings, and take rate stay on the unit-econ dig.",
+      "updated": "2026-10-06",
       "lineage": "bkng-key-metrics",
       "supersedes": [
         "BKNG-zbar-2026-09-21",
-        "BKNG-zbar-2026-09-24"
+        "BKNG-zbar-2026-09-24",
+        "BKNG-zbar-2026-09-30"
       ],
       "related": [
         {
           "label": "Unit economics",
           "path": "BKNG-unit-econ-2026-09-24/",
           "kind": "dig"
+        },
+        {
+          "label": "AI and disintermediation",
+          "path": "BKNG-ai-disintermediation-2026-09-26/",
+          "kind": "ai-disintermediation"
         }
       ],
       "pdf": false,
@@ -215,10 +221,10 @@
         "series_field": "pe_weekly",
         "add_below": 22.0,
         "shelved_above": 30.0,
-        "asof_week": "2026-W38",
+        "asof_week": "2026-W40",
         "large_position_gate": true,
         "hold_reason": null,
-        "notes": "Latent CLEAR 2026-10-01. Short-sample caveat: non-null weekly trail PE from 2025-W14. W38 lock ~18.30× already in-box (size decision). Forward PE GAPPED — not decision series."
+        "notes": "Latent CLEAR. Decision series trailing_pe_ttm. W40 lock ~17.92× already in-box (size decision). Forward PE GAPPED - not decision series. large_position_gate: valuation dig before size-up."
       }
     },
     {
@@ -235,7 +241,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "BKNG-zbar-2026-09-30/",
+          "path": "BKNG-zbar-2026-10-06/",
           "kind": "key-metrics"
         }
       ],
@@ -252,7 +258,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "BKNG-zbar-2026-09-30/",
+          "path": "BKNG-zbar-2026-10-06/",
           "kind": "key-metrics"
         },
         {
