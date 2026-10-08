@@ -193,7 +193,7 @@
       "path": "BKNG-zbar-2026-10-06/",
       "kind": "key-metrics",
       "summary": "Booking Holdings key metrics — annual and quarterly income, diluted weighted-average shares, trailing diluted EPS, and trailing weekly PE through 2026-W40 (about 17.9×). Forward earnings stay blank on that chart. Buy box is unchanged: trailing PE, add below 22, shelved above 30, week 2026-W40. Room nights, gross bookings, and take rate stay on the unit-econ dig.",
-      "updated": "2026-10-08",
+      "updated": "2026-10-07",
       "lineage": "bkng-key-metrics",
       "supersedes": [
         "BKNG-zbar-2026-09-21",
@@ -238,7 +238,7 @@
       "path": "BKNG-peer-benchmark-2026-10-06/",
       "kind": "peer-benchmark",
       "summary": "Booking Holdings against Expedia, Airbnb, and Trip.com — revenue, operating income, operating margin, and trailing weekly PE. Trip.com stays in CNY on its own panel; its weekly PE is blank. No buy box.",
-      "updated": "2026-10-07",
+      "updated": "2026-10-08",
       "lineage": "bkng-peer-benchmark",
       "related": [
         {

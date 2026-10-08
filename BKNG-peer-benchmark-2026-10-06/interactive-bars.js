@@ -741,6 +741,7 @@
       delete view.yDisplayScale;
       delete view.yDisplayUnit;
       delete view.y1DisplayScale;
+      delete view.yCap;
       log("series mode yoy", payload.id, "datasets=", payload.yoyDatasets.length);
       return view;
     }
@@ -1295,7 +1296,123 @@
       },
     });
     if (composition && mode !== "stacked100") scale.grace = "12%";
+    if (!composition) applyYCapToScale(scale, payload);
     return scale;
+  }
+
+  // Opt-in y-axis cap (payload.yCap, set only when a chart_plan entry has
+  // y_cap). Bars beyond the cap are drawn to the edge with a break marker and
+  // a true-value label; the data values are not changed.
+  function yCapOf(payload) {
+    var cap = payload && payload.yCap;
+    if (!cap || typeof cap !== "object") return null;
+    var hasMax = typeof cap.max === "number" && isFinite(cap.max);
+    var hasMin = typeof cap.min === "number" && isFinite(cap.min);
+    if (!hasMax && !hasMin) return null;
+    return { max: hasMax ? cap.max : null, min: hasMin ? cap.min : null };
+  }
+
+  function applyYCapToScale(scale, payload) {
+    var cap = yCapOf(payload);
+    if (!cap || !scale) return;
+    if (cap.max !== null) scale.max = cap.max;
+    if (cap.min !== null) scale.min = cap.min;
+  }
+
+  function restoreYCap(chart, yScale) {
+    if (!chart || !yScale || seriesModeOf(chart) === "yoy") return;
+    if (chart._packMode === "stacked100") return;
+    applyYCapToScale(yScale, chart._packPayload);
+  }
+
+  function yCapLabel(v, unit) {
+    var num = Number(v);
+    var sign = num > 0 ? "+" : num < 0 ? "\u2212" : "";
+    var mag = Math.abs(num);
+    var body = mag >= 100
+      ? Math.round(mag).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+      : mag.toFixed(1);
+    return sign + body + (unit === "%" ? "%" : "");
+  }
+
+  function yCapClipped(chart, fn) {
+    var payload = chart && chart._packPayload;
+    if (seriesModeOf(chart) === "yoy") return;
+    var cap = yCapOf(payload);
+    if (!cap) return;
+    var yScale = chart.scales && chart.scales.y;
+    var area = chart.chartArea;
+    if (!yScale || !area) return;
+    (chart.data.datasets || []).forEach(function (ds, di) {
+      var meta = chart.getDatasetMeta(di);
+      if (!meta || meta.hidden) return;
+      (ds.data || []).forEach(function (v, i) {
+        if (v === null || v === undefined) return;
+        var num = Number(v);
+        if (!isFinite(num)) return;
+        var side = null;
+        if (cap.max !== null && num > cap.max) side = "max";
+        else if (cap.min !== null && num < cap.min) side = "min";
+        if (!side) return;
+        var el = meta.data && meta.data[i];
+        if (!el) return;
+        var x = el.x;
+        if (!(x >= area.left && x <= area.right)) return;
+        var edge = yScale.getPixelForValue(side === "max" ? cap.max : cap.min);
+        fn({ el: el, x: x, edge: edge, side: side, value: num, ds: ds, area: area });
+      });
+    });
+  }
+
+  function drawYCapBreaks(chart) {
+    var ctx = chart.ctx;
+    ctx.save();
+    yCapClipped(chart, function (c) {
+      var w = Math.max(4, (c.el.width || 8) + 2);
+      var off = c.side === "max" ? 9 : -9;
+      var y0 = c.edge + off;
+      ctx.strokeStyle = LATTICE.paper;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(c.x - w / 2, y0 + 2);
+      ctx.lineTo(c.x + w / 2, y0 - 2);
+      ctx.moveTo(c.x - w / 2, y0 + 6);
+      ctx.lineTo(c.x + w / 2, y0 + 2);
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  function drawYCapLabels(chart) {
+    var ctx = chart.ctx;
+    var view = chart._packPayload || {};
+    var items = [];
+    ctx.save();
+    ctx.font = "700 10px " + FONT_SANS;
+    yCapClipped(chart, function (c) {
+      var text = yCapLabel(c.value, c.ds.unit || view.unit || "");
+      var tw = ctx.measureText(text).width;
+      var x = Math.min(Math.max(c.x, c.area.left + tw / 2), c.area.right - tw / 2);
+      items.push({ text: text, x: x, w: tw, side: c.side, edge: c.edge });
+    });
+    // Stagger labels that would collide: a second row sits one line further out.
+    items.sort(function (a, b) { return a.x - b.x; });
+    var lastRight = { max: [-Infinity, -Infinity], min: [-Infinity, -Infinity] };
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    items.forEach(function (it) {
+      var rows = lastRight[it.side];
+      var left = it.x - it.w / 2;
+      var row = left > rows[0] + 3 ? 0 : left > rows[1] + 3 ? 1 : 0;
+      rows[row] = it.x + it.w / 2;
+      var y = it.side === "max" ? it.edge - 2 - row * 12 : it.edge - 4 - row * 12;
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = LATTICE.paper;
+      ctx.strokeText(it.text, it.x, y);
+      ctx.fillStyle = LATTICE.ink;
+      ctx.fillText(it.text, it.x, y);
+    });
+    ctx.restore();
   }
 
   function buildTooltip(payload) {
@@ -1645,6 +1762,7 @@
     if (min <= lo && max >= hi) {
       delete scales.y.min;
       delete scales.y.max;
+      restoreYCap(chart, scales.y);
       log("y zoom full range", chart._packPayload && chart._packPayload.id);
     } else {
       scales.y.min = min;
@@ -1673,6 +1791,7 @@
     if (scales && scales.y) {
       delete scales.y.min;
       delete scales.y.max;
+      restoreYCap(chart, scales.y);
     }
     chart._packYFull = null;
   }
@@ -2472,6 +2591,7 @@
     var payload = chart._packPayload;
     if (!payload) return;
     var view = payloadView(payload, seriesModeOf(chart));
+    var capView = yCapOf(view);
     var area = chart.chartArea;
     if (!area) return;
     var ctx = chart.ctx;
@@ -2488,6 +2608,8 @@
         if (v === null || v === undefined || Number.isNaN(Number(v))) return;
         var el = meta.data && meta.data[i];
         if (!el) return;
+        if (capView && ((capView.max !== null && Number(v) > capView.max) ||
+            (capView.min !== null && Number(v) < capView.min))) return;
         var pos = elementPos(el);
         var x = pos.x;
         var y = pos.y;
@@ -2633,6 +2755,7 @@
         drawCraftLabels(chart);
         if (!calloutUnclipped(chart)) drawCallout(chart);
         drawDataLabels(chart);
+        drawYCapBreaks(chart);
       },
     });
     plugins.push({
@@ -2645,6 +2768,7 @@
           log("tip inset ring", chart._packPayload.id);
         }
         if (calloutUnclipped(chart)) drawCallout(chart);
+        drawYCapLabels(chart);
       },
     });
     var seriesMode = payload.defaultSeriesMode || "levels";
@@ -2668,7 +2792,7 @@
         maintainAspectRatio: false,
         layout: {
           padding: {
-            top: 16,
+            top: payload.yCap && payload.yCap.clipped && payload.yCap.clipped.length ? 30 : 16,
             right: payload.chartType === "line" ? 72 : 52,
             bottom: 2,
             left: 2,
