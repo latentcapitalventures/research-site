@@ -163,6 +163,28 @@
       "pdf": false
     },
     {
+      "ticker": "IBKR-vs-HOOD-2026-10-09",
+      "name": "Interactive Brokers vs Robinhood — how each makes money",
+      "path": "IBKR-vs-HOOD-2026-10-09/",
+      "kind": "dig",
+      "summary": "Interactive Brokers against Robinhood — revenue streams, FY2025 revenue-to-profit flows, net interest and trading mix, pre-tax margin, revenue and assets per account, and interest-rate sensitivity. No buy box.",
+      "updated": "2026-10-08",
+      "lineage": "ibkr-vs-hood",
+      "related": [
+        {
+          "label": "Key metrics",
+          "path": "IBKR-zbar-2026-10-07/",
+          "kind": "key-metrics"
+        },
+        {
+          "label": "Peer benchmark",
+          "path": "IBKR-peer-benchmark-2026-10-05/",
+          "kind": "peer-benchmark"
+        }
+      ],
+      "pdf": false
+    },
+    {
       "ticker": "IBKR-peer-benchmark-2026-10-05",
       "name": "Interactive Brokers — peer benchmark",
       "path": "IBKR-peer-benchmark-2026-10-05/",
@@ -238,7 +260,7 @@
       "path": "BKNG-peer-benchmark-2026-10-06/",
       "kind": "peer-benchmark",
       "summary": "Booking Holdings against Expedia, Airbnb, and Trip.com — revenue, operating income, operating margin, and trailing weekly PE. Trip.com stays in CNY on its own panel; its weekly PE is blank. No buy box.",
-      "updated": "2026-10-08",
+      "updated": "2026-10-07",
       "lineage": "bkng-peer-benchmark",
       "related": [
         {
