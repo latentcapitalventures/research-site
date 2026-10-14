@@ -392,6 +392,23 @@
       "pdf": false
     },
     {
+      "ticker": "UBER-peer-benchmark-2026-10-14",
+      "name": "Uber — peer benchmark",
+      "path": "UBER-peer-benchmark-2026-10-14/",
+      "kind": "peer-benchmark",
+      "summary": "Uber against Lyft, DoorDash, and Grab — revenue, operating income, operating margin, trailing weekly PE, diluted shares, and diluted EPS growth. All USD; no FX. No buy box.",
+      "updated": "2026-10-13",
+      "lineage": "uber-peer-benchmark",
+      "related": [
+        {
+          "label": "Key metrics",
+          "path": "UBER-zbar-2026-10-14/",
+          "kind": "key-metrics"
+        }
+      ],
+      "pdf": false
+    },
+    {
       "ticker": "Z-zbar-2026-10-02",
       "name": "Zillow key metrics — annual income, segments, For Sale versus Rentals, cash, trailing PE",
       "path": "Z-zbar-2026-10-02/",
