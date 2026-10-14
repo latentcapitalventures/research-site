@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Research",
-  "updated": "2026-10-13",
+  "updated": "2026-10-14",
   "packs": [
     {
       "ticker": "SPOT-conversion",
@@ -397,7 +397,7 @@
       "path": "UBER-peer-benchmark-2026-10-14/",
       "kind": "peer-benchmark",
       "summary": "Uber against Lyft, DoorDash, and Grab — revenue, operating income, operating margin, trailing weekly PE, diluted shares, and diluted EPS growth. All USD; no FX. No buy box.",
-      "updated": "2026-10-13",
+      "updated": "2026-10-14",
       "lineage": "uber-peer-benchmark",
       "related": [
         {
