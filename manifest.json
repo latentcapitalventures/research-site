@@ -397,7 +397,7 @@
       "path": "UBER-peer-benchmark-2026-10-14/",
       "kind": "peer-benchmark",
       "summary": "Uber against Lyft, DoorDash, and Grab — revenue, operating income, operating margin, trailing weekly PE, diluted shares, and diluted EPS growth. All USD; no FX. No buy box.",
-      "updated": "2026-10-14",
+      "updated": "2026-10-13",
       "lineage": "uber-peer-benchmark",
       "related": [
         {
@@ -531,6 +531,16 @@
           "kind": "unit-econ"
         }
       ],
+      "pdf": false
+    },
+    {
+      "ticker": "earnings-calls-recap-2026-10-14",
+      "name": "Earnings-call recaps — Q1 and Q2 2026, all desks",
+      "path": "earnings-calls-recap-2026-10-14/",
+      "kind": "dig",
+      "summary": "What management highlighted and where analysts pushed on the Q1 and Q2 2026 calls for Amazon, Alphabet, Booking, IBKR, Spotify, Uber and Zillow, with the next earnings date for each.",
+      "updated": "2026-10-14",
+      "lineage": "earnings-calls-recap",
       "pdf": false
     }
   ]
