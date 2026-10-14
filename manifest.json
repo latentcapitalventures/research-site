@@ -302,7 +302,7 @@
       "path": "BKNG-hotel-connectivity-2026-10-12/",
       "kind": "dig",
       "summary": "How Booking.com plugs into hotel software, what a direct booking costs the hotel, and whether AI assistants or direct MCP connections can route around Booking.com. Flow charts, sourced cost ranges, a who-controls-what map and a watch list. No buy box.",
-      "updated": "2026-10-13",
+      "updated": "2026-10-12",
       "lineage": "bkng-hotel-connectivity",
       "related": [
         {
@@ -354,14 +354,15 @@
       "pdf": false
     },
     {
-      "ticker": "UBER-zbar-2026-09-30",
-      "name": "Uber key metrics — income, free cash flow, trailing PE",
-      "path": "UBER-zbar-2026-09-30/",
+      "ticker": "UBER-zbar-2026-10-14",
+      "name": "Uber key metrics — income, segments, shares, EPS, free cash flow, PE and P/FCF",
+      "path": "UBER-zbar-2026-10-14/",
       "kind": "key-metrics",
-      "summary": "Uber key metrics — revenue, operating income, net income, free cash flow, and trailing weekly PE through the week ending September 27, 2026 (14.93×). Forward earnings stay open. Gross bookings, trips, and segment cuts are not in this cut.",
-      "updated": "2026-09-30",
+      "summary": "Uber key metrics — revenue, operating income, net income, segment revenue, diluted shares, trailing EPS, free cash flow, and weekly trailing PE (15.36×) and P/FCF (14.17×) through the week ending October 11, 2026. Forward earnings stay open.",
+      "updated": "2026-10-13",
       "lineage": "uber-key-metrics",
       "supersedes": [
+        "UBER-zbar-2026-09-30",
         "UBER-zbar-2026-09-27"
       ],
       "related": [
@@ -384,7 +385,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "UBER-zbar-2026-09-30/",
+          "path": "UBER-zbar-2026-10-14/",
           "kind": "key-metrics"
         }
       ],
