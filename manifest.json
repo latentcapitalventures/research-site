@@ -206,7 +206,7 @@
       "related": [
         {
           "label": "IBKR key metrics",
-          "path": "IBKR-zbar-2026-10-07/",
+          "path": "IBKR-zbar-2026-10-15/",
           "kind": "key-metrics"
         },
         {
@@ -231,7 +231,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "IBKR-zbar-2026-10-07/",
+          "path": "IBKR-zbar-2026-10-15/",
           "kind": "key-metrics"
         },
         {
@@ -253,7 +253,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "IBKR-zbar-2026-10-07/",
+          "path": "IBKR-zbar-2026-10-15/",
           "kind": "key-metrics"
         },
         {
@@ -280,7 +280,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "IBKR-zbar-2026-10-07/",
+          "path": "IBKR-zbar-2026-10-15/",
           "kind": "key-metrics"
         },
         {
@@ -292,20 +292,20 @@
       "pdf": false
     },
     {
-      "ticker": "IBKR-zbar-2026-10-07",
+      "ticker": "IBKR-zbar-2026-10-15",
       "name": "Interactive Brokers key metrics — income, franchise, geography, trailing PE",
-      "path": "IBKR-zbar-2026-10-07/",
+      "path": "IBKR-zbar-2026-10-15/",
       "kind": "key-metrics",
-      "summary": "Interactive Brokers key metrics. Annual income from FY2008, pretax as the profit line, diluted weighted-average shares, trailing diluted EPS, and dividends per share on the post-split basis, dividend yield, and fourth-quarter United States and international net revenue and pretax for 2016 through 2025. The fourth quarter of 2015 stays blank. Weekly trailing PE runs from 2018-W41 through 2026-W40 after Tylor #138. Forward FY1 and FY2 sit on that chart. Buy box is unchanged: trailing PE, add below 30, shelved above 34, week 2026-W40.",
-      "updated": "2026-10-06",
-      "lineage": "ibkr-key-metrics",
+      "summary": "Interactive Brokers key metrics through Q3 2026. Annual income from FY2008, pretax as the profit line, diluted weighted-average shares, trailing diluted EPS, dividends per share on the post-split basis (raised to $0.15), dividend yield, and weekly trailing PE. Buy box unchanged: trailing PE add below 30, shelved above 34.",
+      "updated": "2026-10-15",
       "supersedes": [
         "IBKR",
         "IBKR-zbar-2026-09-21",
         "IBKR-zbar-2026-10-03",
         "IBKR-zbar-2026-10-04",
         "IBKR-zbar-2026-10-05",
-        "IBKR-zbar-2026-10-06"
+        "IBKR-zbar-2026-10-06",
+        "IBKR-zbar-2026-10-07"
       ],
       "related": [
         {
@@ -328,21 +328,21 @@
         "series_field": "pe",
         "add_below": 30,
         "shelved_above": 34,
-        "asof_week": "2026-W40",
+        "asof_week": "2026-W41",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent LOCK. Decision series trailing_pe_ttm. W40 week VWAP 86.563 trail 34.60× is shelved at ≥34. Forward FY1 is the companion, not blended. Gates were not reset. Weekly PE folded from Tylor 5bed257 (#138) after Yahoo backfill of the Alpaca hole."
+        "notes": "Latent LOCK. Decision series trailing_pe_ttm. W41 week VWAP 88.227 ÷ post-print TTM 2.6 ≈ 33.93× (DERIVED) sits inside add≤30 / shelve≥34. Forward FY1 is the companion, not blended. Gates were not reset. No new market or Alpaca price pull."
       }
     },
     {
       "ticker": "SEDG-unit-econ-2026-10-14",
-      "name": "SolarEdge — product lines and unit economics",
+      "name": "SEDG-unit-econ-2026-10-14",
       "path": "SEDG-unit-econ-2026-10-14/",
       "kind": "dig",
-      "summary": "SolarEdge — product lines and unit economics",
+      "summary": "Published research pack for SEDG-unit-econ-2026-10-14.",
       "updated": "2026-10-15",
       "pdf": false
     },
@@ -931,7 +931,7 @@
         "HOOD"
       ],
       "related": [
-        "IBKR-zbar-2026-10-07",
+        "IBKR-zbar-2026-10-15",
         "IBKR-quarterly-metrics-2026-09-27"
       ],
       "supersedes": [
@@ -954,7 +954,7 @@
         "HOOD"
       ],
       "related": [
-        "IBKR-zbar-2026-10-07",
+        "IBKR-zbar-2026-10-15",
         "IBKR-quarterly-metrics-2026-09-27"
       ],
       "status_reason": "superseded by IBKR-peer-benchmark-2026-10-05",
@@ -973,7 +973,7 @@
       "dig_type": "operating-kpi",
       "slug": "quarterly-metrics",
       "related": [
-        "IBKR-zbar-2026-10-07",
+        "IBKR-zbar-2026-10-15",
         "IBKR-intensity",
         "IBKR-peer-benchmark-2026-10-05"
       ],
@@ -995,7 +995,7 @@
         "HOOD"
       ],
       "related": [
-        "IBKR-zbar-2026-10-07",
+        "IBKR-zbar-2026-10-15",
         "IBKR-peer-benchmark-2026-10-05"
       ],
       "url": "/t/IBKR/dig/vs-hood/"
@@ -1119,7 +1119,7 @@
       "title": "Interactive Brokers key metrics — income, franchise, geography, trailing PE",
       "summary": "Interactive Brokers key metrics. Annual income from FY2008, pretax as the profit line, diluted weighted-average shares, trailing diluted EPS, and dividends per share on the post-split basis, dividend yield, and fourth-quarter United States and international net revenue and pretax for 2016 through 2025. The fourth quarter of 2015 stays blank. Weekly trailing PE runs from 2018-W41 through 2026-W40 after Tylor #138. Forward FY1 and FY2 sit on that chart. Buy box is unchanged: trailing PE, add below 30, shelved above 34, week 2026-W40.",
       "as_of": "2026-10-06",
-      "status": "live",
+      "status": "superseded",
       "pdf": false,
       "ticker": "IBKR",
       "related": [
@@ -1150,14 +1150,56 @@
         ],
         "notes": "Latent LOCK. Decision series trailing_pe_ttm. W40 week VWAP 86.563 trail 34.60× is shelved at ≥34. Forward FY1 is the companion, not blended. Gates were not reset. Weekly PE folded from Tylor 5bed257 (#138) after Yahoo backfill of the Alpaca hole."
       },
+      "url": "/t/IBKR/key-metrics/",
+      "status_reason": "superseded by IBKR-zbar-2026-10-15"
+    },
+    {
+      "id": "IBKR-zbar-2026-10-15",
+      "type": "key-metrics",
+      "scope": "ticker",
+      "title": "Interactive Brokers key metrics — income, franchise, geography, trailing PE",
+      "summary": "Interactive Brokers key metrics through Q3 2026. Annual income from FY2008, pretax as the profit line, diluted weighted-average shares, trailing diluted EPS, dividends per share on the post-split basis (raised to $0.15), dividend yield, and weekly trailing PE. Buy box unchanged: trailing PE add below 30, shelved above 34.",
+      "as_of": "2026-10-15",
+      "status": "live",
+      "pdf": false,
+      "ticker": "IBKR",
+      "related": [
+        "IBKR-quarterly-metrics-2026-09-27",
+        "IBKR-peer-benchmark-2026-10-05"
+      ],
+      "supersedes": [
+        "IBKR",
+        "IBKR-zbar-2026-09-21",
+        "IBKR-zbar-2026-10-03",
+        "IBKR-zbar-2026-10-04",
+        "IBKR-zbar-2026-10-05",
+        "IBKR-zbar-2026-10-06",
+        "IBKR-zbar-2026-10-07"
+      ],
+      "buy_box": {
+        "shelf_rank": "very_interested",
+        "series": "trailing_pe_ttm",
+        "units": "x",
+        "status": "active",
+        "series_field": "pe",
+        "add_below": 30,
+        "shelved_above": 34,
+        "asof_week": "2026-W41",
+        "large_position_gate": true,
+        "hold_reason": null,
+        "companion_series": [
+          "forward_pe_fy1"
+        ],
+        "notes": "Latent LOCK. Decision series trailing_pe_ttm. W41 week VWAP 88.227 ÷ post-print TTM 2.6 ≈ 33.93× (DERIVED) sits inside add≤30 / shelve≥34. Forward FY1 is the companion, not blended. Gates were not reset. No new market or Alpaca price pull."
+      },
       "url": "/t/IBKR/key-metrics/"
     },
     {
       "id": "SEDG-unit-econ-2026-10-14",
       "type": "dig",
       "scope": "ticker",
-      "title": "SolarEdge — product lines and unit economics",
-      "summary": "SolarEdge — product lines and unit economics",
+      "title": "SEDG-unit-econ-2026-10-14",
+      "summary": "Published research pack for SEDG-unit-econ-2026-10-14.",
       "as_of": "2026-10-15",
       "status": "live",
       "pdf": false,
