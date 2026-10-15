@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Calendar · Latent Capital · Research</title>
+<style>
+    :root{--ink:#1B1A17;--paper:#F5F0E8;--line:#9C958A;--soft:#5C564C;--cu:#B86B3C;--alert:#A8483C;--serif:Georgia,"Times New Roman",serif;--sans:"Helvetica Neue",Arial,sans-serif}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 var(--sans)}
+    .wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+    a{color:inherit;text-decoration:none}a:hover{color:var(--cu)}
+    .mast{padding:36px 0 20px;border-bottom:1px solid var(--ink);display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+    .mast img{height:96px;width:auto;display:block;object-fit:contain}.mast nav a{margin-left:22px;font-size:13px;letter-spacing:.04em;color:var(--soft)}.mast nav a.on{color:var(--ink);border-bottom:1px solid var(--cu)}
+    h2{font:400 26px/1.2 var(--serif);margin:0}
+    .sec{padding:40px 0 8px}.sechead{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:18px}
+    .meta{font-size:12px;color:var(--soft);letter-spacing:.03em}
+    .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+    .strip{display:flex;gap:28px;overflow-x:auto;padding-bottom:8px}
+    .item{flex:0 0 220px}
+    .item .mk{width:88px;height:88px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;margin-bottom:10px;padding:10px;overflow:visible}
+    .item .mk img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+    .item h3{font:400 17px/1.3 var(--serif);margin:4px 0;overflow-wrap:anywhere;word-break:break-word}.new{color:var(--cu)}
+    .item{min-width:0}
+    .grp{margin:22px 0 6px}.grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+    .desk{padding:16px 16px 18px 0;border-bottom:1px solid var(--line);min-width:0}
+    .desk .t{font:400 28px var(--serif);display:flex;align-items:center;gap:10px;min-width:0}
+    .desk .t img{height:28px;width:auto;max-width:7.5rem;object-fit:contain;object-position:left center;flex:0 0 auto}
+    .desk .n{color:var(--soft);font-size:13px}
+    .desk .meta{margin-top:2px}
+    .desk ul{list-style:none;padding:0;margin:10px 0 0;font-size:13px}.desk li{display:flex;justify-content:space-between;gap:12px;padding:2px 0}.desk li span:last-child{color:var(--soft);font-variant-numeric:tabular-nums;text-align:right}
+    .desk li.no span{color:var(--line)}
+    .lock{font-size:11px;color:var(--cu);letter-spacing:.1em}
+    .rows{width:100%;border-collapse:collapse;font-size:14px}.rows td{padding:11px 10px 11px 0;border-bottom:1px solid var(--line);vertical-align:top}
+    .rows td.d{color:var(--soft);white-space:nowrap;width:118px;font-size:13px;font-variant-numeric:tabular-nums}.rows td.tk{width:70px;font-weight:600}.rows td.ty{width:150px;color:var(--soft);font-size:13px}
+    .rows a{font-family:var(--serif);font-size:16px;overflow-wrap:anywhere;word-break:break-word}
+    .earn-source{display:block;margin-top:2px;font:12px/1.4 var(--sans);color:var(--soft);letter-spacing:.03em;overflow-wrap:anywhere}
+    .earn-source a{font:inherit;border-bottom:1px solid var(--line)}
+    .earn-call{display:block;margin-top:2px;font-size:12px}
+    .rows td:last-child{min-width:0}
+    .tk-mark{height:14px;width:auto;vertical-align:-2px;margin-right:6px}
+    .filters{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;margin-bottom:12px;font-size:13px}
+    .chip{padding:3px 0;color:var(--soft);border-bottom:1px solid transparent;cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;font:inherit}
+    .chip.on{color:var(--ink);border-bottom-color:var(--cu)}.chip.off{color:var(--line);cursor:default}
+    .search{border:0;border-bottom:1px solid var(--ink);background:transparent;font:14px var(--sans);padding:4px 0;width:200px;margin-left:auto;color:var(--ink);min-width:0}
+    .search:focus{outline:none;border-bottom-color:var(--cu)}
+    input[type=date].search{width:auto;margin-left:0;font-variant-numeric:tabular-nums;color:var(--soft)}
+    .filters .count{color:var(--ink);font-variant-numeric:tabular-nums}
+    .filters .clear{margin-left:auto;color:var(--soft);border-bottom:1px solid var(--line);font-size:12px}
+    .filters .clear:hover{color:var(--cu);border-bottom-color:var(--cu)}
+    .nothing{color:var(--soft);font-size:12px;letter-spacing:.03em;padding:10px 0;border-bottom:1px solid var(--line);margin:0}
+    .foot{padding:48px 0 40px;color:var(--soft);font-size:12px}
+    .hero{padding:34px 0 10px;display:flex;gap:28px;align-items:flex-end}.hero .t{font:400 64px/1 var(--serif);display:flex;align-items:center;gap:14px;white-space:nowrap}
+    .hero .t img{height:40px;width:auto;max-width:10rem;object-fit:contain;object-position:left center}
+    .two{display:grid;grid-template-columns:2fr 1fr;gap:40px}
+    .kv{display:grid;grid-template-columns:1fr auto;font-size:14px}.kv div{padding:7px 0;border-bottom:1px solid var(--line)}.kv div:nth-child(even){text-align:right;font-variant-numeric:tabular-nums}
+    .tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase}.tag.locked{color:var(--cu)}.tag.open{color:var(--soft)}
+    .desk li.no span:last-child{color:var(--line);font-style:italic}
+    .stale{color:var(--alert)!important}.stale-off .stale{color:var(--soft)!important}
+    .peers{display:inline-flex;flex-wrap:wrap;gap:4px 10px;margin-left:10px;font:12px var(--sans);color:var(--soft);vertical-align:2px}
+    .peer{border-bottom:1px solid var(--line)}.peer.more{border:0;color:var(--line)}
+    .perma{margin-top:8px;font:11px/1.4 ui-monospace,Menlo,Consolas,monospace;color:var(--line);background:none;border:0;padding:0;cursor:pointer;text-align:left;overflow-wrap:anywhere}
+    .perma:hover{color:var(--soft)}
+    .empty{color:var(--line);font-style:italic;margin:0.35rem 0 0}
+    .e404{padding:90px 0 120px}.e404 .code{font:400 120px/1 var(--serif);color:var(--line)}.e404 h1{font:400 30px var(--serif);margin:14px 0 8px}.e404 a{border-bottom:1px solid var(--cu)}
+    button.chip{color:var(--soft)}
+    @media(max-width:640px){.wrap{padding:0 18px}.mast{flex-direction:column;align-items:flex-start}.mast img{height:72px}.mast nav a{margin:0 16px 0 0}
+    .grid{grid-template-columns:1fr 1fr}.rows td.ty{display:none}.two{grid-template-columns:1fr}.hero .t{font-size:44px}.item{flex-basis:170px}
+    .sechead{flex-wrap:wrap;gap:4px 12px}.hero{flex-direction:column;align-items:flex-start;gap:8px 16px}.hero .t{white-space:nowrap}.peers{margin:4px 0 0}
+    .search{width:100%;margin:6px 0 0}.e404 .code{font-size:84px}}
+    @media(max-width:480px){.grid{grid-template-columns:1fr}.desk{padding-right:0}}
+  </style></head>
+<body>
+  <div class="wrap">
+<header class="mast">
+      <a href="../../index.html"><img src="../../facet-l-lockup.png" width="2294" height="1024" alt="Latent Capital"/></a>
+      <nav>
+        <a class="" href="../../index.html#desks">Desks</a>
+        <a class="on" href="../../index.html#cross">Cross-desk</a>
+        <a class="" href="../../digs/">Digs</a>
+      </nav>
+    </header>    <div class="hero">
+      <div class="t"><img src="../../logos/latent.svg" alt="All desks"/> All desks</div>
+      <div>
+        <div style="font:400 22px var(--serif)">Calendar</div>
+        <div class="meta">Upcoming prints · cross-desk</div>
+      </div>
+    </div>
+<section class="sec" id="earnings" aria-labelledby="earnings-heading">
+      <div class="sechead">
+        <h2 id="earnings-heading">Upcoming earnings</h2>
+<span class="meta">Q3 2026</span>      </div>
+      <table class="rows">
+        <tbody>
+          <tr class="is-confirmed">
+            <td class="d"><time datetime="2026-10-15">Thu Oct 15</time></td>
+            <td class="tk"><span class="earn-ticker">IBKR</span></td>
+            <td>Interactive Brokers<span class="earn-source"><a href="https://www.interactivebrokers.com/en/general/about/mediaRelations/7-24-26.php" rel="noopener noreferrer">IBKR IR / Business Wire, Sep 24</a></span></td>
+            <td class="ty"><span class="earn-session">After close<span class="earn-code"> · AMC</span></span><span class="earn-call">call 4:30 PM ET</span></td>
+            <td><span class="earn-status">Confirmed</span></td>
+          </tr>
+          <tr class="is-confirmed">
+            <td class="d"><time datetime="2026-10-22">Thu Oct 22</time></td>
+            <td class="tk"><span class="earn-ticker">SPOT</span></td>
+            <td>Spotify<span class="earn-source"><a href="https://www.businesswire.com/news/home/20260924855017/en/Spotify-Technology-S.A.-to-Announce-Results-for-Third-Quarter-2026" rel="noopener noreferrer">Business Wire, Sep 24</a></span></td>
+            <td class="ty"><span class="earn-session">Before open<span class="earn-code"> · BMO</span></span><span class="earn-call">call 8:00 AM ET</span></td>
+            <td><span class="earn-status">Confirmed</span></td>
+          </tr>
+          <tr class="is-confirmed">
+            <td class="d"><time datetime="2026-10-28">Wed Oct 28</time></td>
+            <td class="tk"><span class="earn-ticker">GOOGL</span></td>
+            <td>Alphabet<span class="earn-source"><a href="https://abc.xyz/investor/news/news-details/2026/Alphabet-Announces-Date-of-Third-Quarter-2026-Financial-Results-Conference-Call-2026-8tpGZsLS6v/default.aspx" rel="noopener noreferrer">Alphabet IR, Oct 6</a></span></td>
+            <td class="ty"><span class="earn-session">After close<span class="earn-code"> · AMC</span></span><span class="earn-call">call 4:30 PM ET</span></td>
+            <td><span class="earn-status">Confirmed</span></td>
+          </tr>
+          <tr class="is-estimated">
+            <td class="d"><time datetime="2026-10-29">Thu Oct 29</time></td>
+            <td class="tk"><span class="earn-ticker">AMZN</span></td>
+            <td>Amazon<span class="earn-source">Prior reporting cadence; no IR or press-release date posted.</span></td>
+            <td class="ty"><span class="earn-session">After close<span class="earn-code"> · AMC</span></span></td>
+            <td><span class="earn-status">Estimated</span> (est.)</td>
+          </tr>
+          <tr class="is-confirmed">
+            <td class="d"><time datetime="2026-11-03">Tue Nov 3</time></td>
+            <td class="tk"><span class="earn-ticker">BKNG</span></td>
+            <td>Booking Holdings<span class="earn-source"><a href="https://www.prnewswire.com/news-releases/booking-holdings-to-webcast-third-quarter-2026-financial-results-on-november-3-302895776.html" rel="noopener noreferrer">PRNewswire, Oct 6</a></span></td>
+            <td class="ty"><span class="earn-session">After close<span class="earn-code"> · AMC</span></span><span class="earn-call">call 4:30 PM ET</span></td>
+            <td><span class="earn-status">Confirmed</span></td>
+          </tr>
+          <tr class="is-estimated">
+            <td class="d"><time datetime="2026-11-04">Wed Nov 4</time></td>
+            <td class="tk"><span class="earn-ticker">SEDG</span></td>
+            <td>SolarEdge<span class="earn-source">Prior reporting cadence; no IR or press-release date posted.</span></td>
+            <td class="ty"><span class="earn-session">Before open<span class="earn-code"> · BMO</span></span></td>
+            <td><span class="earn-status">Estimated</span> (est.)</td>
+          </tr>
+          <tr class="is-confirmed">
+            <td class="d"><time datetime="2026-11-04">Wed Nov 4</time></td>
+            <td class="tk"><span class="earn-ticker">UBER</span></td>
+            <td>Uber<span class="earn-source"><a href="https://www.businesswire.com/news/home/20261005485838/en/" rel="noopener noreferrer">Business Wire, Oct 5</a></span></td>
+            <td class="ty"><span class="earn-session">Before open<span class="earn-code"> · BMO</span></span><span class="earn-call">call 8:00 AM ET</span></td>
+            <td><span class="earn-status">Confirmed</span></td>
+          </tr>
+          <tr class="is-confirmed">
+            <td class="d"><time datetime="2026-11-04">Wed Nov 4</time></td>
+            <td class="tk"><span class="earn-ticker">Z</span></td>
+            <td>Zillow Group<span class="earn-source"><a href="https://www.prnewswire.com/news-releases/zillow-group-to-announce-third-quarter-2026-results-nov-4-302899531.html" rel="noopener noreferrer">PRNewswire, Oct 6</a></span></td>
+            <td class="ty"><span class="earn-session">After close<span class="earn-code"> · AMC</span></span><span class="earn-call">call 5:00 PM ET</span></td>
+            <td><span class="earn-status">Confirmed</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="meta" style="margin-top:12px">Estimated dates follow the prior reporting cadence until IR confirms them.</p>
+    </section><footer class="foot">Latent Capital · Research · 2026-10-14</footer>  </div>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
-  "note": "Source of truth for the hub earnings table. Dates stay Estimated until the issuer's IR page posts them — then set status to Confirmed. Do not mark a row Confirmed from a calendar vendor or prior cadence. Edit this file and regenerate the hub (python -m pack publish, or the site index regen path).",
+  "note": "Source of truth for the hub earnings table and /x/calendar/. Dates stay Estimated until the issuer's IR page or an issuer press release posts them — then set status to Confirmed and fill source / source_url. Do not mark a row Confirmed from a calendar vendor or prior cadence. Edit this file and regenerate the hub (python -m pack publish, or the site index regen path).",
   "events": [
     {
       "ticker": "IBKR",
@@ -7,7 +7,21 @@
       "period": "Q3 2026",
       "date": "2026-10-15",
       "session": "AMC",
-      "status": "Estimated"
+      "status": "Confirmed",
+      "call": "4:30 PM ET",
+      "source": "IBKR IR / Business Wire, Sep 24",
+      "source_url": "https://www.interactivebrokers.com/en/general/about/mediaRelations/7-24-26.php"
+    },
+    {
+      "ticker": "SPOT",
+      "company": "Spotify",
+      "period": "Q3 2026",
+      "date": "2026-10-22",
+      "session": "BMO",
+      "status": "Confirmed",
+      "call": "8:00 AM ET",
+      "source": "Business Wire, Sep 24",
+      "source_url": "https://www.businesswire.com/news/home/20260924855017/en/Spotify-Technology-S.A.-to-Announce-Results-for-Third-Quarter-2026"
     },
     {
       "ticker": "GOOGL",
@@ -15,23 +29,61 @@
       "period": "Q3 2026",
       "date": "2026-10-28",
       "session": "AMC",
-      "status": "Estimated"
+      "status": "Confirmed",
+      "call": "4:30 PM ET",
+      "source": "Alphabet IR, Oct 6",
+      "source_url": "https://abc.xyz/investor/news/news-details/2026/Alphabet-Announces-Date-of-Third-Quarter-2026-Financial-Results-Conference-Call-2026-8tpGZsLS6v/default.aspx"
+    },
+    {
+      "ticker": "AMZN",
+      "company": "Amazon",
+      "period": "Q3 2026",
+      "date": "2026-10-29",
+      "session": "AMC",
+      "status": "Estimated",
+      "note": "Prior reporting cadence; no IR or press-release date posted."
+    },
+    {
+      "ticker": "BKNG",
+      "company": "Booking Holdings",
+      "period": "Q3 2026",
+      "date": "2026-11-03",
+      "session": "AMC",
+      "status": "Confirmed",
+      "call": "4:30 PM ET",
+      "source": "PRNewswire, Oct 6",
+      "source_url": "https://www.prnewswire.com/news-releases/booking-holdings-to-webcast-third-quarter-2026-financial-results-on-november-3-302895776.html"
+    },
+    {
+      "ticker": "SEDG",
+      "company": "SolarEdge",
+      "period": "Q3 2026",
+      "date": "2026-11-04",
+      "session": "BMO",
+      "status": "Estimated",
+      "note": "Prior reporting cadence; no IR or press-release date posted."
+    },
+    {
+      "ticker": "UBER",
+      "company": "Uber",
+      "period": "Q3 2026",
+      "date": "2026-11-04",
+      "session": "BMO",
+      "status": "Confirmed",
+      "call": "8:00 AM ET",
+      "source": "Business Wire, Oct 5",
+      "source_url": "https://www.businesswire.com/news/home/20261005485838/en/"
     },
     {
       "ticker": "Z",
       "company": "Zillow Group",
       "period": "Q3 2026",
-      "date": "2026-10-29",
+      "date": "2026-11-04",
       "session": "AMC",
-      "status": "Estimated"
-    },
-    {
-      "ticker": "SPOT",
-      "company": "Spotify",
-      "period": "Q3 2026",
-      "date": "2026-11-03",
-      "session": "BMO",
-      "status": "Estimated"
+      "status": "Confirmed",
+      "call": "5:00 PM ET",
+      "source": "PRNewswire, Oct 6",
+      "source_url": "https://www.prnewswire.com/news-releases/zillow-group-to-announce-third-quarter-2026-results-nov-4-302899531.html"
     }
   ]
 }

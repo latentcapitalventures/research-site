@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "title": "Latent Capital · Research",
-  "updated": "2026-10-14",
+  "updated": "2026-10-13",
   "packs": [
     {
       "ticker": "AMZN-zbar-2026-09-30",
@@ -629,6 +629,25 @@
       "url": "/t/BKNG/dig/ai-disintermediation/"
     },
     {
+      "id": "BKNG-tech-cycles-2026-10-14",
+      "type": "dig",
+      "scope": "ticker",
+      "title": "Booking through three tech cycles: web, smartphone, AI",
+      "summary": "How Booking handled Google search and the smartphone, and how its AI response compares. Side-by-side timelines, a playbook per cycle, a compare table and twenty years of marketing, room-night and mix history. No buy box.",
+      "as_of": "2026-10-14",
+      "status": "live",
+      "pdf": false,
+      "ticker": "BKNG",
+      "dig_type": "disruption-risk",
+      "slug": "tech-cycles",
+      "related": [
+        "BKNG-zbar-2026-10-06",
+        "BKNG-ai-disintermediation-2026-09-26",
+        "BKNG-hotel-connectivity-2026-10-12"
+      ],
+      "url": "/t/BKNG/dig/tech-cycles/"
+    },
+    {
       "id": "BKNG-hotel-connectivity-2026-10-12",
       "type": "dig",
       "scope": "ticker",
@@ -666,25 +685,6 @@
         "BKNG-unit-econ-2026-09-24"
       ],
       "url": "/t/BKNG/peer-benchmark/"
-    },
-    {
-      "id": "BKNG-tech-cycles-2026-10-14",
-      "type": "dig",
-      "scope": "ticker",
-      "title": "Booking through three tech cycles: web, smartphone, AI",
-      "summary": "How Booking handled Google search and the smartphone, and how its AI response compares. Side-by-side timelines, a playbook per cycle, a compare table and twenty years of marketing, room-night and mix history. No buy box.",
-      "as_of": "2026-10-14",
-      "status": "live",
-      "pdf": false,
-      "ticker": "BKNG",
-      "dig_type": "disruption-risk",
-      "slug": "tech-cycles",
-      "related": [
-        "BKNG-zbar-2026-10-06",
-        "BKNG-ai-disintermediation-2026-09-26",
-        "BKNG-hotel-connectivity-2026-10-12"
-      ],
-      "url": "/t/BKNG/dig/tech-cycles/"
     },
     {
       "id": "BKNG-unit-econ-2026-09-23",
@@ -1142,19 +1142,6 @@
         "notes": "Latent LOCK. Decision series trailing_pe_ttm. W40 week VWAP 86.563 trail 34.60× is shelved at ≥34. Forward FY1 is the companion, not blended. Gates were not reset. Weekly PE folded from Tylor 5bed257 (#138) after Yahoo backfill of the Alpaca hole."
       },
       "url": "/t/IBKR/key-metrics/"
-    },
-    {
-      "id": "SEDG-zbar-2026-10-14",
-      "type": "key-metrics",
-      "scope": "ticker",
-      "title": "SolarEdge — key metrics",
-      "summary": "SolarEdge key metrics — revenue, operating income, net income, diluted shares, trailing EPS, free cash flow, and weekly P/FCF (22.66×) through the week ending October 11, 2026. Still loss-making through June 2026, so trailing PE stays blank.",
-      "as_of": "2026-10-14",
-      "status": "live",
-      "pdf": false,
-      "ticker": "SEDG",
-      "url": "/t/SEDG/key-metrics/",
-      "related": []
     },
     {
       "id": "SPOT",
@@ -1663,6 +1650,19 @@
         "notes": "Latent LOCK 2026-10-01. Trail pe_weekly_ttm ~130.95× @ W38 is FACT printed — not decision series; do not invent PE× gates. Dig B fills add_below/shelved_above when forward_pe_fy1 unlocks."
       },
       "url": "/t/Z/key-metrics/"
+    },
+    {
+      "id": "SEDG-zbar-2026-10-14",
+      "type": "key-metrics",
+      "scope": "ticker",
+      "title": "SolarEdge — key metrics",
+      "summary": "SolarEdge key metrics — revenue, operating income, net income, diluted shares, trailing EPS, free cash flow, and weekly P/FCF (22.66×) through the week ending October 11, 2026. Still loss-making through June 2026, so trailing PE stays blank.",
+      "as_of": "2026-10-14",
+      "status": "live",
+      "pdf": false,
+      "ticker": "SEDG",
+      "related": [],
+      "url": "/t/SEDG/key-metrics/"
     }
   ]
 }
