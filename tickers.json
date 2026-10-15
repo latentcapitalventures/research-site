@@ -70,14 +70,11 @@
     {
       "ticker": "SEDG",
       "name": "SolarEdge",
-      "logo": null,
+      "logo": "logos/solaredge.svg",
       "role": "desk",
       "desk_group": "open",
       "shelf": "unset",
-      "onboarded": false,
-      "not_yet": [
-        "key-metrics"
-      ]
+      "onboarded": true
     },
     {
       "ticker": "TCOM",

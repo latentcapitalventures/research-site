@@ -86,7 +86,7 @@
       "ticker": "BKNG-tech-cycles-2026-10-14",
       "name": "Booking through three tech cycles: web, smartphone, AI",
       "path": "BKNG-tech-cycles-2026-10-14/",
-      "kind": "topic-of-interest",
+      "kind": "dig",
       "summary": "How Booking handled Google search and the smartphone, and how its AI response compares. Side-by-side timelines, a playbook per cycle, a compare table and twenty years of marketing, room-night and mix history. No buy box.",
       "updated": "2026-10-14",
       "lineage": "bkng-tech-cycles",
@@ -336,6 +336,16 @@
         ],
         "notes": "Latent LOCK. Decision series trailing_pe_ttm. W40 week VWAP 86.563 trail 34.60× is shelved at ≥34. Forward FY1 is the companion, not blended. Gates were not reset. Weekly PE folded from Tylor 5bed257 (#138) after Yahoo backfill of the Alpaca hole."
       }
+    },
+    {
+      "ticker": "SEDG-zbar-2026-10-14",
+      "name": "SolarEdge — key metrics",
+      "path": "SEDG-zbar-2026-10-14/",
+      "kind": "key-metrics",
+      "summary": "SolarEdge key metrics — revenue, operating income, net income, diluted shares, trailing EPS, free cash flow, and weekly P/FCF (22.66×) through the week ending October 11, 2026. Still loss-making through June 2026, so trailing PE stays blank.",
+      "updated": "2026-10-14",
+      "lineage": "sedg-key-metrics",
+      "pdf": false
     },
     {
       "ticker": "SPOT-conversion",
@@ -1132,6 +1142,19 @@
         "notes": "Latent LOCK. Decision series trailing_pe_ttm. W40 week VWAP 86.563 trail 34.60× is shelved at ≥34. Forward FY1 is the companion, not blended. Gates were not reset. Weekly PE folded from Tylor 5bed257 (#138) after Yahoo backfill of the Alpaca hole."
       },
       "url": "/t/IBKR/key-metrics/"
+    },
+    {
+      "id": "SEDG-zbar-2026-10-14",
+      "type": "key-metrics",
+      "scope": "ticker",
+      "title": "SolarEdge — key metrics",
+      "summary": "SolarEdge key metrics — revenue, operating income, net income, diluted shares, trailing EPS, free cash flow, and weekly P/FCF (22.66×) through the week ending October 11, 2026. Still loss-making through June 2026, so trailing PE stays blank.",
+      "as_of": "2026-10-14",
+      "status": "live",
+      "pdf": false,
+      "ticker": "SEDG",
+      "url": "/t/SEDG/key-metrics/",
+      "related": []
     },
     {
       "id": "SPOT",
