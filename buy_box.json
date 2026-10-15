@@ -3,23 +3,20 @@
   "updated": "2026-10-14",
   "items": [
     {
-      "ticker": "SPOT-zbar-2026-10-03",
-      "path": "SPOT-zbar-2026-10-03/",
+      "ticker": "BKNG-zbar-2026-10-06",
+      "path": "BKNG-zbar-2026-10-06/",
       "buy_box": {
-        "shelf_rank": "interested",
+        "shelf_rank": "very_interested",
         "series": "trailing_pe_ttm",
         "units": "x",
         "status": "active",
-        "series_field": "pe",
-        "add_below": 30,
-        "shelved_above": 34,
-        "asof_week": "2026-W39",
+        "series_field": "pe_weekly",
+        "add_below": 22.0,
+        "shelved_above": 30.0,
+        "asof_week": "2026-W40",
         "large_position_gate": true,
         "hold_reason": null,
-        "companion_series": [
-          "forward_pe_fy1"
-        ],
-        "notes": "Latent CLEAR 2026-10-01. W39 trail ~31.9x mid-box (not floor ACT). Fwd weekly watch/cross-check only."
+        "notes": "Latent CLEAR. Decision series trailing_pe_ttm. W40 lock ~17.92× already in-box (size decision). Forward PE GAPPED - not decision series. large_position_gate: valuation dig before size-up."
       }
     },
     {
@@ -43,20 +40,23 @@
       }
     },
     {
-      "ticker": "BKNG-zbar-2026-10-06",
-      "path": "BKNG-zbar-2026-10-06/",
+      "ticker": "SPOT-zbar-2026-10-03",
+      "path": "SPOT-zbar-2026-10-03/",
       "buy_box": {
-        "shelf_rank": "very_interested",
+        "shelf_rank": "interested",
         "series": "trailing_pe_ttm",
         "units": "x",
         "status": "active",
-        "series_field": "pe_weekly",
-        "add_below": 22.0,
-        "shelved_above": 30.0,
-        "asof_week": "2026-W40",
+        "series_field": "pe",
+        "add_below": 30,
+        "shelved_above": 34,
+        "asof_week": "2026-W39",
         "large_position_gate": true,
         "hold_reason": null,
-        "notes": "Latent CLEAR. Decision series trailing_pe_ttm. W40 lock ~17.92× already in-box (size decision). Forward PE GAPPED - not decision series. large_position_gate: valuation dig before size-up."
+        "companion_series": [
+          "forward_pe_fy1"
+        ],
+        "notes": "Latent CLEAR 2026-10-01. W39 trail ~31.9x mid-box (not floor ACT). Fwd weekly watch/cross-check only."
       }
     },
     {

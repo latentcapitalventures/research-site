@@ -1,0 +1,139 @@
+{
+  "schema": 2,
+  "tickers": [
+    {
+      "ticker": "Z",
+      "name": "Zillow Group",
+      "logo": "logos/zillow.svg",
+      "role": "desk",
+      "desk_group": "locked",
+      "shelf": "very_interested",
+      "onboarded": true
+    },
+    {
+      "ticker": "SPOT",
+      "name": "Spotify",
+      "logo": "logos/spotify.svg",
+      "role": "desk",
+      "desk_group": "locked",
+      "shelf": "interested",
+      "onboarded": true
+    },
+    {
+      "ticker": "GOOGL",
+      "name": "Alphabet",
+      "logo": "logos/alphabet.svg",
+      "role": "desk",
+      "desk_group": "locked",
+      "shelf": "unset",
+      "onboarded": true,
+      "not_yet": [
+        "key-metrics"
+      ]
+    },
+    {
+      "ticker": "IBKR",
+      "name": "Interactive Brokers",
+      "logo": "logos/ibkr.svg",
+      "role": "desk",
+      "desk_group": "locked",
+      "shelf": "very_interested",
+      "onboarded": true
+    },
+    {
+      "ticker": "AMZN",
+      "name": "Amazon",
+      "logo": "logos/amazon.svg",
+      "role": "desk",
+      "desk_group": "open",
+      "shelf": "unset",
+      "onboarded": true
+    },
+    {
+      "ticker": "BKNG",
+      "name": "Booking Holdings",
+      "logo": "logos/booking.svg",
+      "role": "desk",
+      "desk_group": "open",
+      "shelf": "very_interested",
+      "onboarded": true
+    },
+    {
+      "ticker": "UBER",
+      "name": "Uber",
+      "logo": "logos/uber.svg",
+      "role": "desk",
+      "desk_group": "open",
+      "shelf": "unset",
+      "onboarded": true
+    },
+    {
+      "ticker": "SEDG",
+      "name": "SolarEdge",
+      "logo": null,
+      "role": "desk",
+      "desk_group": "open",
+      "shelf": "unset",
+      "onboarded": false,
+      "not_yet": [
+        "key-metrics"
+      ]
+    },
+    {
+      "ticker": "TCOM",
+      "name": "Trip.com",
+      "logo": null,
+      "role": "peer",
+      "onboarded": false
+    },
+    {
+      "ticker": "EXPE",
+      "name": "Expedia",
+      "logo": null,
+      "role": "peer",
+      "onboarded": false
+    },
+    {
+      "ticker": "ABNB",
+      "name": "Airbnb",
+      "logo": null,
+      "role": "peer",
+      "onboarded": false
+    },
+    {
+      "ticker": "LYFT",
+      "name": "Lyft",
+      "logo": null,
+      "role": "peer",
+      "onboarded": false
+    },
+    {
+      "ticker": "DASH",
+      "name": "DoorDash",
+      "logo": null,
+      "role": "peer",
+      "onboarded": false
+    },
+    {
+      "ticker": "GRAB",
+      "name": "Grab",
+      "logo": null,
+      "role": "peer",
+      "onboarded": false
+    },
+    {
+      "ticker": "HOOD",
+      "name": "Robinhood",
+      "logo": null,
+      "role": "peer",
+      "onboarded": false
+    },
+    {
+      "ticker": "SCHW",
+      "name": "Charles Schwab",
+      "logo": null,
+      "role": "peer",
+      "onboarded": false
+    }
+  ]
+}
