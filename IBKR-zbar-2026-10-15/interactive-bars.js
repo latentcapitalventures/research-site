@@ -667,6 +667,11 @@
     if (chart && mountedCharts.indexOf(chart) < 0) mountedCharts.push(chart);
   }
 
+  function unregisterChart(chart) {
+    var i = mountedCharts.indexOf(chart);
+    if (i >= 0) mountedCharts.splice(i, 1);
+  }
+
   function setDerivedChrome(on, persist) {
     document.documentElement.classList.toggle("derived-chrome-off", !on);
     document.documentElement.setAttribute("data-derived-chrome", on ? "on" : "off");
@@ -748,22 +753,42 @@
     return payload;
   }
 
-  function restyleChart(chart) {
+  function restyleChart(chart, opts) {
     if (!chart || !chart._packPayload) return;
-    var zoom = snapshotZoom(chart);
     var seriesMode = seriesModeOf(chart);
     var view = payloadView(chart._packPayload, seriesMode);
     var mode = chart._packMode || "grouped";
+    var zoom = opts && opts.resetZoom ? null : snapshotZoom(chart);
+    chart.data.labels = (view.labels || []).slice();
     chart.data.datasets = asChartDatasets(view, mode);
     chart.options.scales = scalesFor(view, mode);
     if (chart.options.plugins) {
       chart.options.plugins.tooltip = buildTooltip(view);
       chart.options.plugins.legend = houseLegend(view);
     }
-    restoreZoom(chart, zoom);
-    chart._packYFull = null;
+    if (opts && opts.resetZoom) {
+      var scales = chart.options.scales || {};
+      if (scales.x) {
+        delete scales.x.min;
+        delete scales.x.max;
+      }
+      chart._packXFull = null;
+      chart._packYFull = null;
+    } else {
+      restoreZoom(chart, zoom);
+      chart._packYFull = null;
+    }
     resetTickBudget(chart);
     chart.update();
+    log(
+      "restyle",
+      view.id,
+      "series=",
+      seriesMode,
+      "labels=",
+      (view.labels || []).length,
+      opts && opts.resetZoom ? "resetZoom" : "keepZoom"
+    );
   }
 
   function snapshotZoom(chart) {
@@ -2842,16 +2867,50 @@
     return chart;
   }
 
+  function seriesModeButtons(toolbar) {
+    var group = toolbar.querySelector("[data-series-group]");
+    if (group) return group.querySelectorAll("button[data-series-mode]");
+    if (toolbar.querySelector("[data-period-group]")) return [];
+    return toolbar.querySelectorAll("button[data-series-mode]");
+  }
+
+  function periodModeButtons(toolbar) {
+    var group = toolbar.querySelector("[data-period-group]");
+    return group ? group.querySelectorAll("button[data-series-mode]") : [];
+  }
+
+  function activePeriodSlice(root) {
+    if (!root || !root.periodPayloads) return root;
+    var period = root.defaultPeriod;
+    if (!period || !root.periodPayloads[period]) {
+      period = Object.keys(root.periodPayloads)[0];
+    }
+    return root.periodPayloads[period] || root;
+  }
+
+  function chartShell(figure) {
+    if (figure && figure.closest) {
+      var shell = figure.closest(".chart-card-shell");
+      if (shell) return shell;
+    }
+    return figure;
+  }
+
   function wireToolbar(figure, charts) {
     if (!charts || !charts.length) return;
-    var chart = charts[0];
-    var payload = chart._packPayload;
-    var toolbar = figure.querySelector(".chart-toolbar");
+    var state = {
+      charts: charts,
+      payload: charts[0]._packPayload,
+      root: charts[0]._packRootPayload || charts[0]._packPayload,
+    };
+    var shell = chartShell(figure);
+    var toolbar = shell.querySelector(".chart-toolbar");
     if (!toolbar) return;
+    log("toolbar wired from", shell === figure ? "figure" : "chart-card-shell", figure.getAttribute("data-chart-id"));
     toolbar.querySelectorAll("[data-zoom-reset]").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        charts.forEach(resetZoom);
-        log("zoom reset click", payload && payload.id);
+        state.charts.forEach(resetZoom);
+        log("zoom reset click", state.payload && state.payload.id);
       });
     });
     toolbar.querySelectorAll("button[data-data-labels]").forEach(function (btn) {
@@ -2860,8 +2919,8 @@
         setDataLabels(!dataLabelsOn(), true);
       });
     });
-    toolbar.querySelectorAll("button[data-series-mode]").forEach(function (btn) {
-      var current = seriesModeOf(chart);
+    seriesModeButtons(toolbar).forEach(function (btn) {
+      var current = seriesModeOf(state.charts[0]);
       btn.setAttribute(
         "aria-pressed",
         btn.getAttribute("data-series-mode") === current ? "true" : "false"
@@ -2871,18 +2930,30 @@
         setSeriesMode(next);
       });
     });
+    periodModeButtons(toolbar).forEach(function (btn) {
+      var current = state.charts[0]._packPeriod || (state.root && state.root.defaultPeriod);
+      btn.setAttribute(
+        "aria-pressed",
+        btn.getAttribute("data-series-mode") === current ? "true" : "false"
+      );
+      btn.addEventListener("click", function () {
+        var next = btn.getAttribute("data-series-mode");
+        setPeriodMode(next);
+      });
+    });
     function setSeriesMode(next) {
+      var payload = state.payload;
       if (!payload) return;
       if (next === "yoy" && !(payload.yoyDatasets && payload.yoyDatasets.length)) {
         log("refusing YoY mode — no house sidecar", payload.id);
         return;
       }
-      charts.forEach(function (c) {
+      state.charts.forEach(function (c) {
         if (c._packSeriesMode === next) return;
         c._packSeriesMode = next;
         restyleChart(c);
       });
-      toolbar.querySelectorAll("button[data-series-mode]").forEach(function (peer) {
+      seriesModeButtons(toolbar).forEach(function (peer) {
         peer.setAttribute(
           "aria-pressed",
           peer.getAttribute("data-series-mode") === next ? "true" : "false"
@@ -2890,28 +2961,162 @@
       });
       log("series mode", payload.id, next);
     }
-    if (!payload || !payload.composition) return;
-    var mode = chart._packMode;
-    toolbar.querySelectorAll("button[data-mode]").forEach(function (btn) {
-      var m = btn.getAttribute("data-mode");
-      if (isPercentShare(payload) && m === "stacked") {
-        btn.hidden = true;
-        btn.setAttribute("aria-hidden", "true");
-        log("hiding Stacked button on percent_share", payload.id);
+    function syncPeriodChrome(slice, period, seriesMode) {
+      figure.setAttribute("data-chart-id", slice.id || figure.getAttribute("data-chart-id"));
+      if (slice.hasDerived || (seriesMode === "yoy" && slice.yoyDatasets && slice.yoyDatasets.length)) {
+        figure.setAttribute("data-has-derived", "true");
+      } else {
+        figure.removeAttribute("data-has-derived");
       }
-      btn.setAttribute("aria-pressed", m === mode ? "true" : "false");
+      var takeaway = figure.querySelector(".chart-takeaway");
+      if (takeaway && slice.takeaway) takeaway.textContent = slice.takeaway;
+      var subtitle = figure.querySelector(".chart-subtitle");
+      if (subtitle) subtitle.textContent = slice.subtitle || "";
+      var cap = figure.querySelector("figcaption");
+      if (cap && slice.caption) {
+        var method = cap.querySelector(".method");
+        var methodHtml = method ? method.outerHTML : "";
+        cap.innerHTML =
+          slice.caption +
+          (methodHtml ||
+            (slice.annotation ? '<span class="method">' + slice.annotation + "</span>" : ""));
+      }
+      var canvas = figure.querySelector("canvas");
+      if (canvas) canvas.setAttribute("aria-label", slice.caption || slice.title || slice.id);
+      var seriesGroup = toolbar.querySelector("[data-series-group]");
+      if (seriesGroup) {
+        var hasYoy = !!(slice.yoyDatasets && slice.yoyDatasets.length);
+        seriesGroup.hidden = !hasYoy;
+        log("series group", slice.id, hasYoy ? "shown" : "hidden");
+      }
+      var cagr = toolbar.querySelector(".chart-cagr-readout");
+      if (cagr) {
+        var rows = slice.cagr || [];
+        if (!rows.length) {
+          cagr.hidden = true;
+          cagr.textContent = "";
+        } else {
+          cagr.hidden = false;
+          cagr.innerHTML =
+            rows
+              .map(function (row) {
+                return row.text;
+              })
+              .join(" · ") + '<span class="derived-badge"> · DERIVED</span>';
+        }
+      }
+      var viewGroup = toolbar.querySelector("[data-view-group]");
+      if (viewGroup) viewGroup.hidden = !slice.composition;
+      periodModeButtons(toolbar).forEach(function (peer) {
+        peer.setAttribute(
+          "aria-pressed",
+          peer.getAttribute("data-series-mode") === period ? "true" : "false"
+        );
+      });
+      seriesModeButtons(toolbar).forEach(function (peer) {
+        peer.setAttribute(
+          "aria-pressed",
+          peer.getAttribute("data-series-mode") === seriesMode ? "true" : "false"
+        );
+      });
+      syncViewButtons();
+    }
+    function setPeriodMode(next) {
+      var root = state.root;
+      if (!root || !root.periodPayloads || !root.periodPayloads[next]) {
+        log("refusing period mode", next, root && root.id);
+        return;
+      }
+      if (state.charts[0] && state.charts[0]._packPeriod === next) {
+        log("period mode unchanged", next);
+        return;
+      }
+      var slice = root.periodPayloads[next];
+      var prevSeries = seriesModeOf(state.charts[0]);
+      var nextSeries =
+        prevSeries === "yoy" && slice.yoyDatasets && slice.yoyDatasets.length ? "yoy" : "levels";
+      var prevMode = state.charts[0] && state.charts[0]._packMode;
+      state.charts.forEach(function (c) {
+        unregisterChart(c);
+        try {
+          c.destroy();
+        } catch (err) {
+          log("chart destroy failed", err);
+        }
+      });
+      var canvas = figure.querySelector("canvas");
+      if (!canvas) return;
+      var mounted = mountChart(canvas, slice);
+      if (!mounted) {
+        log("period remount failed", slice.id, next);
+        return;
+      }
+      mounted._packRootPayload = root;
+      mounted._packPeriod = next;
+      if (nextSeries !== seriesModeOf(mounted)) {
+        mounted._packSeriesMode = nextSeries;
+        restyleChart(mounted, { resetZoom: true });
+      }
+      if (
+        prevMode &&
+        mounted._packModes &&
+        mounted._packModes.indexOf(prevMode) >= 0 &&
+        prevMode !== mounted._packMode
+      ) {
+        mounted._packMode = prevMode;
+        restyleChart(mounted, { resetZoom: true });
+        log("kept composition mode across period", prevMode);
+      }
+      state.charts = [mounted];
+      state.payload = slice;
+      syncPeriodChrome(slice, next, nextSeries);
+      log(
+        "period mode",
+        slice.id,
+        next,
+        "series=",
+        nextSeries,
+        "labels=",
+        (slice.labels || []).length
+      );
+    }
+    toolbar.querySelectorAll("button[data-mode]").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        setMode(m);
+        setMode(btn.getAttribute("data-mode"));
       });
       btn.addEventListener("keydown", function (ev) {
         if (ev.key === "Enter" || ev.key === " ") {
           ev.preventDefault();
-          setMode(m);
+          setMode(btn.getAttribute("data-mode"));
         }
       });
     });
-
+    function syncViewButtons() {
+      var payload = state.payload;
+      var chart = state.charts[0];
+      if (!payload || !chart) return;
+      var mode = chart._packMode;
+      toolbar.querySelectorAll("button[data-mode]").forEach(function (btn) {
+        var m = btn.getAttribute("data-mode");
+        if (!payload.composition) {
+          btn.hidden = true;
+          return;
+        }
+        var allowed = chart._packModes || payload.modes || [];
+        btn.hidden = allowed.indexOf(m) < 0;
+        if (isPercentShare(payload) && m === "stacked") {
+          btn.hidden = true;
+          btn.setAttribute("aria-hidden", "true");
+          log("hiding Stacked button on percent_share", payload.id);
+        }
+        btn.setAttribute("aria-pressed", m === mode ? "true" : "false");
+      });
+    }
+    syncViewButtons();
     function setMode(next) {
+      var chart = state.charts[0];
+      var payload = state.payload;
+      if (!chart || !payload) return;
       if (chart._packModes.indexOf(next) < 0 || next === chart._packMode) return;
       if (next === "stacked" && isPercentShare(payload)) {
         log("refusing redundant Stacked on percent_share", payload.id);
@@ -2957,7 +3162,9 @@
       return;
     }
     var canvases = figure.querySelectorAll("canvas");
-    if (payload.hasDerived) {
+    var root = payload;
+    var slice = activePeriodSlice(root);
+    if (slice.hasDerived) {
       figure.setAttribute("data-has-derived", "true");
     }
     if (payload.panels && payload.panels.length) {
@@ -2973,13 +3180,23 @@
       if (!mounted.length) return;
       wireToolbar(figure, mounted);
       figure.classList.add("js-ready");
+      var panelShell = chartShell(figure);
+      if (panelShell !== figure) panelShell.classList.add("js-ready");
       log("mounted panels", payload.id, "n=" + mounted.length);
       return;
     }
-    var chart = mountChart(canvases[0], payload);
+    var chart = mountChart(canvases[0], slice);
     if (!chart) return;
+    chart._packRootPayload = root;
+    if (root.periodPayloads) {
+      chart._packPeriod = root.defaultPeriod || Object.keys(root.periodPayloads)[0];
+      log("mounted period card", slice.id, "period=", chart._packPeriod, "peer=", Object.keys(root.periodPayloads));
+    }
     wireToolbar(figure, [chart]);
     figure.classList.add("js-ready");
+    var readyShell = chartShell(figure);
+    if (readyShell !== figure) readyShell.classList.add("js-ready");
+    log("mounted figure", slice.id, "shell=", readyShell !== figure);
   }
 
   function wireDerivedToggle() {
