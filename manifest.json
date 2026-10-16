@@ -339,11 +339,11 @@
     },
     {
       "ticker": "SEDG-unit-econ-2026-10-14",
-      "name": "SEDG-unit-econ-2026-10-14",
+      "name": "SolarEdge — product lines and unit economics",
       "path": "SEDG-unit-econ-2026-10-14/",
       "kind": "dig",
-      "summary": "Published research pack for SEDG-unit-econ-2026-10-14.",
-      "updated": "2026-10-16",
+      "summary": "SolarEdge — product lines and unit economics",
+      "updated": "2026-10-15",
       "pdf": false
     },
     {
@@ -1198,9 +1198,9 @@
       "id": "SEDG-unit-econ-2026-10-14",
       "type": "dig",
       "scope": "ticker",
-      "title": "SEDG-unit-econ-2026-10-14",
-      "summary": "Published research pack for SEDG-unit-econ-2026-10-14.",
-      "as_of": "2026-10-16",
+      "title": "SolarEdge — product lines and unit economics",
+      "summary": "SolarEdge — product lines and unit economics",
+      "as_of": "2026-10-15",
       "status": "live",
       "pdf": false,
       "ticker": "SEDG",
