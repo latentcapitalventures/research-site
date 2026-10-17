@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "title": "Latent Capital · Research",
-  "updated": "2026-10-16",
+  "updated": "2026-10-17",
   "packs": [
     {
       "ticker": "AMZN-zbar-2026-09-30",
@@ -336,6 +336,15 @@
         ],
         "notes": "Latent LOCK. Decision series trailing_pe_ttm. W41 week VWAP 88.227 ÷ post-print TTM 2.6 ≈ 33.93× (DERIVED) sits inside add≤30 / shelve≥34. Forward FY1 is the companion, not blended. Gates were not reset. No new market or Alpaca price pull."
       }
+    },
+    {
+      "ticker": "SEDG-peer-benchmark-2026-10-17",
+      "name": "SolarEdge — peer benchmark",
+      "path": "SEDG-peer-benchmark-2026-10-17/",
+      "kind": "peer-benchmark",
+      "summary": "SolarEdge — peer benchmark",
+      "updated": "2026-10-17",
+      "pdf": false
     },
     {
       "ticker": "SEDG-unit-econ-2026-10-14",
@@ -1193,6 +1202,24 @@
         "notes": "Latent LOCK. Decision series trailing_pe_ttm. W41 week VWAP 88.227 ÷ post-print TTM 2.6 ≈ 33.93× (DERIVED) sits inside add≤30 / shelve≥34. Forward FY1 is the companion, not blended. Gates were not reset. No new market or Alpaca price pull."
       },
       "url": "/t/IBKR/key-metrics/"
+    },
+    {
+      "id": "SEDG-peer-benchmark-2026-10-17",
+      "type": "peer-benchmark",
+      "scope": "ticker",
+      "title": "SolarEdge — peer benchmark",
+      "summary": "SolarEdge — peer benchmark",
+      "as_of": "2026-10-17",
+      "status": "live",
+      "pdf": false,
+      "ticker": "SEDG",
+      "peers": [
+        "ENPH",
+        "TYGO",
+        "S92",
+        "300274"
+      ],
+      "url": "/t/SEDG/peer-benchmark/"
     },
     {
       "id": "SEDG-unit-econ-2026-10-14",
