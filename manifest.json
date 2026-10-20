@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "title": "Latent Capital · Research",
-  "updated": "2026-10-17",
+  "updated": "2026-10-20",
   "packs": [
     {
       "ticker": "AMZN-zbar-2026-09-30",
@@ -173,6 +173,15 @@
         "hold_reason": null,
         "notes": "Latent CLEAR. Decision series trailing_pe_ttm. W40 lock ~17.92× already in-box (size decision). Forward PE GAPPED - not decision series. large_position_gate: valuation dig before size-up."
       }
+    },
+    {
+      "ticker": "CMG-firstlook-2026-10-19",
+      "name": "First look: Chipotle Mexican Grill, Inc.",
+      "path": "CMG-firstlook-2026-10-19/",
+      "kind": "key-metrics",
+      "summary": "First look: Chipotle Mexican Grill, Inc.",
+      "updated": "2026-10-20",
+      "pdf": false
     },
     {
       "ticker": "earnings-calls-recap-2026-10-14",
@@ -831,6 +840,18 @@
         "notes": "Latent CLEAR. Decision series trailing_pe_ttm. W40 lock ~17.92× already in-box (size decision). Forward PE GAPPED - not decision series. large_position_gate: valuation dig before size-up."
       },
       "url": "/t/BKNG/key-metrics/"
+    },
+    {
+      "id": "CMG-firstlook-2026-10-19",
+      "type": "key-metrics",
+      "scope": "ticker",
+      "title": "First look: Chipotle Mexican Grill, Inc.",
+      "summary": "First look: Chipotle Mexican Grill, Inc.",
+      "as_of": "2026-10-20",
+      "status": "live",
+      "pdf": false,
+      "ticker": "CMG",
+      "url": "/t/CMG/key-metrics/"
     },
     {
       "id": "earnings-calls-recap-2026-10-14",

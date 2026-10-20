@@ -77,6 +77,13 @@
       "onboarded": true
     },
     {
+      "ticker": "CMG",
+      "name": "Chipotle Mexican Grill",
+      "logo": "logos/chipotle.svg",
+      "role": "first-look",
+      "onboarded": true
+    },
+    {
       "ticker": "TCOM",
       "name": "Trip.com",
       "logo": null,
