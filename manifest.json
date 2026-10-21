@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "title": "Latent Capital · Research",
-  "updated": "2026-10-20",
+  "updated": "2026-10-21",
   "packs": [
     {
       "ticker": "AMZN-zbar-2026-09-30",
@@ -180,7 +180,7 @@
       "path": "CMG-firstlook-2026-10-19/",
       "kind": "key-metrics",
       "summary": "First look: Chipotle Mexican Grill, Inc.",
-      "updated": "2026-10-20",
+      "updated": "2026-10-21",
       "pdf": false
     },
     {
@@ -847,7 +847,7 @@
       "scope": "ticker",
       "title": "First look: Chipotle Mexican Grill, Inc.",
       "summary": "First look: Chipotle Mexican Grill, Inc.",
-      "as_of": "2026-10-20",
+      "as_of": "2026-10-21",
       "status": "live",
       "pdf": false,
       "ticker": "CMG",
