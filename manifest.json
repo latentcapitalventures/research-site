@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "title": "Latent Capital · Research",
-  "updated": "2026-10-21",
+  "updated": "2026-10-22",
   "packs": [
     {
       "ticker": "AMZN-zbar-2026-09-30",
@@ -395,8 +395,8 @@
       "name": "Spotify key metrics — income, cash, users, and the trailing multiple",
       "path": "SPOT-zbar-2026-10-03/",
       "kind": "key-metrics",
-      "summary": "Spotify key metrics — annual and quarterly income from FY2018, Premium and advertising, users, free cash flow, capital expenditure, and every weekly trailing PE week from 2022-W13 through 2026-W39. Forward FY1 and FY2 sit on that chart. The blended forward year stays blank. Buy box is unchanged: trailing PE, add below 30, shelved above 34, week 2026-W39.",
-      "updated": "2026-10-03",
+      "summary": "Spotify key metrics through Q3 2026 (printed 2026-10-22) — annual and quarterly income from FY2018, Premium and advertising, users, free cash flow, capital expenditure, and every weekly trailing PE week from 2022-W13 through 2026-W41; 2026-W42 sits on the axis as a blank (no price on file). Forward FY1 and FY2 sit on that chart. The blended forward year stays blank. Buy box band unchanged: trailing PE, add below 30, shelved above 34; week 2026-W41 at 36.07x, above the shelve line.",
+      "updated": "2026-10-22",
       "lineage": "spot-key-metrics",
       "supersedes": [
         "SPOT",
@@ -418,13 +418,13 @@
         "series_field": "pe",
         "add_below": 30,
         "shelved_above": 34,
-        "asof_week": "2026-W39",
+        "asof_week": "2026-W41",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent CLEAR 2026-10-01. W39 trail ~31.9x mid-box (not floor ACT). Fwd weekly watch/cross-check only."
+        "notes": "Latent CLEAR 2026-10-01. W41 trail 36.07x (week ending 2026-10-11) on Q3 2026 four-quarter earnings, above shelve 34 (not floor ACT; band unchanged). W40 restated 34.38x on the same rule. W42 not priced (market-price hold). Fwd weekly watch/cross-check only."
       }
     },
     {
@@ -1328,8 +1328,8 @@
       "type": "key-metrics",
       "scope": "ticker",
       "title": "Spotify key metrics — income, cash, users, and the trailing multiple",
-      "summary": "Spotify key metrics — annual and quarterly income from FY2018, Premium and advertising, users, free cash flow, capital expenditure, and every weekly trailing PE week from 2022-W13 through 2026-W39. Forward FY1 and FY2 sit on that chart. The blended forward year stays blank. Buy box is unchanged: trailing PE, add below 30, shelved above 34, week 2026-W39.",
-      "as_of": "2026-10-03",
+      "summary": "Spotify key metrics through Q3 2026 (printed 2026-10-22) — annual and quarterly income from FY2018, Premium and advertising, users, free cash flow, capital expenditure, and every weekly trailing PE week from 2022-W13 through 2026-W41; 2026-W42 sits on the axis as a blank (no price on file). Forward FY1 and FY2 sit on that chart. The blended forward year stays blank. Buy box band unchanged: trailing PE, add below 30, shelved above 34; week 2026-W41 at 36.07x, above the shelve line.",
+      "as_of": "2026-10-22",
       "status": "live",
       "pdf": false,
       "ticker": "SPOT",
@@ -1348,13 +1348,13 @@
         "series_field": "pe",
         "add_below": 30,
         "shelved_above": 34,
-        "asof_week": "2026-W39",
+        "asof_week": "2026-W41",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent CLEAR 2026-10-01. W39 trail ~31.9x mid-box (not floor ACT). Fwd weekly watch/cross-check only."
+        "notes": "Latent CLEAR 2026-10-01. W41 trail 36.07x (week ending 2026-10-11) on Q3 2026 four-quarter earnings, above shelve 34 (not floor ACT; band unchanged). W40 restated 34.38x on the same rule. W42 not priced (market-price hold). Fwd weekly watch/cross-check only."
       },
       "url": "/t/SPOT/key-metrics/"
     },

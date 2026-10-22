@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Buy box",
-  "updated": "2026-10-21",
+  "updated": "2026-10-22",
   "items": [
     {
       "ticker": "BKNG-zbar-2026-10-06",
@@ -50,13 +50,13 @@
         "series_field": "pe",
         "add_below": 30,
         "shelved_above": 34,
-        "asof_week": "2026-W39",
+        "asof_week": "2026-W41",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent CLEAR 2026-10-01. W39 trail ~31.9x mid-box (not floor ACT). Fwd weekly watch/cross-check only."
+        "notes": "Latent CLEAR 2026-10-01. W41 trail 36.07x (week ending 2026-10-11) on Q3 2026 four-quarter earnings, above shelve 34 (not floor ACT; band unchanged). W40 restated 34.38x on the same rule. W42 not priced (market-price hold). Fwd weekly watch/cross-check only."
       }
     },
     {
