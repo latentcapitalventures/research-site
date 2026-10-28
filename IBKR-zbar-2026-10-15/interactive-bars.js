@@ -742,6 +742,7 @@
         hasDerived: true,
         composition: false,
         trendline: false,
+        packSeriesMode: "yoy",
       });
       delete view.yDisplayScale;
       delete view.yDisplayUnit;
@@ -1134,6 +1135,7 @@
       var spec = {
         type: isLine ? "line" : "bar",
         label: ds.label,
+        reasons: (ds.reasons || []).slice(),
         backgroundColor: isLine ? stroke : barFill(houseDs, payload),
         borderColor: isLine ? stroke : color,
         borderWidth: isLine ? 2 : 0,
@@ -1440,6 +1442,51 @@
     ctx.restore();
   }
 
+  var YOY_REASON_TEXT = {
+    prior_zero: "Growth not shown: prior was zero",
+    prior_missing: "Growth not shown: prior period is missing",
+    prior_negative: "Growth not shown: prior period was negative",
+    sign_flip: "Growth not shown: sign changed",
+    desk_blanked: "Growth not shown: left blank by the desk",
+  };
+
+  function yoyReasonText(code) {
+    if (!code) return "";
+    return YOY_REASON_TEXT[code] || "Growth not shown";
+  }
+
+  function growthReadoutOn(payload) {
+    // A levels/YoY chart only explains a blank while the YoY view is showing.
+    // The level view must not borrow a growth reason for a printed level.
+    if (payload && payload.yoyDatasets && payload.yoyDatasets.length) {
+      return payload.packSeriesMode === "yoy";
+    }
+    return true;
+  }
+
+  function yoyReasonCode(payload, dataset, idx) {
+    if (!growthReadoutOn(payload)) return null;
+    if (!dataset || !dataset.reasons) return null;
+    return dataset.reasons[idx] || null;
+  }
+
+  function yoyReasonNotes(payload) {
+    var seen = {};
+    var notes = [];
+    ((payload && payload.datasets) || []).forEach(function (ds) {
+      (ds.reasons || []).forEach(function (code) {
+        if (!code || seen[code]) return;
+        seen[code] = true;
+        var line = yoyReasonText(code);
+        if (line) notes.push(line);
+      });
+    });
+    if (notes.length) {
+      log("yoy null legend", payload && payload.id, notes.join(" | "));
+    }
+    return notes;
+  }
+
   function buildTooltip(payload) {
     var composition = !!payload.composition;
     return {
@@ -1535,6 +1582,11 @@
         footer: function (items) {
           if (!items.length) return "";
           var label = items[0].label || "";
+          var yoyCode = yoyReasonCode(payload, items[0].dataset, items[0].dataIndex);
+          if (yoyCode) {
+            log("yoy null gap line", payload.id, label, yoyCode, yoyReasonText(yoyCode));
+            return yoyReasonText(yoyCode);
+          }
           var gaps = payload.gapLabels || [];
           if (gaps.indexOf(label) >= 0) {
             var gapIdx = items[0].dataIndex;
@@ -2656,9 +2708,15 @@
     var hasHollow = ((payload && payload.datasets) || []).some(function (ds) {
       return ds && ds.hollow;
     });
+    var yoyNotes = yoyReasonNotes(payload);
     return {
       position: "bottom",
       align: "start",
+      onClick: function (event, legendItem, legend) {
+        if (legendItem && legendItem._yoyNote) return;
+        var def = Chart.defaults.plugins.legend.onClick;
+        if (def) def.call(this, event, legendItem, legend);
+      },
       labels: {
         boxWidth: 10,
         boxHeight: 10,
@@ -2688,6 +2746,17 @@
                 log("hollow legend swatch", payload.id, ds.key || ds.label);
               }
             }
+          });
+          yoyNotes.forEach(function (note) {
+            items.push({
+              text: note,
+              fillStyle: "transparent",
+              strokeStyle: "transparent",
+              lineWidth: 0,
+              hidden: false,
+              datasetIndex: -1,
+              _yoyNote: true,
+            });
           });
           return items;
         },
@@ -2972,14 +3041,24 @@
       if (takeaway && slice.takeaway) takeaway.textContent = slice.takeaway;
       var subtitle = figure.querySelector(".chart-subtitle");
       if (subtitle) subtitle.textContent = slice.subtitle || "";
-      var cap = figure.querySelector("figcaption");
-      if (cap && slice.caption) {
+      var note = shell.querySelector(".chart-note");
+      var cap = note || figure.querySelector("figcaption");
+      if (note) {
+        log(
+          "period caption left outside card",
+          slice.id,
+          (slice.caption || "").slice(0, 80)
+        );
+      } else if (cap && slice.caption) {
         var method = cap.querySelector(".method");
         var methodHtml = method ? method.outerHTML : "";
         cap.innerHTML =
           slice.caption +
           (methodHtml ||
             (slice.annotation ? '<span class="method">' + slice.annotation + "</span>" : ""));
+        log("period figcaption", slice.id, (slice.caption || "").slice(0, 80));
+      } else {
+        log("period caption skipped — no .chart-note or figcaption", slice.id);
       }
       var canvas = figure.querySelector("canvas");
       if (canvas) canvas.setAttribute("aria-label", slice.caption || slice.title || slice.id);

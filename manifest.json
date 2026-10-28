@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "title": "Latent Capital · Research",
-  "updated": "2026-10-22",
+  "updated": "2026-10-28",
   "packs": [
     {
       "ticker": "AMZN-zbar-2026-09-30",
@@ -306,7 +306,7 @@
       "path": "IBKR-zbar-2026-10-15/",
       "kind": "key-metrics",
       "summary": "Interactive Brokers key metrics through Q3 2026. Annual income from FY2008, pretax as the profit line, diluted weighted-average shares, trailing diluted EPS, dividends per share on the post-split basis (raised to $0.15), dividend yield, and weekly trailing PE. Buy box unchanged: trailing PE add below 30, shelved above 34.",
-      "updated": "2026-10-16",
+      "updated": "2026-10-28",
       "supersedes": [
         "IBKR",
         "IBKR-zbar-2026-09-21",
@@ -337,13 +337,13 @@
         "series_field": "pe",
         "add_below": 30,
         "shelved_above": 34,
-        "asof_week": "2026-W41",
+        "asof_week": "2026-W43",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent LOCK. Decision series trailing_pe_ttm. W41 week VWAP 88.227 ÷ post-print TTM 2.6 ≈ 33.93× (DERIVED) sits inside add≤30 / shelve≥34. Forward FY1 is the companion, not blended. Gates were not reset. No new market or Alpaca price pull."
+        "notes": "Latent LOCK. Decision series trailing_pe_ttm. Gates unchanged: add at 30, shelve at 34. As-of 2026-W43. Cabinet weekly_trailing_pe.csv pe_weekly 32.8784× (prints 32.88×) on June TTM EPS 2.50. Q3 10-Q pending. W41 on that basis is 35.29×, above the shelve line. Forward FY1 is the companion, not blended. Gates were not reset."
       }
     },
     {
@@ -1189,7 +1189,7 @@
       "scope": "ticker",
       "title": "Interactive Brokers key metrics — income, franchise, geography, trailing PE",
       "summary": "Interactive Brokers key metrics through Q3 2026. Annual income from FY2008, pretax as the profit line, diluted weighted-average shares, trailing diluted EPS, dividends per share on the post-split basis (raised to $0.15), dividend yield, and weekly trailing PE. Buy box unchanged: trailing PE add below 30, shelved above 34.",
-      "as_of": "2026-10-16",
+      "as_of": "2026-10-28",
       "status": "live",
       "pdf": false,
       "ticker": "IBKR",
@@ -1214,13 +1214,13 @@
         "series_field": "pe",
         "add_below": 30,
         "shelved_above": 34,
-        "asof_week": "2026-W41",
+        "asof_week": "2026-W43",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent LOCK. Decision series trailing_pe_ttm. W41 week VWAP 88.227 ÷ post-print TTM 2.6 ≈ 33.93× (DERIVED) sits inside add≤30 / shelve≥34. Forward FY1 is the companion, not blended. Gates were not reset. No new market or Alpaca price pull."
+        "notes": "Latent LOCK. Decision series trailing_pe_ttm. Gates unchanged: add at 30, shelve at 34. As-of 2026-W43. Cabinet weekly_trailing_pe.csv pe_weekly 32.8784× (prints 32.88×) on June TTM EPS 2.50. Q3 10-Q pending. W41 on that basis is 35.29×, above the shelve line. Forward FY1 is the companion, not blended. Gates were not reset."
       },
       "url": "/t/IBKR/key-metrics/"
     },
