@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "title": "Latent Capital · Research",
-  "updated": "2026-10-28",
+  "updated": "2026-10-29",
   "packs": [
     {
       "ticker": "AMZN-zbar-2026-09-30",
@@ -203,6 +203,15 @@
       "supersedes": [
         "GOOGL"
       ],
+      "pdf": false
+    },
+    {
+      "ticker": "GOOGL-zbar-2026-10-28",
+      "name": "Alphabet (GOOGL): key metrics through the third quarter of 2026",
+      "path": "GOOGL-zbar-2026-10-28/",
+      "kind": "key-metrics",
+      "summary": "Search and ads, Cloud, cash flow, share count and weekly P/E and P/FCF through Q3 2026",
+      "updated": "2026-10-29",
       "pdf": false
     },
     {
@@ -881,13 +890,13 @@
       "title": "Alphabet",
       "summary": "Search & ads scoreboard, Cloud, FCF, TAC, and weekly trailing / forward PE.",
       "as_of": "2026-09-17",
-      "status": "unlisted",
+      "status": "superseded",
       "pdf": false,
       "ticker": "GOOGL",
       "related": [
         "GOOGL-zbar-2026-09-21"
       ],
-      "status_reason": "bare legacy directory; keep until Latent confirms deep-link removal",
+      "status_reason": "superseded by GOOGL-zbar-2026-10-28",
       "url": "/t/GOOGL/key-metrics/"
     },
     {
@@ -909,6 +918,24 @@
         "GOOGL"
       ],
       "url": "/t/GOOGL/dig/zbar/"
+    },
+    {
+      "id": "GOOGL-zbar-2026-10-28",
+      "type": "key-metrics",
+      "scope": "ticker",
+      "title": "Alphabet (GOOGL): key metrics through the third quarter of 2026",
+      "summary": "Search and ads, Cloud, cash flow, share count and weekly P/E and P/FCF through Q3 2026",
+      "as_of": "2026-10-29",
+      "status": "live",
+      "pdf": false,
+      "ticker": "GOOGL",
+      "url": "/t/GOOGL/key-metrics/",
+      "supersedes": [
+        "GOOGL"
+      ],
+      "related": [
+        "GOOGL-zbar-2026-09-21"
+      ]
     },
     {
       "id": "IBKR",
