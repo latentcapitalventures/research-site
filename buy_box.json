@@ -1,6 +1,6 @@
 {
   "title": "Latent Capital · Buy box",
-  "updated": "2026-10-29",
+  "updated": "2026-11-09",
   "items": [
     {
       "ticker": "BKNG-zbar-2026-10-06",
@@ -13,10 +13,10 @@
         "series_field": "pe_weekly",
         "add_below": 22.0,
         "shelved_above": 30.0,
-        "asof_week": "2026-W40",
+        "asof_week": "2026-W45",
         "large_position_gate": true,
         "hold_reason": null,
-        "notes": "Latent CLEAR. Decision series trailing_pe_ttm. W40 lock ~17.92× already in-box (size decision). Forward PE GAPPED - not decision series. large_position_gate: valuation dig before size-up."
+        "notes": "Latent CLEAR. Decision series trailing_pe_ttm. W45 ~17.5× in-box (size decision; first week on TTM EPS through Q3 2026). Forward PE GAPPED - not decision series. large_position_gate: valuation dig before size-up."
       }
     },
     {
