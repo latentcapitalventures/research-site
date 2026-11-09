@@ -447,7 +447,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "UBER-zbar-2026-10-14/",
+          "path": "UBER-zbar-2026-11-04/",
           "kind": "key-metrics"
         }
       ],
@@ -464,27 +464,34 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "UBER-zbar-2026-10-14/",
+          "path": "UBER-zbar-2026-11-04/",
           "kind": "key-metrics"
         }
       ],
       "pdf": false
     },
     {
-      "ticker": "UBER-zbar-2026-10-14",
-      "name": "Uber key metrics — income, segments, shares, EPS, free cash flow, PE and P/FCF",
-      "path": "UBER-zbar-2026-10-14/",
+      "ticker": "UBER-zbar-2026-11-04",
+      "name": "Uber — key metrics",
+      "path": "UBER-zbar-2026-11-04/",
       "kind": "key-metrics",
-      "summary": "Uber key metrics — revenue, operating income, net income, segment revenue, diluted shares, trailing EPS, free cash flow, and weekly trailing PE (15.36×) and P/FCF (14.17×) through the week ending October 11, 2026. Forward earnings stay open.",
-      "updated": "2026-10-13",
-      "lineage": "uber-key-metrics",
+      "summary": "Uber key metrics through Q3 2026: trips 4,061M (+16%), Gross Bookings $59.8B (+20%), revenue $14.8B; Adj. EBITDA $3.0B; TTM FCF $10.4B; W45 trailing P/E 40.48× on Q3 TTM EPS $1.69. Forward P/E open (no house estimate).",
+      "updated": "2026-11-09",
+      "lineage": "uber-zbar-2026-10-14",
       "supersedes": [
+        "UBER-zbar-2026-10-14",
         "UBER-zbar-2026-09-30",
-        "UBER-zbar-2026-09-27"
+        "UBER-zbar-2026-09-27",
+        "UBER"
       ],
       "related": [
         {
-          "label": "EV / operating income dig",
+          "label": "Peer benchmark",
+          "path": "UBER-peer-benchmark-2026-10-14/",
+          "kind": "peer-benchmark"
+        },
+        {
+          "label": "EV / operating income",
           "path": "UBER-ev-oi-2026-09-27/",
           "kind": "valuation"
         }
@@ -1462,7 +1469,7 @@
       "title": "Uber key metrics — income, segments, shares, EPS, free cash flow, PE and P/FCF",
       "summary": "Uber key metrics — revenue, operating income, net income, segment revenue, diluted shares, trailing EPS, free cash flow, and weekly trailing PE (15.36×) and P/FCF (14.17×) through the week ending October 11, 2026. Forward earnings stay open.",
       "as_of": "2026-10-13",
-      "status": "live",
+      "status": "superseded",
       "pdf": false,
       "ticker": "UBER",
       "related": [
@@ -1471,6 +1478,29 @@
       "supersedes": [
         "UBER-zbar-2026-09-30",
         "UBER-zbar-2026-09-27"
+      ],
+      "url": "/t/UBER/key-metrics/",
+      "status_reason": "superseded by UBER-zbar-2026-11-04"
+    },
+    {
+      "id": "UBER-zbar-2026-11-04",
+      "type": "key-metrics",
+      "scope": "ticker",
+      "title": "Uber — key metrics",
+      "summary": "Uber key metrics through Q3 2026: trips 4,061M (+16%), Gross Bookings $59.8B (+20%), revenue $14.8B; Adj. EBITDA $3.0B; TTM FCF $10.4B; W45 trailing P/E 40.48× on Q3 TTM EPS $1.69. Forward P/E open (no house estimate).",
+      "as_of": "2026-11-09",
+      "status": "live",
+      "pdf": false,
+      "ticker": "UBER",
+      "related": [
+        "UBER-peer-benchmark-2026-10-14",
+        "UBER-ev-oi-2026-09-27"
+      ],
+      "supersedes": [
+        "UBER-zbar-2026-10-14",
+        "UBER-zbar-2026-09-30",
+        "UBER-zbar-2026-09-27",
+        "UBER"
       ],
       "url": "/t/UBER/key-metrics/"
     },
