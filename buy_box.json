@@ -60,8 +60,8 @@
       }
     },
     {
-      "ticker": "Z-zbar-2026-10-02",
-      "path": "Z-zbar-2026-10-02/",
+      "ticker": "Z-zbar-2026-11-09",
+      "path": "Z-zbar-2026-11-09/",
       "buy_box": {
         "shelf_rank": "very_interested",
         "series": "forward_pe_fy1",
@@ -69,13 +69,13 @@
         "status": "hold",
         "add_below": null,
         "shelved_above": null,
-        "asof_week": "2026-W38",
+        "asof_week": "2026-W45",
         "large_position_gate": true,
-        "hold_reason": "forward_pe_fy1 GAP",
+        "hold_reason": "No forward earnings multiple for next fiscal year yet (no locked analyst estimate)",
         "companion_series": [
           "trailing_pe_ttm"
         ],
-        "notes": "Latent LOCK 2026-10-01. Trail pe_weekly_ttm ~130.95× @ W38 is FACT printed — not decision series; do not invent PE× gates. Dig B fills add_below/shelved_above when forward_pe_fy1 unlocks."
+        "notes": "Latent LOCK 2026-10-01 carried. There is no locked forward earnings multiple for next fiscal year, so the box holds. Trailing PE is the companion only; it is blank from 2026-W40 because trailing twelve-month earnings are negative. No gates."
       }
     }
   ]
