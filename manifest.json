@@ -4,15 +4,17 @@
   "updated": "2026-11-09",
   "packs": [
     {
-      "ticker": "AMZN-zbar-2026-09-30",
-      "name": "Amazon key metrics — income, segment OI, issuer FCF, trailing PE",
-      "path": "AMZN-zbar-2026-09-30/",
+      "ticker": "AMZN-zbar-2026-11-09",
+      "name": "Amazon — key metrics through Q3 2026 (income, segments, cash, backlog, headcount, shares, EPS, trailing PE)",
+      "path": "AMZN-zbar-2026-11-09/",
       "kind": "key-metrics",
-      "summary": "Amazon key metrics — net sales, operating income, net income, NA / Intl / AWS segment operating income, issuer free cash flow, and trailing weekly PE through 2026-W39 (about 20.3×). Forward earnings stay open. Segment revenue is not in this cut.",
-      "updated": "2026-09-30",
-      "lineage": "amzn-key-metrics",
+      "summary": "Q3 2026: sales $201.9B (+12%), AWS +39%, record 13.9% operating margin; trailing FCF −$42.4B on $210.7B net capex.",
+      "updated": "2026-11-09",
+      "lineage": "amzn-zbar-2026-09-30",
       "supersedes": [
-        "AMZN-zbar-2026-09-25"
+        "AMZN-zbar-2026-09-30",
+        "AMZN-zbar-2026-09-25",
+        "AMZN"
       ],
       "pdf": false
     },
@@ -646,11 +648,29 @@
       "title": "Amazon key metrics — income, segment OI, issuer FCF, trailing PE",
       "summary": "Amazon key metrics — net sales, operating income, net income, NA / Intl / AWS segment operating income, issuer free cash flow, and trailing weekly PE through 2026-W39 (about 20.3×). Forward earnings stay open. Segment revenue is not in this cut.",
       "as_of": "2026-09-30",
-      "status": "live",
+      "status": "superseded",
       "pdf": false,
       "ticker": "AMZN",
       "supersedes": [
         "AMZN-zbar-2026-09-25"
+      ],
+      "url": "/t/AMZN/key-metrics/",
+      "status_reason": "superseded by AMZN-zbar-2026-11-09"
+    },
+    {
+      "id": "AMZN-zbar-2026-11-09",
+      "type": "key-metrics",
+      "scope": "ticker",
+      "title": "Amazon — key metrics through Q3 2026 (income, segments, cash, backlog, headcount, shares, EPS, trailing PE)",
+      "summary": "Q3 2026: sales $201.9B (+12%), AWS +39%, record 13.9% operating margin; trailing FCF −$42.4B on $210.7B net capex.",
+      "as_of": "2026-11-09",
+      "status": "live",
+      "pdf": false,
+      "ticker": "AMZN",
+      "supersedes": [
+        "AMZN-zbar-2026-09-30",
+        "AMZN-zbar-2026-09-25",
+        "AMZN"
       ],
       "url": "/t/AMZN/key-metrics/"
     },
