@@ -40,8 +40,8 @@
       }
     },
     {
-      "ticker": "SPOT-zbar-2026-10-03",
-      "path": "SPOT-zbar-2026-10-03/",
+      "ticker": "SPOT-zbar-2026-11-11",
+      "path": "SPOT-zbar-2026-11-11/",
       "buy_box": {
         "shelf_rank": "interested",
         "series": "trailing_pe_ttm",
@@ -50,13 +50,13 @@
         "series_field": "pe",
         "add_below": 30,
         "shelved_above": 34,
-        "asof_week": "2026-W41",
+        "asof_week": "2026-W45",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent CLEAR 2026-10-01. W41 trail 36.07x (week ending 2026-10-11) on Q3 2026 four-quarter earnings, above shelve 34 (not floor ACT; band unchanged). W40 restated 34.38x on the same rule. W42 not priced (market-price hold). Fwd weekly watch/cross-check only."
+        "notes": "Latent CLEAR 2026-10-01. W45 trail 42.95x (week ending 2026-11-08) on Q3 2026 four-quarter earnings, above shelve 34 (not floor ACT; band unchanged). W40 34.38x and W41 36.07x on the same rule. W42–W44 are Tylor catch-up marks (37.29x, 39.10x, 40.13x). Fwd weekly watch/cross-check only; latest official 2026-W44 is 47.99x / 37.35x."
       }
     },
     {

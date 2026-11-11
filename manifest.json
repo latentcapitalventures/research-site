@@ -394,31 +394,19 @@
       "related": [
         {
           "label": "SPOT key metrics",
-          "path": "SPOT-zbar-2026-10-03/",
+          "path": "SPOT-zbar-2026-11-11/",
           "kind": "key-metrics"
         }
       ],
       "pdf": true
     },
     {
-      "ticker": "SPOT-zbar-2026-10-03",
-      "name": "Spotify key metrics — income, cash, users, and the trailing multiple",
-      "path": "SPOT-zbar-2026-10-03/",
+      "ticker": "SPOT-zbar-2026-11-11",
+      "name": "Spotify — key metrics",
+      "path": "SPOT-zbar-2026-11-11/",
       "kind": "key-metrics",
-      "summary": "Spotify key metrics through Q3 2026 (printed 2026-10-22) — annual and quarterly income from FY2018, Premium and advertising, users, free cash flow, capital expenditure, and every weekly trailing PE week from 2022-W13 through 2026-W41; 2026-W42 sits on the axis as a blank (no price on file). Forward FY1 and FY2 sit on that chart. The blended forward year stays blank. Buy box band unchanged: trailing PE, add below 30, shelved above 34; week 2026-W41 at 36.07x, above the shelve line.",
-      "updated": "2026-10-22",
-      "lineage": "spot-key-metrics",
-      "supersedes": [
-        "SPOT",
-        "SPOT-zbar-2026-09-21"
-      ],
-      "related": [
-        {
-          "label": "Premium conversion dig",
-          "path": "SPOT-conversion/",
-          "kind": "dig"
-        }
-      ],
+      "summary": "Q3 2026: revenue €4,969M, 788 million monthly users and 306 million subscribers; operating margin slipped a second quarter to 13.5%; trailing PE 43× at last week's price, above the 34 shelve line.",
+      "updated": "2026-11-11",
       "pdf": false,
       "buy_box": {
         "shelf_rank": "interested",
@@ -428,13 +416,13 @@
         "series_field": "pe",
         "add_below": 30,
         "shelved_above": 34,
-        "asof_week": "2026-W41",
+        "asof_week": "2026-W45",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent CLEAR 2026-10-01. W41 trail 36.07x (week ending 2026-10-11) on Q3 2026 four-quarter earnings, above shelve 34 (not floor ACT; band unchanged). W40 restated 34.38x on the same rule. W42 not priced (market-price hold). Fwd weekly watch/cross-check only."
+        "notes": "Latent CLEAR 2026-10-01. W45 trail 42.95x (week ending 2026-11-08) on Q3 2026 four-quarter earnings, above shelve 34 (not floor ACT; band unchanged). W40 34.38x and W41 36.07x on the same rule. W42–W44 are Tylor catch-up marks (37.29x, 39.10x, 40.13x). Fwd weekly watch/cross-check only; latest official 2026-W44 is 47.99x / 37.35x."
       }
     },
     {
@@ -1400,7 +1388,7 @@
       "title": "Spotify key metrics — income, cash, users, and the trailing multiple",
       "summary": "Spotify key metrics through Q3 2026 (printed 2026-10-22) — annual and quarterly income from FY2018, Premium and advertising, users, free cash flow, capital expenditure, and every weekly trailing PE week from 2022-W13 through 2026-W41; 2026-W42 sits on the axis as a blank (no price on file). Forward FY1 and FY2 sit on that chart. The blended forward year stays blank. Buy box band unchanged: trailing PE, add below 30, shelved above 34; week 2026-W41 at 36.07x, above the shelve line.",
       "as_of": "2026-10-22",
-      "status": "live",
+      "status": "superseded",
       "pdf": false,
       "ticker": "SPOT",
       "related": [
@@ -1426,7 +1414,39 @@
         ],
         "notes": "Latent CLEAR 2026-10-01. W41 trail 36.07x (week ending 2026-10-11) on Q3 2026 four-quarter earnings, above shelve 34 (not floor ACT; band unchanged). W40 restated 34.38x on the same rule. W42 not priced (market-price hold). Fwd weekly watch/cross-check only."
       },
-      "url": "/t/SPOT/key-metrics/"
+      "url": "/t/SPOT/key-metrics/",
+      "status_reason": "superseded by SPOT-zbar-2026-11-11"
+    },
+    {
+      "id": "SPOT-zbar-2026-11-11",
+      "type": "key-metrics",
+      "scope": "ticker",
+      "title": "Spotify — key metrics",
+      "summary": "Q3 2026: revenue €4,969M, 788 million monthly users and 306 million subscribers; operating margin slipped a second quarter to 13.5%; trailing PE 43× at last week's price, above the 34 shelve line.",
+      "as_of": "2026-11-11",
+      "status": "live",
+      "pdf": false,
+      "ticker": "SPOT",
+      "buy_box": {
+        "shelf_rank": "interested",
+        "series": "trailing_pe_ttm",
+        "units": "x",
+        "status": "active",
+        "series_field": "pe",
+        "add_below": 30,
+        "shelved_above": 34,
+        "asof_week": "2026-W45",
+        "large_position_gate": true,
+        "hold_reason": null,
+        "companion_series": [
+          "forward_pe_fy1"
+        ],
+        "notes": "Latent CLEAR 2026-10-01. W45 trail 42.95x (week ending 2026-11-08) on Q3 2026 four-quarter earnings, above shelve 34 (not floor ACT; band unchanged). W40 34.38x and W41 36.07x on the same rule. W42–W44 are Tylor catch-up marks (37.29x, 39.10x, 40.13x). Fwd weekly watch/cross-check only; latest official 2026-W44 is 47.99x / 37.35x."
+      },
+      "url": "/t/SPOT/key-metrics/",
+      "supersedes": [
+        "SPOT-zbar-2026-10-03"
+      ]
     },
     {
       "id": "UBER-ev-oi-2026-09-27",
