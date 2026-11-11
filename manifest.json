@@ -226,7 +226,7 @@
       "related": [
         {
           "label": "IBKR key metrics",
-          "path": "IBKR-zbar-2026-10-15/",
+          "path": "IBKR-zbar-2026-11-11/",
           "kind": "key-metrics"
         },
         {
@@ -251,7 +251,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "IBKR-zbar-2026-10-15/",
+          "path": "IBKR-zbar-2026-11-11/",
           "kind": "key-metrics"
         },
         {
@@ -273,7 +273,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "IBKR-zbar-2026-10-15/",
+          "path": "IBKR-zbar-2026-11-11/",
           "kind": "key-metrics"
         },
         {
@@ -300,7 +300,7 @@
       "related": [
         {
           "label": "Key metrics",
-          "path": "IBKR-zbar-2026-10-15/",
+          "path": "IBKR-zbar-2026-11-11/",
           "kind": "key-metrics"
         },
         {
@@ -312,20 +312,22 @@
       "pdf": false
     },
     {
-      "ticker": "IBKR-zbar-2026-10-15",
+      "ticker": "IBKR-zbar-2026-11-11",
       "name": "Interactive Brokers key metrics — income, franchise, geography, trailing PE",
-      "path": "IBKR-zbar-2026-10-15/",
+      "path": "IBKR-zbar-2026-11-11/",
       "kind": "key-metrics",
-      "summary": "Interactive Brokers key metrics through Q3 2026. Annual income from FY2008, pretax as the profit line, diluted weighted-average shares, trailing diluted EPS, dividends per share on the post-split basis (raised to $0.15), dividend yield, and weekly trailing PE. Buy box unchanged: trailing PE add below 30, shelved above 34.",
-      "updated": "2026-10-28",
+      "summary": "Interactive Brokers key metrics through Q3 2026 from the 10-Q: income, fee mix, geography, accounts, the total economic share count, trailing diluted EPS 2.60, dividends per share, dividend yield, and weekly trailing PE through 2026-W45 (29.09×, below the add line of 30). Buy box unchanged: add below 30, shelved above 34.",
+      "updated": "2026-11-11",
+      "lineage": "ibkr-zbar-2026-10-15",
       "supersedes": [
-        "IBKR",
-        "IBKR-zbar-2026-09-21",
-        "IBKR-zbar-2026-10-03",
-        "IBKR-zbar-2026-10-04",
-        "IBKR-zbar-2026-10-05",
+        "IBKR-zbar-2026-10-15",
+        "IBKR-zbar-2026-10-07",
         "IBKR-zbar-2026-10-06",
-        "IBKR-zbar-2026-10-07"
+        "IBKR-zbar-2026-10-05",
+        "IBKR-zbar-2026-10-04",
+        "IBKR-zbar-2026-10-03",
+        "IBKR-zbar-2026-09-21",
+        "IBKR"
       ],
       "related": [
         {
@@ -348,13 +350,13 @@
         "series_field": "pe",
         "add_below": 30,
         "shelved_above": 34,
-        "asof_week": "2026-W43",
+        "asof_week": "2026-W45",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent LOCK. Decision series trailing_pe_ttm. Gates unchanged: add at 30, shelve at 34. As-of 2026-W43. Cabinet weekly_trailing_pe.csv pe_weekly 32.8784× (prints 32.88×) on June TTM EPS 2.50. Q3 10-Q pending. W41 on that basis is 35.29×, above the shelve line. Forward FY1 is the companion, not blended. Gates were not reset."
+        "notes": "Latent LOCK. Decision series trailing_pe_ttm. Gates unchanged: add at 30, shelve at 34. As-of 2026-W45. W45 29.09x DERIVED = VWAP 75.6390 / Q3 TTM EPS 2.60 (10-Q 0001381197-26-000163), below the add line. Cabinet stored June-TTM basis prints 30.26x. Forward FY1 is the companion, not blended. Gates were not reset."
       }
     },
     {
@@ -1232,7 +1234,7 @@
       "title": "Interactive Brokers key metrics — income, franchise, geography, trailing PE",
       "summary": "Interactive Brokers key metrics through Q3 2026. Annual income from FY2008, pretax as the profit line, diluted weighted-average shares, trailing diluted EPS, dividends per share on the post-split basis (raised to $0.15), dividend yield, and weekly trailing PE. Buy box unchanged: trailing PE add below 30, shelved above 34.",
       "as_of": "2026-10-28",
-      "status": "live",
+      "status": "superseded",
       "pdf": false,
       "ticker": "IBKR",
       "related": [
@@ -1263,6 +1265,49 @@
           "forward_pe_fy1"
         ],
         "notes": "Latent LOCK. Decision series trailing_pe_ttm. Gates unchanged: add at 30, shelve at 34. As-of 2026-W43. Cabinet weekly_trailing_pe.csv pe_weekly 32.8784× (prints 32.88×) on June TTM EPS 2.50. Q3 10-Q pending. W41 on that basis is 35.29×, above the shelve line. Forward FY1 is the companion, not blended. Gates were not reset."
+      },
+      "url": "/t/IBKR/key-metrics/",
+      "status_reason": "superseded by IBKR-zbar-2026-11-11"
+    },
+    {
+      "id": "IBKR-zbar-2026-11-11",
+      "type": "key-metrics",
+      "scope": "ticker",
+      "title": "Interactive Brokers key metrics — income, franchise, geography, trailing PE",
+      "summary": "Interactive Brokers key metrics through Q3 2026 from the 10-Q: income, fee mix, geography, accounts, the total economic share count, trailing diluted EPS 2.60, dividends per share, dividend yield, and weekly trailing PE through 2026-W45 (29.09×, below the add line of 30). Buy box unchanged: add below 30, shelved above 34.",
+      "as_of": "2026-11-11",
+      "status": "live",
+      "pdf": false,
+      "ticker": "IBKR",
+      "related": [
+        "IBKR-quarterly-metrics-2026-09-27",
+        "IBKR-peer-benchmark-2026-10-05"
+      ],
+      "supersedes": [
+        "IBKR-zbar-2026-10-15",
+        "IBKR-zbar-2026-10-07",
+        "IBKR-zbar-2026-10-06",
+        "IBKR-zbar-2026-10-05",
+        "IBKR-zbar-2026-10-04",
+        "IBKR-zbar-2026-10-03",
+        "IBKR-zbar-2026-09-21",
+        "IBKR"
+      ],
+      "buy_box": {
+        "shelf_rank": "very_interested",
+        "series": "trailing_pe_ttm",
+        "units": "x",
+        "status": "active",
+        "series_field": "pe",
+        "add_below": 30,
+        "shelved_above": 34,
+        "asof_week": "2026-W45",
+        "large_position_gate": true,
+        "hold_reason": null,
+        "companion_series": [
+          "forward_pe_fy1"
+        ],
+        "notes": "Latent LOCK. Decision series trailing_pe_ttm. Gates unchanged: add at 30, shelve at 34. As-of 2026-W45. W45 29.09x DERIVED = VWAP 75.6390 / Q3 TTM EPS 2.60 (10-Q 0001381197-26-000163), below the add line. Cabinet stored June-TTM basis prints 30.26x. Forward FY1 is the companion, not blended. Gates were not reset."
       },
       "url": "/t/IBKR/key-metrics/"
     },

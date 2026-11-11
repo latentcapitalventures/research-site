@@ -20,8 +20,8 @@
       }
     },
     {
-      "ticker": "IBKR-zbar-2026-10-15",
-      "path": "IBKR-zbar-2026-10-15/",
+      "ticker": "IBKR-zbar-2026-11-11",
+      "path": "IBKR-zbar-2026-11-11/",
       "buy_box": {
         "shelf_rank": "very_interested",
         "series": "trailing_pe_ttm",
@@ -30,13 +30,13 @@
         "series_field": "pe",
         "add_below": 30,
         "shelved_above": 34,
-        "asof_week": "2026-W43",
+        "asof_week": "2026-W45",
         "large_position_gate": true,
         "hold_reason": null,
         "companion_series": [
           "forward_pe_fy1"
         ],
-        "notes": "Latent LOCK. Decision series trailing_pe_ttm. Gates unchanged: add at 30, shelve at 34. As-of 2026-W43. Cabinet weekly_trailing_pe.csv pe_weekly 32.8784× (prints 32.88×) on June TTM EPS 2.50. Q3 10-Q pending. W41 on that basis is 35.29×, above the shelve line. Forward FY1 is the companion, not blended. Gates were not reset."
+        "notes": "Latent LOCK. Decision series trailing_pe_ttm. Gates unchanged: add at 30, shelve at 34. As-of 2026-W45. W45 29.09x DERIVED = VWAP 75.6390 / Q3 TTM EPS 2.60 (10-Q 0001381197-26-000163), below the add line. Cabinet stored June-TTM basis prints 30.26x. Forward FY1 is the companion, not blended. Gates were not reset."
       }
     },
     {
