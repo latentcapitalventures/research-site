@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "title": "Latent Capital · Research",
-  "updated": "2026-11-09",
+  "updated": "2026-11-11",
   "packs": [
     {
       "ticker": "AMZN-zbar-2026-11-09",
@@ -376,13 +376,12 @@
       "pdf": false
     },
     {
-      "ticker": "SEDG-zbar-2026-10-14",
+      "ticker": "SEDG-zbar-2026-11-11",
       "name": "SolarEdge — key metrics",
-      "path": "SEDG-zbar-2026-10-14/",
+      "path": "SEDG-zbar-2026-11-11/",
       "kind": "key-metrics",
-      "summary": "SolarEdge key metrics — revenue, operating income, net income, diluted shares, trailing EPS, free cash flow, and weekly P/FCF (22.66×) through the week ending October 11, 2026. Still loss-making through June 2026, so trailing PE stays blank.",
-      "updated": "2026-10-14",
-      "lineage": "sedg-key-metrics",
+      "summary": "Q3 2026: revenue $326M (−4%), batteries now the largest line (+57%); fifth straight positive free-cash-flow quarter, $75M trailing (24× price); still loss-making, so trailing PE stays blank.",
+      "updated": "2026-11-11",
       "pdf": false
     },
     {
@@ -1318,11 +1317,27 @@
       "title": "SolarEdge — key metrics",
       "summary": "SolarEdge key metrics — revenue, operating income, net income, diluted shares, trailing EPS, free cash flow, and weekly P/FCF (22.66×) through the week ending October 11, 2026. Still loss-making through June 2026, so trailing PE stays blank.",
       "as_of": "2026-10-14",
-      "status": "live",
+      "status": "superseded",
       "pdf": false,
       "ticker": "SEDG",
       "related": [],
-      "url": "/t/SEDG/key-metrics/"
+      "url": "/t/SEDG/key-metrics/",
+      "status_reason": "superseded by SEDG-zbar-2026-11-11"
+    },
+    {
+      "id": "SEDG-zbar-2026-11-11",
+      "type": "key-metrics",
+      "scope": "ticker",
+      "title": "SolarEdge — key metrics",
+      "summary": "Q3 2026: revenue $326M (−4%), batteries now the largest line (+57%); fifth straight positive free-cash-flow quarter, $75M trailing (24× price); still loss-making, so trailing PE stays blank.",
+      "as_of": "2026-11-11",
+      "status": "live",
+      "pdf": false,
+      "ticker": "SEDG",
+      "url": "/t/SEDG/key-metrics/",
+      "supersedes": [
+        "SEDG-zbar-2026-10-14"
+      ]
     },
     {
       "id": "SPOT",
