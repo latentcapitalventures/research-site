@@ -667,6 +667,11 @@
     if (chart && mountedCharts.indexOf(chart) < 0) mountedCharts.push(chart);
   }
 
+  function unregisterChart(chart) {
+    var i = mountedCharts.indexOf(chart);
+    if (i >= 0) mountedCharts.splice(i, 1);
+  }
+
   function setDerivedChrome(on, persist) {
     document.documentElement.classList.toggle("derived-chrome-off", !on);
     document.documentElement.setAttribute("data-derived-chrome", on ? "on" : "off");
@@ -737,6 +742,7 @@
         hasDerived: true,
         composition: false,
         trendline: false,
+        packSeriesMode: "yoy",
       });
       delete view.yDisplayScale;
       delete view.yDisplayUnit;
@@ -748,22 +754,42 @@
     return payload;
   }
 
-  function restyleChart(chart) {
+  function restyleChart(chart, opts) {
     if (!chart || !chart._packPayload) return;
-    var zoom = snapshotZoom(chart);
     var seriesMode = seriesModeOf(chart);
     var view = payloadView(chart._packPayload, seriesMode);
     var mode = chart._packMode || "grouped";
+    var zoom = opts && opts.resetZoom ? null : snapshotZoom(chart);
+    chart.data.labels = (view.labels || []).slice();
     chart.data.datasets = asChartDatasets(view, mode);
     chart.options.scales = scalesFor(view, mode);
     if (chart.options.plugins) {
       chart.options.plugins.tooltip = buildTooltip(view);
       chart.options.plugins.legend = houseLegend(view);
     }
-    restoreZoom(chart, zoom);
-    chart._packYFull = null;
+    if (opts && opts.resetZoom) {
+      var scales = chart.options.scales || {};
+      if (scales.x) {
+        delete scales.x.min;
+        delete scales.x.max;
+      }
+      chart._packXFull = null;
+      chart._packYFull = null;
+    } else {
+      restoreZoom(chart, zoom);
+      chart._packYFull = null;
+    }
     resetTickBudget(chart);
     chart.update();
+    log(
+      "restyle",
+      view.id,
+      "series=",
+      seriesMode,
+      "labels=",
+      (view.labels || []).length,
+      opts && opts.resetZoom ? "resetZoom" : "keepZoom"
+    );
   }
 
   function snapshotZoom(chart) {
@@ -1032,6 +1058,15 @@
     });
   }
 
+  function explicitPointStyle(ds) {
+    // Engine defaults already set pointRadius (0 or 2) and hollow on some
+    // forward lines. Those keep the line-craft path. A desk style is present
+    // only when pointStyle or pointBorderWidth is set on the dataset.
+    if (!ds) return false;
+    if (ds.pointStyle) return true;
+    return ds.pointBorderWidth !== undefined && ds.pointBorderWidth !== null;
+  }
+
   function isPrimaryLine(payload, ds) {
     if (ds.dashed || ds.overlay === "forward") return false;
     var list = payload.datasets || [];
@@ -1109,6 +1144,7 @@
       var spec = {
         type: isLine ? "line" : "bar",
         label: ds.label,
+        reasons: (ds.reasons || []).slice(),
         backgroundColor: isLine ? stroke : barFill(houseDs, payload),
         borderColor: isLine ? stroke : color,
         borderWidth: isLine ? 2 : 0,
@@ -1174,7 +1210,55 @@
       if (!isLine) {
         spec.backgroundColor = muteCopperFill(spec.backgroundColor, values, color);
       }
-      if (isLine) {
+      if (isLine && explicitPointStyle(ds)) {
+        // Desk pointRadius / hollow / pointBorderWidth stay as declared.
+        // Null weeks get radius 0 so a blank slot is not a ring.
+        var radiusSrc = ds.pointRadius;
+        spec.pointRadius = values.map(function (v, i) {
+          if (v === null || v === undefined || Number.isNaN(Number(v))) return 0;
+          if (Array.isArray(radiusSrc)) return radiusSrc[i] == null ? 0 : radiusSrc[i];
+          if (radiusSrc !== undefined && radiusSrc !== null) return radiusSrc;
+          return 4;
+        });
+        var hollowMark = !!(ds.hollow || ds.pointStyle === "hollow");
+        if (hollowMark) {
+          spec.pointBackgroundColor = "transparent";
+          spec.pointBorderColor = stroke;
+          spec.backgroundColor = "transparent";
+          spec.pointBorderWidth =
+            ds.pointBorderWidth !== undefined && ds.pointBorderWidth !== null
+              ? ds.pointBorderWidth
+              : 1.6;
+          log(
+            "hollow marker honoured",
+            payload.id,
+            ds.key || ds.label,
+            stroke,
+            "border",
+            spec.pointBorderWidth,
+            "radius",
+            ds.pointRadius
+          );
+        } else if (ds.pointBorderWidth !== undefined && ds.pointBorderWidth !== null) {
+          spec.pointBorderColor = stroke;
+          spec.pointBorderWidth = ds.pointBorderWidth;
+          log("point border honoured", payload.id, ds.key || ds.label, ds.pointBorderWidth);
+        }
+        spec.pointHoverRadius = spec.pointRadius.map(function (r) {
+          return r ? Number(r) + 1 : 0;
+        });
+        log(
+          "explicit point style",
+          payload.id,
+          ds.key || ds.label,
+          "showLine=",
+          spec.showLine,
+          "spanGaps=",
+          spec.spanGaps,
+          "hollow=",
+          hollowMark
+        );
+      } else if (isLine) {
         spec.pointRadius = values.map(function (_v, i) {
           if (Array.isArray(radius)) return radius[i] || 0;
           if (i === last) return primary ? 5 : radius || 3;
@@ -1206,6 +1290,10 @@
           "last=",
           last
         );
+      }
+      if (ds.order !== undefined && ds.order !== null) {
+        spec.order = ds.order;
+        log("dataset draw order", payload.id, ds.key || ds.label, ds.order);
       }
       if (!isLine && payload.composition && mode !== "grouped") {
         spec.stack = "pack";
@@ -1415,6 +1503,51 @@
     ctx.restore();
   }
 
+  var YOY_REASON_TEXT = {
+    prior_zero: "Growth not shown: prior was zero",
+    prior_missing: "Growth not shown: prior period is missing",
+    prior_negative: "Growth not shown: prior period was negative",
+    sign_flip: "Growth not shown: sign changed",
+    desk_blanked: "Growth not shown: left blank by the desk",
+  };
+
+  function yoyReasonText(code) {
+    if (!code) return "";
+    return YOY_REASON_TEXT[code] || "Growth not shown";
+  }
+
+  function growthReadoutOn(payload) {
+    // A levels/YoY chart only explains a blank while the YoY view is showing.
+    // The level view must not borrow a growth reason for a printed level.
+    if (payload && payload.yoyDatasets && payload.yoyDatasets.length) {
+      return payload.packSeriesMode === "yoy";
+    }
+    return true;
+  }
+
+  function yoyReasonCode(payload, dataset, idx) {
+    if (!growthReadoutOn(payload)) return null;
+    if (!dataset || !dataset.reasons) return null;
+    return dataset.reasons[idx] || null;
+  }
+
+  function yoyReasonNotes(payload) {
+    var seen = {};
+    var notes = [];
+    ((payload && payload.datasets) || []).forEach(function (ds) {
+      (ds.reasons || []).forEach(function (code) {
+        if (!code || seen[code]) return;
+        seen[code] = true;
+        var line = yoyReasonText(code);
+        if (line) notes.push(line);
+      });
+    });
+    if (notes.length) {
+      log("yoy null legend", payload && payload.id, notes.join(" | "));
+    }
+    return notes;
+  }
+
   function buildTooltip(payload) {
     var composition = !!payload.composition;
     return {
@@ -1510,6 +1643,11 @@
         footer: function (items) {
           if (!items.length) return "";
           var label = items[0].label || "";
+          var yoyCode = yoyReasonCode(payload, items[0].dataset, items[0].dataIndex);
+          if (yoyCode) {
+            log("yoy null gap line", payload.id, label, yoyCode, yoyReasonText(yoyCode));
+            return yoyReasonText(yoyCode);
+          }
           var gaps = payload.gapLabels || [];
           if (gaps.indexOf(label) >= 0) {
             var gapIdx = items[0].dataIndex;
@@ -2631,9 +2769,15 @@
     var hasHollow = ((payload && payload.datasets) || []).some(function (ds) {
       return ds && ds.hollow;
     });
+    var yoyNotes = yoyReasonNotes(payload);
     return {
       position: "bottom",
       align: "start",
+      onClick: function (event, legendItem, legend) {
+        if (legendItem && legendItem._yoyNote) return;
+        var def = Chart.defaults.plugins.legend.onClick;
+        if (def) def.call(this, event, legendItem, legend);
+      },
       labels: {
         boxWidth: 10,
         boxHeight: 10,
@@ -2646,7 +2790,10 @@
           var items = gen ? gen(chart) : [];
           var sets = (payload && payload.datasets) || [];
           items.forEach(function (item, i) {
-            var ds = sets[i] || {};
+            var ds =
+              (item && typeof item.datasetIndex === "number" && sets[item.datasetIndex]) ||
+              sets[i] ||
+              {};
             if (ds.hero && String(item.text).indexOf("(hero)") < 0) {
               item.text = item.text + " (hero)";
             }
@@ -2659,10 +2806,24 @@
               item.fillStyle = ds.hollow ? "transparent" : ds.color;
               if (ds.hollow) {
                 item.pointStyle = "circle";
-                item.lineWidth = 1.6;
-                log("hollow legend swatch", payload.id, ds.key || ds.label);
+                item.lineWidth =
+                  ds.pointBorderWidth !== undefined && ds.pointBorderWidth !== null
+                    ? ds.pointBorderWidth
+                    : 1.6;
+                log("hollow legend swatch", payload.id, ds.key || ds.label, "lineWidth", item.lineWidth);
               }
             }
+          });
+          yoyNotes.forEach(function (note) {
+            items.push({
+              text: note,
+              fillStyle: "transparent",
+              strokeStyle: "transparent",
+              lineWidth: 0,
+              hidden: false,
+              datasetIndex: -1,
+              _yoyNote: true,
+            });
           });
           return items;
         },
@@ -2842,16 +3003,50 @@
     return chart;
   }
 
+  function seriesModeButtons(toolbar) {
+    var group = toolbar.querySelector("[data-series-group]");
+    if (group) return group.querySelectorAll("button[data-series-mode]");
+    if (toolbar.querySelector("[data-period-group]")) return [];
+    return toolbar.querySelectorAll("button[data-series-mode]");
+  }
+
+  function periodModeButtons(toolbar) {
+    var group = toolbar.querySelector("[data-period-group]");
+    return group ? group.querySelectorAll("button[data-series-mode]") : [];
+  }
+
+  function activePeriodSlice(root) {
+    if (!root || !root.periodPayloads) return root;
+    var period = root.defaultPeriod;
+    if (!period || !root.periodPayloads[period]) {
+      period = Object.keys(root.periodPayloads)[0];
+    }
+    return root.periodPayloads[period] || root;
+  }
+
+  function chartShell(figure) {
+    if (figure && figure.closest) {
+      var shell = figure.closest(".chart-card-shell");
+      if (shell) return shell;
+    }
+    return figure;
+  }
+
   function wireToolbar(figure, charts) {
     if (!charts || !charts.length) return;
-    var chart = charts[0];
-    var payload = chart._packPayload;
-    var toolbar = figure.querySelector(".chart-toolbar");
+    var state = {
+      charts: charts,
+      payload: charts[0]._packPayload,
+      root: charts[0]._packRootPayload || charts[0]._packPayload,
+    };
+    var shell = chartShell(figure);
+    var toolbar = shell.querySelector(".chart-toolbar");
     if (!toolbar) return;
+    log("toolbar wired from", shell === figure ? "figure" : "chart-card-shell", figure.getAttribute("data-chart-id"));
     toolbar.querySelectorAll("[data-zoom-reset]").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        charts.forEach(resetZoom);
-        log("zoom reset click", payload && payload.id);
+        state.charts.forEach(resetZoom);
+        log("zoom reset click", state.payload && state.payload.id);
       });
     });
     toolbar.querySelectorAll("button[data-data-labels]").forEach(function (btn) {
@@ -2860,8 +3055,8 @@
         setDataLabels(!dataLabelsOn(), true);
       });
     });
-    toolbar.querySelectorAll("button[data-series-mode]").forEach(function (btn) {
-      var current = seriesModeOf(chart);
+    seriesModeButtons(toolbar).forEach(function (btn) {
+      var current = seriesModeOf(state.charts[0]);
       btn.setAttribute(
         "aria-pressed",
         btn.getAttribute("data-series-mode") === current ? "true" : "false"
@@ -2871,18 +3066,30 @@
         setSeriesMode(next);
       });
     });
+    periodModeButtons(toolbar).forEach(function (btn) {
+      var current = state.charts[0]._packPeriod || (state.root && state.root.defaultPeriod);
+      btn.setAttribute(
+        "aria-pressed",
+        btn.getAttribute("data-series-mode") === current ? "true" : "false"
+      );
+      btn.addEventListener("click", function () {
+        var next = btn.getAttribute("data-series-mode");
+        setPeriodMode(next);
+      });
+    });
     function setSeriesMode(next) {
+      var payload = state.payload;
       if (!payload) return;
       if (next === "yoy" && !(payload.yoyDatasets && payload.yoyDatasets.length)) {
         log("refusing YoY mode — no house sidecar", payload.id);
         return;
       }
-      charts.forEach(function (c) {
+      state.charts.forEach(function (c) {
         if (c._packSeriesMode === next) return;
         c._packSeriesMode = next;
         restyleChart(c);
       });
-      toolbar.querySelectorAll("button[data-series-mode]").forEach(function (peer) {
+      seriesModeButtons(toolbar).forEach(function (peer) {
         peer.setAttribute(
           "aria-pressed",
           peer.getAttribute("data-series-mode") === next ? "true" : "false"
@@ -2890,28 +3097,172 @@
       });
       log("series mode", payload.id, next);
     }
-    if (!payload || !payload.composition) return;
-    var mode = chart._packMode;
-    toolbar.querySelectorAll("button[data-mode]").forEach(function (btn) {
-      var m = btn.getAttribute("data-mode");
-      if (isPercentShare(payload) && m === "stacked") {
-        btn.hidden = true;
-        btn.setAttribute("aria-hidden", "true");
-        log("hiding Stacked button on percent_share", payload.id);
+    function syncPeriodChrome(slice, period, seriesMode) {
+      figure.setAttribute("data-chart-id", slice.id || figure.getAttribute("data-chart-id"));
+      if (slice.hasDerived || (seriesMode === "yoy" && slice.yoyDatasets && slice.yoyDatasets.length)) {
+        figure.setAttribute("data-has-derived", "true");
+      } else {
+        figure.removeAttribute("data-has-derived");
       }
-      btn.setAttribute("aria-pressed", m === mode ? "true" : "false");
+      var takeaway = figure.querySelector(".chart-takeaway");
+      if (takeaway && slice.takeaway) takeaway.textContent = slice.takeaway;
+      var subtitle = figure.querySelector(".chart-subtitle");
+      if (subtitle) subtitle.textContent = slice.subtitle || "";
+      var note = shell.querySelector(".chart-note");
+      var cap = note || figure.querySelector("figcaption");
+      if (note) {
+        log(
+          "period caption left outside card",
+          slice.id,
+          (slice.caption || "").slice(0, 80)
+        );
+      } else if (cap && slice.caption) {
+        var method = cap.querySelector(".method");
+        var methodHtml = method ? method.outerHTML : "";
+        cap.innerHTML =
+          slice.caption +
+          (methodHtml ||
+            (slice.annotation ? '<span class="method">' + slice.annotation + "</span>" : ""));
+        log("period figcaption", slice.id, (slice.caption || "").slice(0, 80));
+      } else {
+        log("period caption skipped — no .chart-note or figcaption", slice.id);
+      }
+      var canvas = figure.querySelector("canvas");
+      if (canvas) canvas.setAttribute("aria-label", slice.caption || slice.title || slice.id);
+      var seriesGroup = toolbar.querySelector("[data-series-group]");
+      if (seriesGroup) {
+        var hasYoy = !!(slice.yoyDatasets && slice.yoyDatasets.length);
+        seriesGroup.hidden = !hasYoy;
+        log("series group", slice.id, hasYoy ? "shown" : "hidden");
+      }
+      var cagr = toolbar.querySelector(".chart-cagr-readout");
+      if (cagr) {
+        var rows = slice.cagr || [];
+        if (!rows.length) {
+          cagr.hidden = true;
+          cagr.textContent = "";
+        } else {
+          cagr.hidden = false;
+          cagr.innerHTML =
+            rows
+              .map(function (row) {
+                return row.text;
+              })
+              .join(" · ") + '<span class="derived-badge"> · DERIVED</span>';
+        }
+      }
+      var viewGroup = toolbar.querySelector("[data-view-group]");
+      if (viewGroup) viewGroup.hidden = !slice.composition;
+      periodModeButtons(toolbar).forEach(function (peer) {
+        peer.setAttribute(
+          "aria-pressed",
+          peer.getAttribute("data-series-mode") === period ? "true" : "false"
+        );
+      });
+      seriesModeButtons(toolbar).forEach(function (peer) {
+        peer.setAttribute(
+          "aria-pressed",
+          peer.getAttribute("data-series-mode") === seriesMode ? "true" : "false"
+        );
+      });
+      syncViewButtons();
+    }
+    function setPeriodMode(next) {
+      var root = state.root;
+      if (!root || !root.periodPayloads || !root.periodPayloads[next]) {
+        log("refusing period mode", next, root && root.id);
+        return;
+      }
+      if (state.charts[0] && state.charts[0]._packPeriod === next) {
+        log("period mode unchanged", next);
+        return;
+      }
+      var slice = root.periodPayloads[next];
+      var prevSeries = seriesModeOf(state.charts[0]);
+      var nextSeries =
+        prevSeries === "yoy" && slice.yoyDatasets && slice.yoyDatasets.length ? "yoy" : "levels";
+      var prevMode = state.charts[0] && state.charts[0]._packMode;
+      state.charts.forEach(function (c) {
+        unregisterChart(c);
+        try {
+          c.destroy();
+        } catch (err) {
+          log("chart destroy failed", err);
+        }
+      });
+      var canvas = figure.querySelector("canvas");
+      if (!canvas) return;
+      var mounted = mountChart(canvas, slice);
+      if (!mounted) {
+        log("period remount failed", slice.id, next);
+        return;
+      }
+      mounted._packRootPayload = root;
+      mounted._packPeriod = next;
+      if (nextSeries !== seriesModeOf(mounted)) {
+        mounted._packSeriesMode = nextSeries;
+        restyleChart(mounted, { resetZoom: true });
+      }
+      if (
+        prevMode &&
+        mounted._packModes &&
+        mounted._packModes.indexOf(prevMode) >= 0 &&
+        prevMode !== mounted._packMode
+      ) {
+        mounted._packMode = prevMode;
+        restyleChart(mounted, { resetZoom: true });
+        log("kept composition mode across period", prevMode);
+      }
+      state.charts = [mounted];
+      state.payload = slice;
+      syncPeriodChrome(slice, next, nextSeries);
+      log(
+        "period mode",
+        slice.id,
+        next,
+        "series=",
+        nextSeries,
+        "labels=",
+        (slice.labels || []).length
+      );
+    }
+    toolbar.querySelectorAll("button[data-mode]").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        setMode(m);
+        setMode(btn.getAttribute("data-mode"));
       });
       btn.addEventListener("keydown", function (ev) {
         if (ev.key === "Enter" || ev.key === " ") {
           ev.preventDefault();
-          setMode(m);
+          setMode(btn.getAttribute("data-mode"));
         }
       });
     });
-
+    function syncViewButtons() {
+      var payload = state.payload;
+      var chart = state.charts[0];
+      if (!payload || !chart) return;
+      var mode = chart._packMode;
+      toolbar.querySelectorAll("button[data-mode]").forEach(function (btn) {
+        var m = btn.getAttribute("data-mode");
+        if (!payload.composition) {
+          btn.hidden = true;
+          return;
+        }
+        var allowed = chart._packModes || payload.modes || [];
+        btn.hidden = allowed.indexOf(m) < 0;
+        if (isPercentShare(payload) && m === "stacked") {
+          btn.hidden = true;
+          btn.setAttribute("aria-hidden", "true");
+          log("hiding Stacked button on percent_share", payload.id);
+        }
+        btn.setAttribute("aria-pressed", m === mode ? "true" : "false");
+      });
+    }
+    syncViewButtons();
     function setMode(next) {
+      var chart = state.charts[0];
+      var payload = state.payload;
+      if (!chart || !payload) return;
       if (chart._packModes.indexOf(next) < 0 || next === chart._packMode) return;
       if (next === "stacked" && isPercentShare(payload)) {
         log("refusing redundant Stacked on percent_share", payload.id);
@@ -2957,7 +3308,9 @@
       return;
     }
     var canvases = figure.querySelectorAll("canvas");
-    if (payload.hasDerived) {
+    var root = payload;
+    var slice = activePeriodSlice(root);
+    if (slice.hasDerived) {
       figure.setAttribute("data-has-derived", "true");
     }
     if (payload.panels && payload.panels.length) {
@@ -2973,13 +3326,23 @@
       if (!mounted.length) return;
       wireToolbar(figure, mounted);
       figure.classList.add("js-ready");
+      var panelShell = chartShell(figure);
+      if (panelShell !== figure) panelShell.classList.add("js-ready");
       log("mounted panels", payload.id, "n=" + mounted.length);
       return;
     }
-    var chart = mountChart(canvases[0], payload);
+    var chart = mountChart(canvases[0], slice);
     if (!chart) return;
+    chart._packRootPayload = root;
+    if (root.periodPayloads) {
+      chart._packPeriod = root.defaultPeriod || Object.keys(root.periodPayloads)[0];
+      log("mounted period card", slice.id, "period=", chart._packPeriod, "peer=", Object.keys(root.periodPayloads));
+    }
     wireToolbar(figure, [chart]);
     figure.classList.add("js-ready");
+    var readyShell = chartShell(figure);
+    if (readyShell !== figure) readyShell.classList.add("js-ready");
+    log("mounted figure", slice.id, "shell=", readyShell !== figure);
   }
 
   function wireDerivedToggle() {

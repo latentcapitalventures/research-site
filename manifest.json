@@ -68,7 +68,7 @@
       "path": "BKNG-peer-benchmark-2026-10-06/",
       "kind": "peer-benchmark",
       "summary": "Booking Holdings against Expedia, Airbnb, and Trip.com — revenue, operating income, operating margin, and trailing weekly PE. Trip.com stays in CNY on its own panel; its weekly PE is blank. No buy box.",
-      "updated": "2026-10-07",
+      "updated": "2026-11-11",
       "lineage": "bkng-peer-benchmark",
       "related": [
         {
@@ -715,7 +715,7 @@
       "scope": "ticker",
       "title": "Booking Holdings — peer benchmark",
       "summary": "Booking Holdings against Expedia, Airbnb, and Trip.com — revenue, operating income, operating margin, and trailing weekly PE. Trip.com stays in CNY on its own panel; its weekly PE is blank. No buy box.",
-      "as_of": "2026-10-07",
+      "as_of": "2026-11-11",
       "status": "live",
       "pdf": false,
       "ticker": "BKNG",
