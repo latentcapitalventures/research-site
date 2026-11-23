@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "title": "Latent Capital · Research",
-  "updated": "2026-11-11",
+  "updated": "2026-11-23",
   "packs": [
     {
       "ticker": "AMZN-zbar-2026-11-09",
@@ -35,6 +35,38 @@
         {
           "label": "Unit economics",
           "path": "BKNG-unit-econ-2026-09-24/",
+          "kind": "dig"
+        }
+      ],
+      "pdf": false
+    },
+    {
+      "ticker": "BKNG-earnings-robustness-2026-11-23",
+      "name": "Booking Holdings — how robust are the earnings?",
+      "path": "BKNG-earnings-robustness-2026-11-23/",
+      "kind": "dig",
+      "summary": "Through Q3 2026: where profit growth comes from, how much of per-share growth is buybacks, whether free cash flow backs the profit, and whether marketing, IT and Vayo’s planned $100 million are large enough to matter. No buy box.",
+      "updated": "2026-11-23",
+      "lineage": "bkng-earnings-robustness",
+      "related": [
+        {
+          "label": "Key metrics",
+          "path": "BKNG-zbar-2026-10-06/",
+          "kind": "key-metrics"
+        },
+        {
+          "label": "Unit economics",
+          "path": "BKNG-unit-econ-2026-09-24/",
+          "kind": "dig"
+        },
+        {
+          "label": "AI disintermediation",
+          "path": "BKNG-ai-disintermediation-2026-09-26/",
+          "kind": "ai-disintermediation"
+        },
+        {
+          "label": "Tech cycles",
+          "path": "BKNG-tech-cycles-2026-10-14/",
           "kind": "dig"
         }
       ],
@@ -680,6 +712,26 @@
         "BKNG-unit-econ-2026-09-24"
       ],
       "url": "/t/BKNG/dig/ai-disintermediation/"
+    },
+    {
+      "id": "BKNG-earnings-robustness-2026-11-23",
+      "type": "dig",
+      "scope": "ticker",
+      "title": "Booking Holdings — how robust are the earnings?",
+      "summary": "Through Q3 2026: where profit growth comes from, how much of per-share growth is buybacks, whether free cash flow backs the profit, and whether marketing, IT and Vayo’s planned $100 million are large enough to matter. No buy box.",
+      "as_of": "2026-11-23",
+      "status": "live",
+      "pdf": false,
+      "ticker": "BKNG",
+      "dig_type": "topic",
+      "slug": "earnings-robustness",
+      "related": [
+        "BKNG-zbar-2026-10-06",
+        "BKNG-unit-econ-2026-09-24",
+        "BKNG-ai-disintermediation-2026-09-26",
+        "BKNG-tech-cycles-2026-10-14"
+      ],
+      "url": "/t/BKNG/dig/earnings-robustness/"
     },
     {
       "id": "BKNG-hotel-connectivity-2026-10-12",
